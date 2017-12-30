@@ -1,0 +1,61 @@
+from voice_module import VoiceModule
+from KNN import KNN
+import os
+import glob
+
+emotions = ["neutral", "anger", "boredom", "disgust", "fear", "happiness", "sadness"]
+
+
+def build_file_set(pattern):
+    train_set = []
+    for path_and_file in glob.iglob(pattern, recursive=True):
+        if path_and_file.endswith('.wav'):
+            path, filename = os.path.split(path_and_file)
+            emotion = os.path.basename(path)
+            train_set.append([path_and_file, emotion])
+    return train_set
+
+
+def print2DArray(array_2D):
+    for row in range(0, len(array_2D)):
+        print(array_2D[row][0] + " " + array_2D[row][1])
+
+
+def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█'):
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filled_length = int(length * iteration // total)
+    bar = fill * filled_length + '-' * (length - filled_length)
+    print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end='\r')
+    if iteration == total:
+        print()
+
+
+train_set = build_file_set('/home/ela/Documents/inz_SER/HMM_py/Berlin_EmoDatabase/wav/a*/*/*.wav')
+
+voice_m = VoiceModule(1024)
+knn_module = KNN(emotions, 7)
+
+for i in range(0, len(train_set)):
+    printProgressBar(i + 1, len(train_set), prefix='Progress:', suffix='Complete', length=50)
+    feature_vector = []
+    feature_vector.extend(voice_m.get_feature_vector(train_set[i][0]))
+    knn_module.train(feature_vector, train_set[i][1])
+
+
+input_set = build_file_set('/home/ela/Documents/inz_SER/HMM_py/Berlin_EmoDatabase/wav/b*/*/*.wav')
+summary_table = {}
+for i in range(0, len(emotions)):
+    summary_table[emotions[i]] = {"all": 0, "guessed": 0}
+
+for i in range(0, len(input_set)):
+    feature_vector = []
+    feature_vector.extend(voice_m.get_feature_vector(input_set[i][0]))
+    if len(feature_vector) > 0:
+        summary_table[input_set[i][1]]["all"] += 1
+        computed_emotion = knn_module.get_emotion(feature_vector)
+        if computed_emotion == input_set[i][1]:
+            summary_table[input_set[i][1]]["guessed"] += 1
+
+
+for i in range(0, len(emotions)):
+    print("emo: %s\t, all: %d \t guessed: %d\n" %(emotions[i], summary_table[emotions[i]]["all"], summary_table[emotions[i]]["guessed"]))
