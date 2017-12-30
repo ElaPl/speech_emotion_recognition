@@ -23,29 +23,39 @@ class VoiceModule:
             print("Can't open file " + filename)
             return []
 
+        sample_rate = wav_file.getframerate()
+        sample_in_sec_quarter = sample_rate / 4
+        frames_num = sample_in_sec_quarter/self.sample_length
+        if sample_in_sec_quarter % self.sample_length != 0:
+            frames_num += 1
+
+        features_vectors_container = []
+        frame_counter = 0
         wav_iter = WavIterator(wav_file, self.sample_length)
         fundamental_freq_array = []
         energy_deviation_array = []
         for time_domain_vector in wav_iter:
             if len(time_domain_vector) == self.sample_length:
                 signal = self.window.plot(time_domain_vector)
-            elif len(time_domain_vector) > 1:
+            else:
                 tmp_hanning_module = HanningWindow(len(time_domain_vector))
                 signal = tmp_hanning_module.plot(time_domain_vector)
-            else:
-                break
+
             frequency_domain_vector = np.fft.rfft(signal)
             fundamental_freq_array.append(self.get_fundamental_freq(frequency_domain_vector, wav_file.getframerate(),
                                                                     len(time_domain_vector)))
             energy_deviation_array.append(self.get_std_deviation(time_domain_vector))
+            frame_counter += 1
+            if frame_counter >= frames_num:
+                frame_counter = 0
+                features_vector = self.get_pitch_features(fundamental_freq_array)
+                features_vector.extend(self.get_energy_features(energy_deviation_array))
+                features_vectors_container.append(features_vector)
+                fundamental_freq_array = []
+                energy_deviation_array = []
 
         wav_file.close()
-
-        pitch_features_vector = self.get_pitch_features(fundamental_freq_array)
-        energy_features_vector = self.get_energy_features(energy_deviation_array)
-        pitch_features_vector.extend(energy_features_vector)
-
-        return pitch_features_vector
+        return features_vectors_container
 
     @staticmethod
     def get_file_info(filename):
@@ -55,7 +65,23 @@ class VoiceModule:
             print("Can't open file " + filename)
             return []
 
-        return wav_file.getparams()
+        file_params = wav_file.getparams()
+
+        wav_file.close()
+        return file_params
+
+    @staticmethod
+    def get_sample_rate(filename):
+        try:
+            wav_file = wave.open(filename, 'rb')
+        except IOError:
+            print("Can't open file " + filename)
+            return []
+
+        sample_rate = wav_file.getframerate()
+
+        wav_file.close()
+        return sample_rate
 
     def get_freq_vector(self, filename):
         try:

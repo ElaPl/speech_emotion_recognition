@@ -31,18 +31,19 @@ def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, lengt
 
 
 def main():
-    train_set = build_file_set('/home/ela/Documents/inz_SER/HMM_py/Berlin_EmoDatabase/wav/a*/*/*.wav')
+    train_set = build_file_set('Berlin_EmoDatabase_tmp/wav/a*/*/*.wav')
 
     voice_m = VoiceModule(512)
-    knn_module = KNN(emotions, 7)
+    knn_module = KNN(emotions, 15)
 
     for i in range(0, len(train_set)):
         print_progress_bar(i + 1, len(train_set), prefix='Training progress:', suffix='Complete', length=50)
-        feature_vector = []
-        feature_vector.extend(voice_m.get_feature_vector(train_set[i][0]))
-        knn_module.train(feature_vector, train_set[i][1])
+        feature_vector = voice_m.get_feature_vector(train_set[i][0])
+        for j in range(0, len(feature_vector)):
+            # print(feature_vector[j])
+            knn_module.train(feature_vector[j], train_set[i][1])
 
-    input_set = build_file_set('/home/ela/Documents/inz_SER/HMM_py/Berlin_EmoDatabase/wav/b*/*/*.wav')
+    input_set = build_file_set('Berlin_EmoDatabase_tmp/wav/b*/*/*.wav')
 
     summary_table = {}
     for i in range(0, len(emotions)):
@@ -50,11 +51,10 @@ def main():
 
     for i in range(0, len(input_set)):
         print_progress_bar(i + 1, len(input_set), prefix='Computing progress:', suffix='Complete', length=50)
-        feature_vector = []
-        feature_vector.extend(voice_m.get_feature_vector(input_set[i][0]))
+        feature_vector = voice_m.get_feature_vector(input_set[i][0])
         if len(feature_vector) > 0:
             summary_table[input_set[i][1]]["all"] += 1
-            computed_emotion = knn_module.get_emotion(feature_vector)
+            computed_emotion = knn_module.compute_emotion(feature_vector)
             if computed_emotion == input_set[i][1]:
                 summary_table[input_set[i][1]]["guessed"] += 1
     print()

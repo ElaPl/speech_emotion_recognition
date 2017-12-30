@@ -62,10 +62,6 @@ class KNN:
 
         dist_table.sort(key=lambda x: x[0])
 
-        # for i in range(0, 9):
-        #     print(dist_table[i][0], end=" ")
-        #     print(dist_table[i][1])
-
         states_counter = {}
         for state in self.states:
             states_counter[state] = 0
@@ -76,15 +72,11 @@ class KNN:
 
         for i in range(0, neightbour_num):
             states_counter[dist_table[i][1]] += 1
-        #
-        # for key, value in states_counter.items():
-        #     print(key, end=" : ")
-        #     print(value)
 
         return self.get_most_frequent_state(states_counter)
 
     def compute_emotion(self, obs_sequence):
-        states_counter = []
+        states_counter = {}
         for state in self.states:
             states_counter[state] = 0
 
