@@ -49,7 +49,7 @@ class VoiceModule:
             if frame_counter >= frames_num:
                 frame_counter = 0
                 features_vector = self.get_pitch_features(fundamental_freq_array)
-                features_vector.extend(self.get_energy_features(energy_deviation_array))
+                # features_vector.extend(self.get_energy_features(energy_deviation_array))
                 features_vectors_container.append(features_vector)
                 fundamental_freq_array = []
                 energy_deviation_array = []
@@ -147,7 +147,7 @@ class VoiceModule:
         for i in range(1, len(fundamental_freq_array)):
             sum_freq += fundamental_freq_array[i]
 
-            if fundamental_freq_array[i] > fundamental_freq_array[i-1]+50:
+            if fundamental_freq_array[i] > fundamental_freq_array[i-1] + 3000:
                 dynamic_tones_counter += 1
 
             if fundamental_freq_array[i] > fundamental_freq_array[i-1]:
@@ -164,9 +164,9 @@ class VoiceModule:
 
         vocal_range = max_freq - min_freq
         avg_frequency = sum_freq/len(fundamental_freq_array)
-        percent_of_dynamic_tones = 100 * dynamic_tones_counter / len(fundamental_freq_array)
-        percent_of_rising_tones = 100 * rising_tones_counter / len(fundamental_freq_array)
-        percent_of_falling_tones = 100 * falling_tones_counter / len(fundamental_freq_array)
+        percent_of_dynamic_tones = 100 * (dynamic_tones_counter / len(fundamental_freq_array))
+        percent_of_rising_tones = 100 * (rising_tones_counter / len(fundamental_freq_array))
+        percent_of_falling_tones = 100 * (falling_tones_counter / len(fundamental_freq_array))
 
         # compute standard deviation
         std_sum = 0

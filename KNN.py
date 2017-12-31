@@ -16,6 +16,19 @@ class KNN:
 
         return sqrt(dist)
 
+    def cosine_similarity(self, vecA, vecB):
+        dotProduct = 0
+        normA = 0
+        normB = 0
+        for i in range(0, len(vecA)):
+            dotProduct += vecA[i] * vecB[i]
+            normA += pow(vecA[i], 2)
+            normB += pow(vecB[i], 2)
+        normA = sqrt(normA)
+        normB = sqrt(normB)
+
+        return dotProduct/(normA*normB)
+
     # Normalizuje wektor testowy wartościami z wektora treningowego
     def norm_test_vec(self, test_vec, train_min, train_max):
         norm_vect = []
@@ -48,15 +61,14 @@ class KNN:
         for i in range(0, len(training_vec)):
             norm_vec.append((training_vec[i] - min_value) / (max_value - min_value))
 
-        self.training_set.append({'training_vec': training_vec, 'norm_vec': norm_vec, 'min': min_value, 'max': max_value,
-                                  'state': state})
+        self.training_set.append({'training_vec': training_vec, 'norm_vec': norm_vec, 'min': min_value,
+                                  'max': max_value, 'state': state})
 
     def get_emotion(self, test_vec):
         dist_table = []
 
         for train_vec in self.training_set:
-            norm_test_vec = []
-            norm_test_vec.extend(self.norm_test_vec(test_vec, train_vec['min'], train_vec['max']))
+            norm_test_vec = self.norm_test_vec(test_vec, train_vec['min'], train_vec['max'])
             dist = self.dist_eu(train_vec['norm_vec'], norm_test_vec)
             dist_table.append([dist, train_vec['state']])
 
