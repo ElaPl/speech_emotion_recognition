@@ -16,7 +16,7 @@ class WavIterator:
         if self.wav_file.tell() >= self.wav_file.getnframes():
             raise StopIteration()
         else:
-            if self.wav_file.getnframes() - self.wav_file.tell() >= 1024:
+            if self.wav_file.getnframes() - self.wav_file.tell() >= self.frame_count:
                 decoded = struct.unpack(self.fmt, self.wav_file.readframes(self.frame_count))
                 decoded_on_channel = []
                 for i in range(0, len(decoded), self.wav_file.getnchannels()):

@@ -2,11 +2,10 @@ from math import pow, sqrt
 
 
 class KNN:
-    training_set = []
-
     def __init__(self, states, k):
         self.states = states
         self.k = k
+        self.training_set = []
 
     # Oblicza odległosć euklidesową pomiedzy dwoma wektorami
     def dist_eu(self, vec1, vec2):
@@ -31,19 +30,22 @@ class KNN:
 
     # Normalizuje wektor testowy wartościami z wektora treningowego
     def norm_test_vec(self, test_vec, train_min, train_max):
+        if train_min == train_max:
+            return test_vec
+
         norm_vect = []
         for i in range(0, len(test_vec)):
             norm_vect.append(((test_vec[i] - train_min) / (train_max - train_min)))
-
         return norm_vect
 
     # Zwraca najczęściej występujący stan
     def get_most_frequent_state(self, states_counter):
-        max_state, max_state_counter = states_counter.popitem()
-        for key, value in states_counter.items():
-            if value > max_state_counter:
-                max_state_counter = value
-                max_state = key
+        max_state_counter = states_counter[self.states[0]]
+        max_state = self.states[0]
+        for state in self.states:
+            if states_counter[state] > max_state_counter:
+                max_state_counter = states_counter[state]
+                max_state = state
 
         return max_state
 
@@ -57,12 +59,16 @@ class KNN:
             if training_vec[i] > max_value:
                 max_value = training_vec[i]
 
-        norm_vec = []
-        for i in range(0, len(training_vec)):
-            norm_vec.append((training_vec[i] - min_value) / (max_value - min_value))
+        if max_value != min_value:
+            norm_vec = []
+            for i in range(0, len(training_vec)):
+                norm_vec.append((training_vec[i] - min_value) / (max_value - min_value))
 
-        self.training_set.append({'training_vec': training_vec, 'norm_vec': norm_vec, 'min': min_value,
-                                  'max': max_value, 'state': state})
+            self.training_set.append({'training_vec': training_vec, 'norm_vec': norm_vec, 'min': min_value,
+                                      'max': max_value, 'state': state})
+        else:
+            self.training_set.append({'training_vec': training_vec, 'norm_vec': training_vec, 'min': min_value,
+                                      'max': max_value, 'state': state})
 
     def get_emotion(self, test_vec):
         dist_table = []
@@ -78,11 +84,11 @@ class KNN:
         for state in self.states:
             states_counter[state] = 0
 
-        neightbour_num = self.k
+        neighbour_num = self.k
         if self.k > len(dist_table):
-            neightbour_num = len(dist_table)
+            neighbour_num = len(dist_table)
 
-        for i in range(0, neightbour_num):
+        for i in range(0, neighbour_num):
             states_counter[dist_table[i][1]] += 1
 
         return self.get_most_frequent_state(states_counter)
@@ -95,4 +101,11 @@ class KNN:
         for observation in obs_sequence:
             states_counter[self.get_emotion(observation)] += 1
 
-        return self.get_most_frequent_state(states_counter)
+        max_state = self.get_most_frequent_state(states_counter)
+        max_occurance = states_counter[max_state]
+        possible_states = []
+        for state, num_occurence in states_counter.items():
+            if num_occurence == max_occurance:
+                possible_states.append(state)
+
+        return possible_states
