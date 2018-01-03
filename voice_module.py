@@ -184,11 +184,13 @@ class VoiceModule:
         dynamic_tones_counter = 0
         rising_tones_counter = 0
         falling_tones_counter = 0
+        frames_with_dynamic_tones = []
 
         for i in range(1, len(fundamental_freq_array)):
             sum_freq += fundamental_freq_array[i]
 
             if fundamental_freq_array[i] > fundamental_freq_array[i-1] + 3000:
+                frames_with_dynamic_tones.append(i)
                 dynamic_tones_counter += 1
 
             if fundamental_freq_array[i] > fundamental_freq_array[i-1]:
@@ -205,9 +207,15 @@ class VoiceModule:
 
         vocal_range = max_freq - min_freq
         avg_frequency = sum_freq/len(fundamental_freq_array)
-        percent_of_dynamic_tones = 100 * (dynamic_tones_counter / len(fundamental_freq_array))
+        dynamic_tones_frequency = dynamic_tones_counter / len(fundamental_freq_array)
         percent_of_rising_tones = 100 * (rising_tones_counter / len(fundamental_freq_array))
         percent_of_falling_tones = 100 * (falling_tones_counter / len(fundamental_freq_array))
+        min_dynamic_tones_dist = 0
+        max_dynamic_tones_dist = 0
+
+        if dynamic_tones_counter > 1:
+            min_dynamic_tones_dist = frames_with_dynamic_tones[1] - frames_with_dynamic_tones[0]
+            max_dynamic_tones_dist = frames_with_dynamic_tones[len(frames_with_dynamic_tones) - 1] - frames_with_dynamic_tones[0]
 
         # compute standard deviation
         variance = 0
@@ -218,8 +226,54 @@ class VoiceModule:
 
         standard_deviation_frequency = sqrt(variance)
 
-        return [vocal_range, max_freq, min_freq, avg_frequency, percent_of_dynamic_tones, percent_of_falling_tones,
-                percent_of_rising_tones, standard_deviation_frequency]
+        return [vocal_range, max_freq, min_freq, avg_frequency, dynamic_tones_frequency, percent_of_falling_tones,
+                percent_of_rising_tones, standard_deviation_frequency, variance, min_dynamic_tones_dist,
+                max_dynamic_tones_dist]
+
+    def get_summary_pitch_feature_vector(self, pitch_feature_vectors):
+        pitch_feature_vectors_size = len(pitch_feature_vectors)
+        max_freq = pitch_feature_vectors[0][1]
+        min_freq = pitch_feature_vectors[0][2]
+        avg_freq = pitch_feature_vectors[0][3]
+        falling_tones_counter = 0
+        rising_tones_counter = 0
+        dynamic_tones_freq = 0
+        if pitch_feature_vectors[0][4] != 0:
+            dynamic_tones_freq = 1
+
+        for i in range(1, pitch_feature_vectors_size):
+            avg_freq += pitch_feature_vectors[i][3]
+
+            if pitch_feature_vectors[i][1] > max_freq:
+                max_freq = pitch_feature_vectors[i][1]
+
+            if pitch_feature_vectors[i][2] < min_freq:
+                min_freq = pitch_feature_vectors[i][2]
+
+            if pitch_feature_vectors[i][4] != 0:
+                dynamic_tones_freq += 1
+
+            if pitch_feature_vectors[i][3] > pitch_feature_vectors[i-1][3]:
+                rising_tones_counter += 1
+
+            if pitch_feature_vectors[i][3] < pitch_feature_vectors[i-1][3]:
+                falling_tones_counter += 1
+
+        avg_freq /= pitch_feature_vectors_size
+        freq_range = max_freq - min_freq
+        dynamic_tones_freq /= pitch_feature_vectors_size
+        percent_of_falling_tones = (falling_tones_counter/pitch_feature_vectors_size) * 100
+        percent_of_rising_tones = (rising_tones_counter/pitch_feature_vectors_size) * 100
+
+        variance = 0
+        for i in range(1, pitch_feature_vectors_size):
+            variance += pow(pitch_feature_vectors[i][3] - avg_freq, 2)
+
+        std_deviation = sqrt(variance)
+
+        return [freq_range, max_freq, min_freq, avg_freq, dynamic_tones_freq, percent_of_falling_tones,
+                percent_of_rising_tones, std_deviation, variance]
+
 
     @staticmethod
     def get_energy_features(time_domain_signal):
@@ -252,4 +306,4 @@ class VoiceModule:
         variance /= len(time_domain_signal)
         standard_deviation = sqrt(variance)
 
-        return [standard_deviation, range_energy, crossing_rate]
+        return [standard_deviation, range_energy, variance, crossing_rate]

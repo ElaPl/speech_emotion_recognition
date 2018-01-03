@@ -2,10 +2,10 @@ from math import pow, sqrt
 
 
 class KNN:
-    def __init__(self, states, k):
+    def __init__(self, states, k, training_set=[]):
         self.states = states
         self.k = k
-        self.training_set = []
+        self.training_set = training_set
 
     # Oblicza odległosć euklidesową pomiedzy dwoma wektorami
     def dist_eu(self, vec1, vec2):
@@ -91,7 +91,14 @@ class KNN:
         for i in range(0, neighbour_num):
             states_counter[dist_table[i][1]] += 1
 
-        return self.get_most_frequent_state(states_counter)
+        max_state = self.get_most_frequent_state(states_counter)
+        max_occurance = states_counter[max_state]
+        possible_states = []
+        for state, num_occurence in states_counter.items():
+            if num_occurence == max_occurance:
+                possible_states.append(state)
+
+        return possible_states
 
     def compute_emotion(self, obs_sequence):
         states_counter = {}
@@ -99,7 +106,9 @@ class KNN:
             states_counter[state] = 0
 
         for observation in obs_sequence:
-            states_counter[self.get_emotion(observation)] += 1
+            states = self.get_emotion(observation)
+            for state in states:
+                states_counter[state] += 1
 
         max_state = self.get_most_frequent_state(states_counter)
         max_occurance = states_counter[max_state]
