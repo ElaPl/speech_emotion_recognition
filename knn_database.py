@@ -9,7 +9,7 @@ energy_train_set_name = 'energy_train_set'
 
 KNN_DB_TABLES = {}
 KNN_DB_TABLES[pitch_train_set_name] = {}
-KNN_DB_TABLES[summary_pitch_train_set_name] = {}
+# KNN_DB_TABLES[summary_pitch_train_set_name] = {}
 KNN_DB_TABLES[energy_train_set_name] = {}
 
 KNN_DB_TABLES[pitch_train_set_name]['create'] = (
@@ -23,8 +23,6 @@ KNN_DB_TABLES[pitch_train_set_name]['create'] = (
     "percent_of_rising_tones DOUBLE, "
     "standard_deviation_freq DOUBLE, "
     "variance DOUBLE, "
-    "min_dynamic_tones_dist DOUBLE, "
-    "max_dynamic_tones_dist DOUBLE, "
     "emotion TEXT);"
 )
 
@@ -39,40 +37,38 @@ KNN_DB_TABLES[pitch_train_set_name]['insert'] = (
     "percent_of_rising_tones,"
     "standard_deviation_freq,"
     "variance,"
-    "min_dynamic_tones_dist,"
-    "max_dynamic_tones_dist,"
     "emotion)"
-    "VALUES (%lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %s)"
+    "VALUES (%lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %s)"
 )
 
-KNN_DB_TABLES[summary_pitch_train_set_name]['create'] = (
-    "CREATE TABLE summary_pitch_train_set ("
-    "freq_range DOUBLE,"
-    "max_freq DOUBLE,"
-    "min_freq DOUBLE,"
-    "avg_freq DOUBLE,"
-    "dynamic_tones_freq DOUBLE,"
-    "percent_of_falling_tones DOUBLE,"
-    "percent_of_rising_tones DOUBLE,"
-    "standard_deviation_freq DOUBLE,"
-    "variance DOUBLE,"
-    "emotion TEXT);"
-)
-
-KNN_DB_TABLES[summary_pitch_train_set_name]['insert'] = (
-    "INSERT INTO summary_pitch_train_set("
-    "freq_range,"
-    "max_freq,"
-    "min_freq,"
-    "avg_freq,"
-    "dynamic_tones_freq,"
-    "percent_of_falling_tones,"
-    "percent_of_rising_tones,"
-    "standard_deviation_freq,"
-    "variance,"
-    "emotion)"
-    "VALUES (%lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %s);"
-)
+# KNN_DB_TABLES[summary_pitch_train_set_name]['create'] = (
+#     "CREATE TABLE summary_pitch_train_set ("
+#     "freq_range DOUBLE,"
+#     "max_freq DOUBLE,"
+#     "min_freq DOUBLE,"
+#     "avg_freq DOUBLE,"
+#     "dynamic_tones_freq DOUBLE,"
+#     "percent_of_falling_tones DOUBLE,"
+#     "percent_of_rising_tones DOUBLE,"
+#     "standard_deviation_freq DOUBLE,"
+#     "variance DOUBLE,"
+#     "emotion TEXT);"
+# )
+#
+# KNN_DB_TABLES[summary_pitch_train_set_name]['insert'] = (
+#     "INSERT INTO summary_pitch_train_set("
+#     "freq_range,"
+#     "max_freq,"
+#     "min_freq,"
+#     "avg_freq,"
+#     "dynamic_tones_freq,"
+#     "percent_of_falling_tones,"
+#     "percent_of_rising_tones,"
+#     "standard_deviation_freq,"
+#     "variance,"
+#     "emotion)"
+#     "VALUES (%lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %s);"
+# )
 
 KNN_DB_TABLES[energy_train_set_name]['create'] = (
     "CREATE TABLE energy_train_set ("
@@ -92,6 +88,7 @@ KNN_DB_TABLES[energy_train_set_name]['insert'] = (
     "emotion)"
     "VALUES (%lf, %lf, %lf, %lf, %s);"
 )
+
 
 def create_training_set(db, cursor):
     for name, ddl in KNN_DB_TABLES.items():
@@ -133,7 +130,7 @@ def save_in_dbtable(db, cursor, vect, emotion, tbname):
     try:
         if tbname == pitch_train_set_name:
             cursor.execute(KNN_DB_TABLES[tbname]['insert'] % (vect[0], vect[1], vect[2], vect[3], vect[4], vect[5],
-                                                              vect[6], vect[7], vect[8], vect[9], vect[10], "'" + emotion + "'"))
+                                                              vect[6], vect[7], vect[8], "'" + emotion + "'"))
         elif tbname == summary_pitch_train_set_name:
             cursor.execute(KNN_DB_TABLES[tbname]['insert'] % (vect[0], vect[1], vect[2], vect[3], vect[4], vect[5],
                                                               vect[6], vect[7], vect[8], "'" + emotion + "'"))

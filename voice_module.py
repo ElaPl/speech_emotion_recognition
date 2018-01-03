@@ -4,6 +4,18 @@ from math import sqrt
 from wav_iterator import WavIterator
 from hanning_window import HanningWindow
 
+voice_freq_scale = [
+    {"id": 1, "min": 0, "max": 150},
+    {"id": 2, "min": 151, "max": 300},
+    {"id": 3, "min": 300, "max": 500},
+    {"id": 4, "min": 501, "max": 700},
+    {"id": 5, "min": 701, "max": 900},
+    {"id": 6, "min": 901, "max": 1300},
+    {"id": 7, "min": 1301, "max": 2000},
+    {"id": 8, "min": 2001, "max": 4000},
+    {"id": 9, "min": 4001, "max": 6000},
+    {"id": 10, "min": 6001, "max": 30000},
+]
 
 def print_signal(signal):
     for i in range(0, len(signal)):
@@ -177,7 +189,12 @@ class VoiceModule:
         return (sample_rate/sample_length) * max_magnitude_ind
 
     @staticmethod
-    def get_pitch_features(fundamental_freq_array):
+    def get_scale_id(freq):
+        for scale in voice_freq_scale:
+            if scale['min'] <= freq <= scale['max']:
+                return scale['id']
+
+    def get_pitch_features(self, fundamental_freq_array):
         max_freq = fundamental_freq_array[0]
         min_freq = fundamental_freq_array[0]
         sum_freq = fundamental_freq_array[0]
@@ -185,9 +202,15 @@ class VoiceModule:
         rising_tones_counter = 0
         falling_tones_counter = 0
         frames_with_dynamic_tones = []
+        freq_scale_counter = [0] * len(voice_freq_scale)
 
         for i in range(1, len(fundamental_freq_array)):
             sum_freq += fundamental_freq_array[i]
+
+            freq_scale_counter[self.get_scale_id(fundamental_freq_array[i])-1] += 1
+            # for scale in voice_freq_scale:
+            #     if scale['min'] <= fundamental_freq_array[i] <= scale['max']:
+            #         freq_scale_counter[scale['id']] += 1
 
             if fundamental_freq_array[i] > fundamental_freq_array[i-1] + 3000:
                 frames_with_dynamic_tones.append(i)
@@ -205,17 +228,22 @@ class VoiceModule:
             if fundamental_freq_array[i] < min_freq:
                 min_freq = fundamental_freq_array[i]
 
+        max_dynamic_freq_id = 0
+        max_dynamic_freq_occurance = freq_scale_counter[max_dynamic_freq_id]
+
+        for i in range(1, len(freq_scale_counter)):
+            if freq_scale_counter[i] > max_dynamic_freq_occurance:
+                max_dynamic_freq_id = i
+                max_dynamic_freq_occurance = freq_scale_counter[i]
+
+        # To avoid 0
+        max_dynamic_freq_id += 1
+
         vocal_range = max_freq - min_freq
         avg_frequency = sum_freq/len(fundamental_freq_array)
         dynamic_tones_frequency = dynamic_tones_counter / len(fundamental_freq_array)
         percent_of_rising_tones = 100 * (rising_tones_counter / len(fundamental_freq_array))
         percent_of_falling_tones = 100 * (falling_tones_counter / len(fundamental_freq_array))
-        min_dynamic_tones_dist = 0
-        max_dynamic_tones_dist = 0
-
-        if dynamic_tones_counter > 1:
-            min_dynamic_tones_dist = frames_with_dynamic_tones[1] - frames_with_dynamic_tones[0]
-            max_dynamic_tones_dist = frames_with_dynamic_tones[len(frames_with_dynamic_tones) - 1] - frames_with_dynamic_tones[0]
 
         # compute standard deviation
         variance = 0
@@ -226,9 +254,9 @@ class VoiceModule:
 
         standard_deviation_frequency = sqrt(variance)
 
-        return [vocal_range, max_freq, min_freq, avg_frequency, dynamic_tones_frequency, percent_of_falling_tones,
-                percent_of_rising_tones, standard_deviation_frequency, variance, min_dynamic_tones_dist,
-                max_dynamic_tones_dist]
+        return [vocal_range, self.get_scale_id(max_freq), self.get_scale_id(min_freq), max_dynamic_freq_id,
+                dynamic_tones_frequency, percent_of_falling_tones, percent_of_rising_tones,
+                standard_deviation_frequency, variance]
 
     def get_summary_pitch_feature_vector(self, pitch_feature_vectors):
         pitch_feature_vectors_size = len(pitch_feature_vectors)
@@ -250,7 +278,7 @@ class VoiceModule:
             if pitch_feature_vectors[i][2] < min_freq:
                 min_freq = pitch_feature_vectors[i][2]
 
-            if pitch_feature_vectors[i][4] != 0:
+            if pitch_feature_vectors[i][4] > 0:
                 dynamic_tones_freq += 1
 
             if pitch_feature_vectors[i][3] > pitch_feature_vectors[i-1][3]:
@@ -258,6 +286,7 @@ class VoiceModule:
 
             if pitch_feature_vectors[i][3] < pitch_feature_vectors[i-1][3]:
                 falling_tones_counter += 1
+
 
         avg_freq /= pitch_feature_vectors_size
         freq_range = max_freq - min_freq

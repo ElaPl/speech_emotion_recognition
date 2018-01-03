@@ -10,7 +10,7 @@ import knn_database as knn_db
 from voice_module import VoiceModule
 from KNN import KNN
 
-emotions = ["neutral", "anger", "boredom", "disgust", "fear", "happiness", "sadness"]
+emotions = ["neutral", "anger", "boredom", "happiness", "sadness"]
 
 
 def build_file_set(pattern):
@@ -36,16 +36,6 @@ def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, lengt
     if iteration == total:
         print()
 
-# def train_knn_from_db(cursor, knn_module, table_name):
-#     sql = "SELECT * FROM %s" % table_name
-#
-#     try:
-#         cursor.execute(sql)
-#         results = cursor.fetchall()
-#         for row in results:
-#             knn_module.add_to_train_set(row)
-#     except pymysql.connector.Error as err:
-#         sys.exit("Could not get %s table: {}".format(err) % table_name)
 
 def get_most_frequent_emotion(possible_emotions):
     emotion_counter = {}
@@ -64,6 +54,7 @@ def get_most_frequent_emotion(possible_emotions):
 
     return computed_emotion
 
+
 def draw_freq_histogram():
     train_set = build_file_set('Berlin_EmoDatabase/wav/' + sys.argv[1] + '/*.wav')
     frame_size = 512
@@ -71,6 +62,8 @@ def draw_freq_histogram():
 
     for i in range(0, len(train_set)):
         freq_vector = voice_m.get_freq_vector(train_set[i][0], 512)
+        print(freq_vector)
+        print()
         sample_rate = voice_m.get_sample_rate(train_set[i][0])
 
         bins = np.arange(0, len(freq_vector), 1)  # fixed bin size
@@ -129,7 +122,7 @@ def compare_feature_vectors(file):
             or False == are_equal(knn_moduleA.training_set[i]["norm_vec"], knn_moduleB.training_set[i]["norm_vec"])
             or knn_moduleA.training_set[i]["min"] != knn_moduleB.training_set[i]["min"]
             or knn_moduleA.training_set[i]["max"] != knn_moduleB.training_set[i]["max"]
-            or False == are_equal(knn_moduleA.training_set[i]["state"], knn_moduleB.training_set[i]["state"])):
+            or (False == are_equal(knn_moduleA.training_set[i]["state"], knn_moduleB.training_set[i]["state"]))):
             print("Not equal")
             break
         print("Equal")
@@ -160,27 +153,31 @@ def main(knn_pitch, knn_energy):
                                       "sadness": 0, "guessed": 0, "all": 0, "trained": 0}
     frame_length = 512
 
-    pitch_knn_module = KNN(emotions, knn_pitch)
-    summary_pitch_knn_module = KNN(emotions, 4)
-    energy_knn_module = KNN(emotions, knn_energy)
+    pitch_knn_module = KNN(emotions)
+    # summary_pitch_knn_module = KNN(emotions, 4)
+    energy_knn_module = KNN(emotions)
     voice_m = VoiceModule()
 
     db = pymysql.connect(host="localhost", user="root", passwd="Mout", db=knn_db.DB_NAME)
     cursor = db.cursor()
 
     if knn_db.is_training_set_exists(cursor):
-        print("datatbase exists")
+        print_progress_bar(1, 3, prefix='Training progress:', suffix='Complete', length=50)
         for row in knn_db.train_knn_from_db(cursor, knn_db.pitch_train_set_name):
-            pitch_knn_module.train(row[1: -1], row[-1])
+            pitch_knn_module.train(row[0: -1], row[-1])
+            summary_table[row[-1]]["trained"] += 1
 
-        for row in knn_db.train_knn_from_db(cursor, knn_db.summary_pitch_train_set_name):
-            summary_pitch_knn_module.train(row[1: -1], row[-1])
+        # print_progress_bar(2, 3, prefix='Training progress:', suffix='Complete', length=50)
+        # for row in knn_db.train_knn_from_db(cursor, knn_db.summary_pitch_train_set_name):
+        #     summary_pitch_knn_module.train(row[0: -1], row[-1])
+        #     summary_table[row[-1]]["trained"] += 1
 
+        print_progress_bar(3, 3, prefix='Training progress:', suffix='Complete', length=50)
         for row in knn_db.train_knn_from_db(cursor, knn_db.energy_train_set_name):
-            energy_knn_module.train(row[1: -1], row[-1])
-    else:
-        print("COMPUTING")
+            energy_knn_module.train(row[0: -1], row[-1])
+            summary_table[row[-1]]["trained"] += 1
 
+    else:
         knn_db.create_training_set(db, cursor)
         train_set = build_file_set('Berlin_EmoDatabase/wav/a*/*/*.wav')
 
@@ -192,9 +189,9 @@ def main(knn_pitch, knn_energy):
                 pitch_knn_module.train(pitch_feature_vectors[j], train_set[i][1])
                 knn_db.save_in_dbtable(db, cursor, pitch_feature_vectors[j], train_set[i][1],  knn_db.pitch_train_set_name)
 
-            summary_pitch_feature_vector = voice_m.get_summary_pitch_feature_vector(pitch_feature_vectors)
-            summary_pitch_knn_module.train(summary_pitch_feature_vector, train_set[i][1])
-            knn_db.save_in_dbtable(db, cursor, summary_pitch_feature_vector, train_set[i][1], knn_db.summary_pitch_train_set_name)
+            # summary_pitch_feature_vector = voice_m.get_summary_pitch_feature_vector(pitch_feature_vectors)
+            # summary_pitch_knn_module.train(summary_pitch_feature_vector, train_set[i][1])
+            # knn_db.save_in_dbtable(db, cursor, summary_pitch_feature_vector, train_set[i][1], knn_db.summary_pitch_train_set_name)
 
             sample_rate = voice_m.get_sample_rate(train_set[i][0])
             energy_feature_vectors = voice_m.get_energy_feature_vector(train_set[i][0], int(sample_rate / 4))
@@ -214,37 +211,47 @@ def main(knn_pitch, knn_energy):
         possible_emotions = []
         print("\n" + input_set[i][0])
         if len(pitch_feature_vectors) > 0:
-            pitch_possible_emotions = pitch_knn_module.compute_emotion(pitch_feature_vectors)
+            # print("\npitch_possible_emotions")
+            pitch_possible_emotions = pitch_knn_module.compute_emotion(pitch_feature_vectors, 10)
             possible_emotions.extend(pitch_possible_emotions)
-            print("pitch_possible_emotions")
-            print(pitch_possible_emotions)
+            # print(pitch_possible_emotions)
 
-            summary_pitch_feature_vector = voice_m.get_summary_pitch_feature_vector(pitch_feature_vectors)
-            summary_pitch_possible_emotions = summary_pitch_knn_module.get_emotion(summary_pitch_feature_vector)
-            possible_emotions.extend(summary_pitch_possible_emotions)
-            print("summary_pitch_possible_emotions")
-            print(summary_pitch_possible_emotions)
+            # print("summary_pitch_possible_emotions")
+            # summary_pitch_feature_vector = voice_m.get_summary_pitch_feature_vector(pitch_feature_vectors)
+            # summary_pitch_possible_emotions = summary_pitch_knn_module.get_emotion(summary_pitch_feature_vector)
+            # possible_emotions.extend(summary_pitch_possible_emotions)
+            # print(summary_pitch_possible_emotions)
 
         sample_rate = voice_m.get_sample_rate(input_set[i][0])
         energy_feature_vectors = voice_m.get_energy_feature_vector(input_set[i][0], int(sample_rate / 4))
+        energy_possible_emotions = []
         if len(energy_feature_vectors) > 0:
-            energy_possible_emotions = energy_knn_module.compute_emotion(energy_feature_vectors)
-            possible_emotions.extend(energy_possible_emotions)
-            print("energy_possible_emotions")
-            print(energy_possible_emotions)
+            # print("energy_possible_emotions")
+            energy_possible_emotions = energy_knn_module.compute_emotion(energy_feature_vectors, 7)
+            # print(energy_possible_emotions)
 
-        computed_emotion = get_most_frequent_emotion(possible_emotions)
+        # if len(possible_emotions) > 1:
+        #     print_progress_bar(i + 1, len(input_set), prefix='Computing progress:', suffix='Complete', length=50)
+        #     pitch_feature_vectors = voice_m.get_pitch_feature_vector(input_set[i][0], frame_length)
+        #     if len(pitch_feature_vectors) > 0:
+        #         pitch_possible_emotions = pitch_knn_module.compute_emotion(pitch_feature_vectors, 10)
+        #         possible_emotions.extend(pitch_possible_emotions)
 
-        # possible_emotions = []
-        # for stateA in pitch_possible_emotions:
-        #     if stateA in energy_possible_emotions:
-        #         possible_emotions.append(stateA)
-        #
-        # computed_emotion = ""
-        # if len(possible_emotions) == 0:
-        #     computed_emotion = pitch_possible_emotions[0]
-        # else:
-        #     computed_emotion = possible_emotions[0]
+        # computed_emotion = get_most_frequent_emotion(possible_emotions)
+        print("\npitch_possible_emotions")
+        print(pitch_possible_emotions)
+        print("energy_possible_emotions")
+        print(energy_possible_emotions)
+
+        computed_emotion = ""
+        for emotion in energy_possible_emotions:
+            if emotion in pitch_possible_emotions:
+                computed_emotion = emotion
+                break
+
+        if computed_emotion == "":
+            computed_emotion = pitch_possible_emotions[0]
+
         summary_table[input_set[i][1]]["all"] += 1
         if computed_emotion == input_set[i][1]:
             summary_table[input_set[i][1]]["guessed"] += 1

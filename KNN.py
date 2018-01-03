@@ -2,13 +2,14 @@ from math import pow, sqrt
 
 
 class KNN:
-    def __init__(self, states, k, training_set=[]):
+    def __init__(self, states):
         self.states = states
-        self.k = k
-        self.training_set = training_set
+        self.training_set = []
 
     # Oblicza odległosć euklidesową pomiedzy dwoma wektorami
     def dist_eu(self, vec1, vec2):
+        if len(vec1) != len(vec2):
+            print("Wektory mają różną długosc?")
         dist = 0
         for i in range(0, len(vec1)):
             dist += pow(vec1[i] - vec2[i], 2)
@@ -70,7 +71,7 @@ class KNN:
             self.training_set.append({'training_vec': training_vec, 'norm_vec': training_vec, 'min': min_value,
                                       'max': max_value, 'state': state})
 
-    def get_emotion(self, test_vec):
+    def get_emotion(self, test_vec, num_of_nearest_neighbour):
         dist_table = []
 
         for train_vec in self.training_set:
@@ -84,11 +85,10 @@ class KNN:
         for state in self.states:
             states_counter[state] = 0
 
-        neighbour_num = self.k
-        if self.k > len(dist_table):
-            neighbour_num = len(dist_table)
+        if num_of_nearest_neighbour > len(dist_table):
+            num_of_nearest_neighbour = len(dist_table)
 
-        for i in range(0, neighbour_num):
+        for i in range(0, num_of_nearest_neighbour):
             states_counter[dist_table[i][1]] += 1
 
         max_state = self.get_most_frequent_state(states_counter)
@@ -100,13 +100,13 @@ class KNN:
 
         return possible_states
 
-    def compute_emotion(self, obs_sequence):
+    def compute_emotion(self, obs_sequence, num_of_nearest_neighbour):
         states_counter = {}
         for state in self.states:
             states_counter[state] = 0
 
         for observation in obs_sequence:
-            states = self.get_emotion(observation)
+            states = self.get_emotion(observation, num_of_nearest_neighbour)
             for state in states:
                 states_counter[state] += 1
 
