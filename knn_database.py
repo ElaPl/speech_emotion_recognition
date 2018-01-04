@@ -26,6 +26,7 @@ KNN_DB_TABLES[pitch_train_set_name]['create'] = (
     "emotion TEXT);"
 )
 
+
 KNN_DB_TABLES[pitch_train_set_name]['insert'] = (
     "INSERT INTO pitch_train_set("
     "vocal_range,"
@@ -74,7 +75,6 @@ KNN_DB_TABLES[energy_train_set_name]['create'] = (
     "CREATE TABLE energy_train_set ("
     "standard_deviation_freq DOUBLE,"
     "variance DOUBLE,"
-    "energy_range DOUBLE,"
     "crossing_rate DOUBLE,"
     "emotion TEXT);"
 )
@@ -83,10 +83,9 @@ KNN_DB_TABLES[energy_train_set_name]['insert'] = (
     "INSERT INTO energy_train_set("
     "standard_deviation_freq,"
     "variance,"
-    "energy_range,"
     "crossing_rate,"
     "emotion)"
-    "VALUES (%lf, %lf, %lf, %lf, %s);"
+    "VALUES (%lf, %lf, %lf, %s);"
 )
 
 
@@ -135,7 +134,7 @@ def save_in_dbtable(db, cursor, vect, emotion, tbname):
             cursor.execute(KNN_DB_TABLES[tbname]['insert'] % (vect[0], vect[1], vect[2], vect[3], vect[4], vect[5],
                                                               vect[6], vect[7], vect[8], "'" + emotion + "'"))
         else:
-            cursor.execute(KNN_DB_TABLES[tbname]['insert'] % (vect[0], vect[1], vect[2], vect[3], "'" + emotion + "'"))
+            cursor.execute(KNN_DB_TABLES[tbname]['insert'] % (vect[0], vect[1], vect[2], "'" + emotion + "'"))
 
         db.commit()
     except pymysql.Error as e:

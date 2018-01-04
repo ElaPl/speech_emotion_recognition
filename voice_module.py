@@ -335,4 +335,4 @@ class VoiceModule:
         variance /= len(time_domain_signal)
         standard_deviation = sqrt(variance)
 
-        return [standard_deviation, range_energy, variance, crossing_rate]
+        return [standard_deviation, variance, 100 * crossing_rate/len(time_domain_signal)]

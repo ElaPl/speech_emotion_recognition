@@ -145,8 +145,7 @@ def draw_energy_histogram():
 
         plt.show()
 
-def main(knn_pitch, knn_energy):
-    print("\n MAIN  %d %d \n" % (knn_pitch, knn_energy))
+def main(train_path_pattern, test_path_pattern):
     summary_table = {}
     for i in range(0, len(emotions)):
         summary_table[emotions[i]] = {"neutral": 0, "anger": 0, "boredom": 0, "disgust": 0, "fear": 0, "happiness": 0,
@@ -179,7 +178,7 @@ def main(knn_pitch, knn_energy):
 
     else:
         knn_db.create_training_set(db, cursor)
-        train_set = build_file_set('Berlin_EmoDatabase/wav/a*/*/*.wav')
+        train_set = build_file_set(train_path_pattern)
 
         for i in range(0, len(train_set)):
             print_progress_bar(i + 1, len(train_set), prefix='Training progress:', suffix='Complete', length=50)
@@ -201,8 +200,7 @@ def main(knn_pitch, knn_energy):
 
             summary_table[train_set[i][1]]["trained"] += 1
 
-    # input_set = build_file_set("Berlin_EmoDatabase/wav/b02/happiness/*.wav")
-    input_set = build_file_set('Berlin_EmoDatabase/wav/b*/*/*.wav')
+    input_set = build_file_set(test_path_pattern)
 
     for i in range(0, len(input_set)):
         print_progress_bar(i + 1, len(input_set), prefix='Computing progress:', suffix='Complete', length=50)
@@ -258,7 +256,6 @@ def main(knn_pitch, knn_energy):
 
         summary_table[input_set[i][1]][computed_emotion] += 1
 
-    # file = open('test_result/test_' + str(knn_pitch) + '_' + str(knn_energy) + '.txt', 'w')
     print()
     for i in range(0, len(emotions)):
         print("emo: %s\t, neutral: %d\t, anger: %d\t, boredom: %d\t, disgust: %d\t, fear: %d\t, happiness: %d\t, "
@@ -271,6 +268,10 @@ def main(knn_pitch, knn_energy):
 
 
 filterwarnings('ignore', category = pymysql.Warning)
+
+main('Berlin_EmoDatabase/wav/a*/*/*.wav', 'Berlin_EmoDatabase/wav/b*/*/*.wav')
+
+
 # db = pymysql.connect(host="localhost", user="root", passwd="Mout", db="speech_emotion_recognition")
 # cursor = db.cursor()
 # knn_db.create_training_set(db, cursor)
@@ -282,6 +283,4 @@ filterwarnings('ignore', category = pymysql.Warning)
 # compare_feature_vectors("/home/ela/Documents/inz_proj/speech_emotion_recognition/Berlin_EmoDatabase/wav/a02/fear/08a02Ab.wav")
 # compare_feature_vectors("/home/ela/Documents/inz_proj/speech_emotion_recognition/Berlin_EmoDatabase/wav/a02/happiness/13a02Fa.wav")
 # compare_feature_vectors("/home/ela/Documents/inz_proj/speech_emotion_recognition/Berlin_EmoDatabase/wav/a02/anger/03a02Wb.wav")
-
-main(10, 7)
 
