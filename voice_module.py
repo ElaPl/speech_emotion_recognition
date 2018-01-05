@@ -208,9 +208,6 @@ class VoiceModule:
             sum_freq += fundamental_freq_array[i]
 
             freq_scale_counter[self.get_scale_id(fundamental_freq_array[i])-1] += 1
-            # for scale in voice_freq_scale:
-            #     if scale['min'] <= fundamental_freq_array[i] <= scale['max']:
-            #         freq_scale_counter[scale['id']] += 1
 
             if fundamental_freq_array[i] > fundamental_freq_array[i-1] + 3000:
                 frames_with_dynamic_tones.append(i)
@@ -260,48 +257,39 @@ class VoiceModule:
 
     def get_summary_pitch_feature_vector(self, pitch_feature_vectors):
         pitch_feature_vectors_size = len(pitch_feature_vectors)
-        max_freq = pitch_feature_vectors[0][1]
-        min_freq = pitch_feature_vectors[0][2]
-        avg_freq = pitch_feature_vectors[0][3]
-        falling_tones_counter = 0
-        rising_tones_counter = 0
+        max_freq_range = 1
+        min_freq_range = len(voice_freq_scale)
         dynamic_tones_freq = 0
+        freq_scale_counter = [0] * len(voice_freq_scale)
+        avg_range = 0
+
         if pitch_feature_vectors[0][4] != 0:
             dynamic_tones_freq = 1
 
-        for i in range(1, pitch_feature_vectors_size):
-            avg_freq += pitch_feature_vectors[i][3]
+        for i in range(0, pitch_feature_vectors_size):
+            freq_scale_counter.append(pitch_feature_vectors[i][3])
+            avg_range += pitch_feature_vectors[i][3]
 
-            if pitch_feature_vectors[i][1] > max_freq:
-                max_freq = pitch_feature_vectors[i][1]
+            if pitch_feature_vectors[i][1] > max_freq_range:
+                max_freq_range = pitch_feature_vectors[i][1]
 
-            if pitch_feature_vectors[i][2] < min_freq:
-                min_freq = pitch_feature_vectors[i][2]
+            if pitch_feature_vectors[i][2] < min_freq_range:
+                min_freq_range = pitch_feature_vectors[i][2]
 
             if pitch_feature_vectors[i][4] > 0:
                 dynamic_tones_freq += 1
 
-            if pitch_feature_vectors[i][3] > pitch_feature_vectors[i-1][3]:
-                rising_tones_counter += 1
-
-            if pitch_feature_vectors[i][3] < pitch_feature_vectors[i-1][3]:
-                falling_tones_counter += 1
-
-
-        avg_freq /= pitch_feature_vectors_size
-        freq_range = max_freq - min_freq
+        avg_range /= pitch_feature_vectors_size
+        freq_range = max_freq_range - min_freq_range
         dynamic_tones_freq /= pitch_feature_vectors_size
-        percent_of_falling_tones = (falling_tones_counter/pitch_feature_vectors_size) * 100
-        percent_of_rising_tones = (rising_tones_counter/pitch_feature_vectors_size) * 100
 
         variance = 0
         for i in range(1, pitch_feature_vectors_size):
-            variance += pow(pitch_feature_vectors[i][3] - avg_freq, 2)
+            variance += pow(pitch_feature_vectors[i][3] - avg_range, 2)
 
         std_deviation = sqrt(variance)
 
-        return [freq_range, max_freq, min_freq, avg_freq, dynamic_tones_freq, percent_of_falling_tones,
-                percent_of_rising_tones, std_deviation, variance]
+        return [freq_range, max_freq_range, min_freq_range, avg_range, 100*dynamic_tones_freq, std_deviation, variance]
 
 
     @staticmethod
