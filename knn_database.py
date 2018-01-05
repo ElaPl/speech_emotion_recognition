@@ -3,6 +3,8 @@ import pymysql, sys
 from KNN import KNN
 
 DB_NAME = 'speech_emotion_recognition'
+DB_FEMALE_NAME = 'female_speech_emo'
+DB_MALE_NAME = 'male_speech_emo'
 pitch_train_set_name = 'pitch_train_set'
 summary_pitch_train_set_name = 'summary_pitch_train_set'
 energy_train_set_name = 'energy_train_set'

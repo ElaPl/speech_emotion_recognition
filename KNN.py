@@ -71,15 +71,31 @@ class KNN:
             self.training_set.append({'training_vec': training_vec, 'norm_vec': training_vec, 'min': min_value,
                                       'max': max_value, 'state': state})
 
+    def tmp_dist_eu(self, vec1, vec2, dist_table):
+        if len(vec1) != len(vec2):
+            print("Wektory mają różną długosc?")
+        dist = 0
+        for i in range(0, len(vec1)):
+            dist += pow(vec1[i] - vec2[i], 2)
+            dist_table.append(pow(vec1[i] - vec2[i], 2))
+
+        return sqrt(dist)
+
     def get_emotion(self, test_vec, num_of_nearest_neighbour):
         dist_table = []
+
+        tmp_table = []
 
         for train_vec in self.training_set:
             norm_test_vec = self.norm_test_vec(test_vec, train_vec['min'], train_vec['max'])
             dist = self.dist_eu(train_vec['norm_vec'], norm_test_vec)
             dist_table.append([dist, train_vec['state']])
+            tmp_dist_table = []
+            self.tmp_dist_eu(train_vec['norm_vec'], norm_test_vec, tmp_dist_table)
+            # tmp_table.append([dist, tmp_dist_table, train_vec['state'], train_vec['norm_vec'], norm_test_vec])
 
         dist_table.sort(key=lambda x: x[0])
+        # tmp_table.sort(key=lambda x: x[0])
 
         states_counter = {}
         for state in self.states:
@@ -90,6 +106,11 @@ class KNN:
 
         for i in range(0, num_of_nearest_neighbour):
             states_counter[dist_table[i][1]] += 1
+            # print()
+            # print(tmp_table[i][2])
+            # print(tmp_table[i][4])
+            # print(tmp_table[i][3])
+            # print(tmp_table[i][1])
 
         max_state = self.get_most_frequent_state(states_counter)
         max_occurance = states_counter[max_state]

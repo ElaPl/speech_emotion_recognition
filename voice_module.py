@@ -5,16 +5,17 @@ from wav_iterator import WavIterator
 from hanning_window import HanningWindow
 
 voice_freq_scale = [
-    {"id": 1, "min": 0, "max": 150},
-    {"id": 2, "min": 151, "max": 300},
-    {"id": 3, "min": 300, "max": 500},
-    {"id": 4, "min": 501, "max": 700},
-    {"id": 5, "min": 701, "max": 900},
-    {"id": 6, "min": 901, "max": 1300},
-    {"id": 7, "min": 1301, "max": 2000},
-    {"id": 8, "min": 2001, "max": 4000},
-    {"id": 9, "min": 4001, "max": 6000},
-    {"id": 10, "min": 6001, "max": 30000},
+    {"id": 1, "min": 0, "max": 100},
+    {"id": 2, "min": 101, "max": 200},
+    {"id": 3, "min": 201, "max": 300},
+    {"id": 4, "min": 301, "max": 500},
+    {"id": 5, "min": 501, "max": 700},
+    {"id": 6, "min": 701, "max": 900},
+    {"id": 7, "min": 901, "max": 1300},
+    {"id": 8, "min": 1301, "max": 2000},
+    {"id": 9, "min": 2001, "max": 4000},
+    {"id": 10, "min": 4001, "max": 6000},
+    {"id": 11, "min": 6001, "max": 30000},
 ]
 
 def print_signal(signal):
@@ -35,7 +36,7 @@ class VoiceModule:
             return []
 
         sample_rate = wav_file.getframerate()
-        sample_in_sec_quarter = sample_rate / 4
+        sample_in_sec_quarter = sample_rate / 2
         frames_num = sample_in_sec_quarter/frame_length
         if sample_in_sec_quarter % frame_length != 0:
             frames_num += 1
