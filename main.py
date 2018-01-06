@@ -219,7 +219,7 @@ def main(train_path_pattern, test_path_pattern, db_name):
         pitch_feature_vectors = voice_m.get_pitch_feature_vector(input_set[i][0], frame_length)
         summary_pitch_feature_vector = []
         if len(pitch_feature_vectors) > 0:
-            pitch_possible_emotions = pitch_knn_module.compute_emotion(pitch_feature_vectors, 10)
+            pitch_possible_emotions = pitch_knn_module.compute_emotion(pitch_feature_vectors, 13)
 
             summary_pitch_feature_vector.extend(voice_m.get_summary_pitch_feature_vector(pitch_feature_vectors))
             summary_pitch_possible_emotions = summary_pitch_knn_module.get_emotion(summary_pitch_feature_vector, 4)
@@ -227,7 +227,7 @@ def main(train_path_pattern, test_path_pattern, db_name):
         energy_feature_vectors = voice_m.get_energy_feature_vector(input_set[i][0], int(sample_rate / 3))
         energy_possible_emotions = []
         if len(energy_feature_vectors) > 0:
-            energy_possible_emotions = energy_knn_module.compute_emotion(energy_feature_vectors, 7)
+            energy_possible_emotions = energy_knn_module.compute_emotion(energy_feature_vectors, 10)
 
         # print("\n" + input_set[i][0])
         # print("\npitch_possible_emotions")
@@ -268,7 +268,7 @@ filterwarnings('ignore', category = pymysql.Warning)
 # pitch_knn_module = KNN(emotions)
 # summary_pitch_knn_module = KNN(emotions)
 # energy_knn_module = KNN(emotions)
-main('emoDbText/train/*/*/*.wav', 'emoDbText/test/*/*/*.wav', knn_db.DB_NAME)
+main('Berlin_EmoDatabase/train/*/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav', knn_db.DB_NAME)
 
 # main('emodb/train/female/*/*.wav', 'emodb/test/female/*/*.wav', knn_db.DB_FEMALE_NAME)
 # print()

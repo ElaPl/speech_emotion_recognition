@@ -1,6 +1,6 @@
 import wave
 import numpy as np
-from math import sqrt
+from math import sqrt, log10
 from wav_iterator import WavIterator
 from hanning_window import HanningWindow
 
@@ -17,6 +17,7 @@ voice_freq_scale = [
     {"id": 10, "min": 4001, "max": 6000},
     {"id": 11, "min": 6001, "max": 30000},
 ]
+
 
 def print_signal(signal):
     for i in range(0, len(signal)):
@@ -47,6 +48,7 @@ class VoiceModule:
         fundamental_freq_array = []
         for time_domain_vector in wav_iter:
             time_domain_vect_size = len(time_domain_vector)
+            signal = []
             if time_domain_vect_size == frame_length:
                 signal = window.plot(time_domain_vector)
                 frame_counter += 1
@@ -55,15 +57,18 @@ class VoiceModule:
                 signal = tmp_hanning_module.plot(time_domain_vector)
                 frame_counter += 1
 
-            if time_domain_vect_size != 0:
+            if signal and time_domain_vect_size != 0:
                 frequency_domain_vector = np.fft.rfft(signal)
-                fundamental_freq_array.append(self.get_fundamental_freq(frequency_domain_vector, wav_file.getframerate(),
-                                                                        len(time_domain_vector)))
+                fundamental_freq_array.append(
+                    self.get_fundamental_freq(frequency_domain_vector, wav_file.getframerate(),
+                                              len(time_domain_vector)))
 
             if frame_counter >= frames_num or (time_domain_vect_size == 0 and frame_counter != 0):
                 frame_counter = 0
-                features_vector = self.get_pitch_features(fundamental_freq_array)
-                features_vectors_container.append(features_vector)
+                pitch_feature_vec = self.get_pitch_features(fundamental_freq_array)
+                if len(pitch_feature_vec) != 0:
+                    features_vector = pitch_feature_vec
+                    features_vectors_container.append(features_vector)
                 fundamental_freq_array = []
 
         wav_file.close()
@@ -89,7 +94,9 @@ class VoiceModule:
             else:
                 break
 
-            features_vectors_container.append(self.get_energy_features(signal))
+            energy_feature_vec = self.get_energy_features(signal)
+            if len(energy_feature_vec) > 0:
+                features_vectors_container.append(energy_feature_vec)
 
         wav_file.close()
         return features_vectors_container
@@ -148,7 +155,8 @@ class VoiceModule:
 
         return fundamental_freq_array
 
-    def get_energy_vector(self, filename, frame_length):
+    @staticmethod
+    def get_energy_vector(filename, frame_length):
         window = HanningWindow(frame_length)
 
         try:
@@ -185,8 +193,6 @@ class VoiceModule:
                 max_magnitude = magnitude_i
                 max_magnitude_ind = i
 
-        # print ("sample rate: %d  | len_freq_domain_vec: %d  | mangitude_ind: %d   \n" %(sample_rate, len(freq_domain_vect), max_magnitude_ind))
-
         return (sample_rate/sample_length) * max_magnitude_ind
 
     @staticmethod
@@ -196,6 +202,8 @@ class VoiceModule:
                 return scale['id']
 
     def get_pitch_features(self, fundamental_freq_array):
+        if len(fundamental_freq_array) == 0:
+            return []
         max_freq = fundamental_freq_array[0]
         min_freq = fundamental_freq_array[0]
         sum_freq = fundamental_freq_array[0]
@@ -225,6 +233,9 @@ class VoiceModule:
 
             if fundamental_freq_array[i] < min_freq:
                 min_freq = fundamental_freq_array[i]
+
+        if sum_freq == 0:
+            return []
 
         max_dynamic_freq_id = 0
         max_dynamic_freq_occurance = freq_scale_counter[max_dynamic_freq_id]
@@ -256,7 +267,8 @@ class VoiceModule:
                 dynamic_tones_frequency, percent_of_falling_tones, percent_of_rising_tones,
                 standard_deviation_frequency, variance]
 
-    def get_summary_pitch_feature_vector(self, pitch_feature_vectors):
+    @staticmethod
+    def get_summary_pitch_feature_vector(pitch_feature_vectors):
         pitch_feature_vectors_size = len(pitch_feature_vectors)
         max_freq_range = 1
         min_freq_range = len(voice_freq_scale)
@@ -292,36 +304,46 @@ class VoiceModule:
 
         return [freq_range, max_freq_range, min_freq_range, avg_range, 100*dynamic_tones_freq, std_deviation, variance]
 
-
     @staticmethod
     def get_energy_features(time_domain_signal):
-        crossing_rate = 0
-        min_value = time_domain_signal[0]
-        max_value = time_domain_signal[0]
-        sum = time_domain_signal[0]
+        time_domain_signal_len = len(time_domain_signal)
+        if time_domain_signal_len == 0:
+            return []
 
-        for i in range(1, len(time_domain_signal)):
-            sum += time_domain_signal[i]
+        peak = time_domain_signal[0]
+        sound_vol_rms = 0
+        sound_vol_avg = 0
+        amplitude_ration_signal = [0] * time_domain_signal_len
+        zero_crossing_rate = 0
 
-            if time_domain_signal[i] < min_value:
-                min_value = time_domain_signal[i]
+        for i in range(0, time_domain_signal_len):
+            sound_vol_rms += pow(time_domain_signal[i], 2)
+            peak = max(peak, time_domain_signal[i])
 
-            if time_domain_signal[i] > max_value:
-                max_value = time_domain_signal[i]
+            if time_domain_signal[i] != 0:
+                amplitude_ration_signal[i] = 10 * log10(pow(time_domain_signal[i], 2))
+                sound_vol_avg += amplitude_ration_signal[i]
 
-            if (time_domain_signal[i-1] < 0 and time_domain_signal[i] > 0 or
-                time_domain_signal[i-1] == 0 and time_domain_signal[i] != 0 or
-                time_domain_signal[i-1] > 0 and time_domain_signal[i] < 0):
-                crossing_rate += 1
+            if i > 0:
+                if (amplitude_ration_signal[i-1] < 0 < amplitude_ration_signal[i]
+                    or amplitude_ration_signal[i-1] == 0 and amplitude_ration_signal[i] != 0
+                    or amplitude_ration_signal[i-1] > 0 > amplitude_ration_signal[i]):
+                    zero_crossing_rate += 1
 
-        range_energy = max_value - min_value
-        avg_value = sum/len(time_domain_signal)
+        if sound_vol_rms == 0:
+            return []
+
+        sound_vol_rms = sqrt(sound_vol_rms / time_domain_signal_len)
+        rms_db = 10 * log10(sound_vol_rms)
+        peak_db = 10 * log10(pow(peak, 2) / pow(sound_vol_rms, 2))
+        zero_crossing_rate /= (time_domain_signal_len - 1)
+        sound_vol_avg /= time_domain_signal_len
 
         variance = 0
-        for i in range(1, len(time_domain_signal)):
-            variance += pow(time_domain_signal[i] - avg_value, 2)
+        for i in range(0, time_domain_signal_len):
+            variance += pow(amplitude_ration_signal[i] - sound_vol_avg, 2)
 
-        variance /= len(time_domain_signal)
+        variance /= time_domain_signal_len
         standard_deviation = sqrt(variance)
 
-        return [standard_deviation, variance, 100 * crossing_rate/len(time_domain_signal)]
+        return [standard_deviation, variance, 100 * zero_crossing_rate, sound_vol_rms, rms_db, peak_db]
