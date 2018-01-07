@@ -24,7 +24,6 @@ KNN_DB_TABLES[pitch_train_set_name]['create'] = (
     "percent_of_falling_tones DOUBLE, "
     "percent_of_rising_tones DOUBLE, "
     "standard_deviation_freq DOUBLE, "
-    "variance DOUBLE, "
     "emotion TEXT);"
 )
 
@@ -38,9 +37,8 @@ KNN_DB_TABLES[pitch_train_set_name]['insert'] = (
     "percent_of_falling_tones,"
     "percent_of_rising_tones,"
     "standard_deviation_freq,"
-    "variance,"
     "emotion)"
-    "VALUES (%lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %s)"
+    "VALUES (%lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %s)"
 )
 
 KNN_DB_TABLES[summary_pitch_train_set_name]['create'] = (
@@ -51,7 +49,6 @@ KNN_DB_TABLES[summary_pitch_train_set_name]['create'] = (
     "avg_freq DOUBLE,"
     "dynamic_tones_freq DOUBLE,"
     "standard_deviation_freq DOUBLE,"
-    "variance DOUBLE,"
     "emotion TEXT);"
 )
 
@@ -63,15 +60,13 @@ KNN_DB_TABLES[summary_pitch_train_set_name]['insert'] = (
     "avg_freq,"
     "dynamic_tones_freq,"
     "standard_deviation_freq,"
-    "variance,"
     "emotion)"
-    "VALUES (%lf, %lf, %lf, %lf, %lf, %lf, %lf, %s);"
+    "VALUES (%lf, %lf, %lf, %lf, %lf, %lf, %s);"
 )
 
 KNN_DB_TABLES[energy_train_set_name]['create'] = (
     "CREATE TABLE energy_train_set ("
     "standard_deviation_freq DOUBLE,"
-    "variance DOUBLE,"
     "crossing_rate DOUBLE,"
     "soundVolRMS DOUBLE,"
     "rms_db DOUBLE,"
@@ -82,13 +77,12 @@ KNN_DB_TABLES[energy_train_set_name]['create'] = (
 KNN_DB_TABLES[energy_train_set_name]['insert'] = (
     "INSERT INTO energy_train_set("
     "standard_deviation_freq,"
-    "variance,"
     "crossing_rate,"
     "soundVolRMS,"
     "rms_db,"
     "peak_db,"
     "emotion)"
-    "VALUES (%lf, %lf, %lf, %lf, %lf, %lf, %s);"
+    "VALUES (%lf, %lf, %lf, %lf, %lf, %s);"
 )
 
 
@@ -132,12 +126,12 @@ def save_in_dbtable(db, cursor, vect, emotion, tbname):
     try:
         if tbname == pitch_train_set_name:
             cursor.execute(KNN_DB_TABLES[tbname]['insert'] % (vect[0], vect[1], vect[2], vect[3], vect[4], vect[5],
-                                                              vect[6], vect[7], vect[8], "'" + emotion + "'"))
+                                                              vect[6], vect[7], "'" + emotion + "'"))
         elif tbname == summary_pitch_train_set_name:
             cursor.execute(KNN_DB_TABLES[tbname]['insert'] % (vect[0], vect[1], vect[2], vect[3], vect[4], vect[5],
-                                                              vect[6], "'" + emotion + "'"))
+                                                              "'" + emotion + "'"))
         else:
-            cursor.execute(KNN_DB_TABLES[tbname]['insert'] % (vect[0], vect[1], vect[2], vect[3], vect[4], vect[5],
+            cursor.execute(KNN_DB_TABLES[tbname]['insert'] % (vect[0], vect[1], vect[2], vect[3], vect[3],
                                                               "'" + emotion + "'"))
 
         db.commit()

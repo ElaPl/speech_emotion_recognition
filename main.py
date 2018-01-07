@@ -187,7 +187,7 @@ def train(train_path_pattern, voice_m, db_name, pitch_knn_module, summary_pitch_
                 summary_pitch_knn_module.train(summary_pitch_feature_vector, train_set[i][1])
                 knn_db.save_in_dbtable(db, cursor, summary_pitch_feature_vector, train_set[i][1], knn_db.summary_pitch_train_set_name)
 
-            energy_feature_vectors = voice_m.get_energy_feature_vector(train_set[i][0], int(sample_rate / 4))
+            energy_feature_vectors = voice_m.get_energy_feature_vector(train_set[i][0])
             for j in range(0, len(energy_feature_vectors)):
                 energy_knn_module.train(energy_feature_vectors[j], train_set[i][1])
                 knn_db.save_in_dbtable(db, cursor, energy_feature_vectors[j], train_set[i][1], knn_db.energy_train_set_name)
@@ -219,15 +219,15 @@ def main(train_path_pattern, test_path_pattern, db_name):
         pitch_feature_vectors = voice_m.get_pitch_feature_vector(input_set[i][0], frame_length)
         summary_pitch_feature_vector = []
         if len(pitch_feature_vectors) > 0:
-            pitch_possible_emotions = pitch_knn_module.compute_emotion(pitch_feature_vectors, 13)
+            pitch_possible_emotions = pitch_knn_module.compute_emotion(pitch_feature_vectors, 15)
 
             summary_pitch_feature_vector.extend(voice_m.get_summary_pitch_feature_vector(pitch_feature_vectors))
             summary_pitch_possible_emotions = summary_pitch_knn_module.get_emotion(summary_pitch_feature_vector, 4)
 
-        energy_feature_vectors = voice_m.get_energy_feature_vector(input_set[i][0], int(sample_rate / 3))
+        energy_feature_vectors = voice_m.get_energy_feature_vector(input_set[i][0])
         energy_possible_emotions = []
         if len(energy_feature_vectors) > 0:
-            energy_possible_emotions = energy_knn_module.compute_emotion(energy_feature_vectors, 10)
+            energy_possible_emotions = energy_knn_module.compute_emotion(energy_feature_vectors, 15)
 
         # print("\n" + input_set[i][0])
         # print("\npitch_possible_emotions")

@@ -6,16 +6,16 @@ from hanning_window import HanningWindow
 
 voice_freq_scale = [
     {"id": 1, "min": 0, "max": 100},
-    {"id": 2, "min": 101, "max": 200},
-    {"id": 3, "min": 201, "max": 300},
-    {"id": 4, "min": 301, "max": 500},
-    {"id": 5, "min": 501, "max": 700},
-    {"id": 6, "min": 701, "max": 900},
-    {"id": 7, "min": 901, "max": 1300},
-    {"id": 8, "min": 1301, "max": 2000},
-    {"id": 9, "min": 2001, "max": 4000},
-    {"id": 10, "min": 4001, "max": 6000},
-    {"id": 11, "min": 6001, "max": 30000},
+    {"id": 2, "min": 100, "max": 200},
+    {"id": 3, "min": 200, "max": 300},
+    {"id": 4, "min": 300, "max": 500},
+    {"id": 5, "min": 500, "max": 700},
+    {"id": 6, "min": 700, "max": 900},
+    {"id": 7, "min": 900, "max": 1300},
+    {"id": 8, "min": 1300, "max": 2000},
+    {"id": 9, "min": 2000, "max": 4000},
+    {"id": 10, "min": 4000, "max": 6000},
+    {"id": 11, "min": 6000, "max": 30000},
 ]
 
 
@@ -37,7 +37,7 @@ class VoiceModule:
             return []
 
         sample_rate = wav_file.getframerate()
-        sample_in_sec_quarter = sample_rate / 2
+        sample_in_sec_quarter = sample_rate / 4
         frames_num = sample_in_sec_quarter/frame_length
         if sample_in_sec_quarter % frame_length != 0:
             frames_num += 1
@@ -74,15 +74,16 @@ class VoiceModule:
         wav_file.close()
         return features_vectors_container
 
-    def get_energy_feature_vector(self, filename, frame_length):
-        window = HanningWindow(frame_length)
-
+    def get_energy_feature_vector(self, filename):
         try:
             wav_file = wave.open(filename, 'rb')
         except IOError:
             print("Can't open file " + filename)
             return []
 
+        sample_rate = wav_file.getframerate()
+        frame_length = int(sample_rate / 3)
+        window = HanningWindow(frame_length)
         features_vectors_container = []
         wav_iter = WavIterator(wav_file, frame_length)
         for time_domain_vector in wav_iter:
@@ -198,7 +199,7 @@ class VoiceModule:
     @staticmethod
     def get_scale_id(freq):
         for scale in voice_freq_scale:
-            if scale['min'] <= freq <= scale['max']:
+            if scale['min'] <= freq < scale['max']:
                 return scale['id']
 
     def get_pitch_features(self, fundamental_freq_array):
@@ -206,21 +207,17 @@ class VoiceModule:
             return []
         max_freq = fundamental_freq_array[0]
         min_freq = fundamental_freq_array[0]
-        sum_freq = fundamental_freq_array[0]
-        dynamic_tones_counter = 0
+        sum_freq = 0
         rising_tones_counter = 0
         falling_tones_counter = 0
-        frames_with_dynamic_tones = []
         freq_scale_counter = [0] * len(voice_freq_scale)
 
-        for i in range(1, len(fundamental_freq_array)):
+        for i in range(0, len(fundamental_freq_array)):
             sum_freq += fundamental_freq_array[i]
-
             freq_scale_counter[self.get_scale_id(fundamental_freq_array[i])-1] += 1
 
-            if fundamental_freq_array[i] > fundamental_freq_array[i-1] + 3000:
-                frames_with_dynamic_tones.append(i)
-                dynamic_tones_counter += 1
+            max_freq = max(max_freq, fundamental_freq_array[i])
+            min_freq = min(min_freq, fundamental_freq_array[i])
 
             if fundamental_freq_array[i] > fundamental_freq_array[i-1]:
                 rising_tones_counter += 1
@@ -228,56 +225,38 @@ class VoiceModule:
             if fundamental_freq_array[i] < fundamental_freq_array[i-1]:
                 falling_tones_counter += 1
 
-            if fundamental_freq_array[i] > max_freq:
-                max_freq = fundamental_freq_array[i]
-
-            if fundamental_freq_array[i] < min_freq:
-                min_freq = fundamental_freq_array[i]
-
         if sum_freq == 0:
             return []
 
-        max_dynamic_freq_id = 0
-        max_dynamic_freq_occurance = freq_scale_counter[max_dynamic_freq_id]
-
-        for i in range(1, len(freq_scale_counter)):
-            if freq_scale_counter[i] > max_dynamic_freq_occurance:
-                max_dynamic_freq_id = i
-                max_dynamic_freq_occurance = freq_scale_counter[i]
-
-        # To avoid 0
-        max_dynamic_freq_id += 1
-
+        # print(sum_freq)
         vocal_range = max_freq - min_freq
         avg_frequency = sum_freq/len(fundamental_freq_array)
-        dynamic_tones_frequency = dynamic_tones_counter / len(fundamental_freq_array)
         percent_of_rising_tones = 100 * (rising_tones_counter / len(fundamental_freq_array))
         percent_of_falling_tones = 100 * (falling_tones_counter / len(fundamental_freq_array))
 
-        # compute standard deviation
+        dynamic_tones_percent = 0
         variance = 0
         for i in range(0, len(fundamental_freq_array)):
             variance += pow(fundamental_freq_array[i] - avg_frequency, 2)
+            if fundamental_freq_array[i] >= avg_frequency + 3000:
+                dynamic_tones_percent += 1
 
-        variance /= len(fundamental_freq_array)
-
-        standard_deviation_frequency = sqrt(variance)
-
-        return [vocal_range, self.get_scale_id(max_freq), self.get_scale_id(min_freq), max_dynamic_freq_id,
-                dynamic_tones_frequency, percent_of_falling_tones, percent_of_rising_tones,
-                standard_deviation_frequency, variance]
+        dynamic_tones_percent = (dynamic_tones_percent / len(fundamental_freq_array)) * 100
+        standard_deviation_frequency = sqrt(variance/(len(fundamental_freq_array)-1))
+        relative_std_deviation = (standard_deviation_frequency/avg_frequency) * 100
+        # print(avg_frequency)
+        return [vocal_range, self.get_scale_id(max_freq), self.get_scale_id(min_freq), self.get_scale_id(avg_frequency),
+                dynamic_tones_percent, percent_of_falling_tones, percent_of_rising_tones,
+                relative_std_deviation]
 
     @staticmethod
     def get_summary_pitch_feature_vector(pitch_feature_vectors):
         pitch_feature_vectors_size = len(pitch_feature_vectors)
         max_freq_range = 1
         min_freq_range = len(voice_freq_scale)
-        dynamic_tones_freq = 0
         freq_scale_counter = [0] * len(voice_freq_scale)
         avg_range = 0
-
-        if pitch_feature_vectors[0][4] != 0:
-            dynamic_tones_freq = 1
+        dynamic_tones_percent = 0
 
         for i in range(0, pitch_feature_vectors_size):
             freq_scale_counter.append(pitch_feature_vectors[i][3])
@@ -289,20 +268,20 @@ class VoiceModule:
             if pitch_feature_vectors[i][2] < min_freq_range:
                 min_freq_range = pitch_feature_vectors[i][2]
 
-            if pitch_feature_vectors[i][4] > 0:
-                dynamic_tones_freq += 1
+            dynamic_tones_percent += pitch_feature_vectors[i][4] / 100
 
+        dynamic_tones_percent = (dynamic_tones_percent / pitch_feature_vectors_size) * 100
         avg_range /= pitch_feature_vectors_size
         freq_range = max_freq_range - min_freq_range
-        dynamic_tones_freq /= pitch_feature_vectors_size
 
         variance = 0
         for i in range(1, pitch_feature_vectors_size):
             variance += pow(pitch_feature_vectors[i][3] - avg_range, 2)
 
-        std_deviation = sqrt(variance)
+        std_deviation = sqrt(variance/(len(pitch_feature_vectors)-1))
+        relative_std_deviation = (std_deviation / avg_range) * 100
 
-        return [freq_range, max_freq_range, min_freq_range, avg_range, 100*dynamic_tones_freq, std_deviation, variance]
+        return [freq_range, max_freq_range, min_freq_range, avg_range, dynamic_tones_percent, relative_std_deviation]
 
     @staticmethod
     def get_energy_features(time_domain_signal):
@@ -336,14 +315,13 @@ class VoiceModule:
         sound_vol_rms = sqrt(sound_vol_rms / time_domain_signal_len)
         rms_db = 10 * log10(sound_vol_rms)
         peak_db = 10 * log10(pow(peak, 2) / pow(sound_vol_rms, 2))
-        zero_crossing_rate /= (time_domain_signal_len - 1)
+        zero_crossing_rate = (zero_crossing_rate/ (time_domain_signal_len - 1)) * 100
         sound_vol_avg /= time_domain_signal_len
 
-        variance = 0
+        standard_deviation = 0
         for i in range(0, time_domain_signal_len):
-            variance += pow(amplitude_ration_signal[i] - sound_vol_avg, 2)
+            standard_deviation += pow(amplitude_ration_signal[i] - sound_vol_avg, 2)
 
-        variance /= time_domain_signal_len
-        standard_deviation = sqrt(variance)
-
-        return [standard_deviation, variance, 100 * zero_crossing_rate, sound_vol_rms, rms_db, peak_db]
+        standard_deviation = sqrt(standard_deviation/(time_domain_signal_len-1))
+        relative_std_deviation = (standard_deviation/sound_vol_avg) * 100
+        return [relative_std_deviation, zero_crossing_rate, sound_vol_rms, rms_db, peak_db]
