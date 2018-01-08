@@ -34,7 +34,8 @@ class HMM:
 
         return alfa
 
-    # C
+    # That is, b_k(i) stores the probability of observing the rest of the sequence after time step
+    # i given that at time step i we are in state k in the HMM.
     def backward_algorithm(self, ob_sequence):
         observation_len = len(ob_sequence)
 
@@ -131,5 +132,8 @@ class HMM:
             if abs(numpy.dot(old_transition_ppb, old_emission_ppb) - numpy.dot(self.transition_ppb, self.emission_ppb)) < .00001:
                 break
 
+    # Oblicza prawdopodobieństwo, żę dana sekwencja obserwacji została wyprodukowana przez ten model
+    def evaluate(self, obs_sequence):
+        alfa = self.forward_algorithm(obs_sequence)
 
-        
+        return sum(alfa[state][len(obs_sequence)-1] for state in range(0, self.hidden_states_num))
