@@ -1,21 +1,23 @@
 import numpy
 
+
 class HMM:
     def __init__(self, transition_ppb, states_num, observation_num):
         self.hidden_states_num = states_num
+        # transition_ppb[i][j] - ppb of transition from state i to state j
         self.transition_ppb = numpy.zeros(shape=(self.hidden_states_num, self.hidden_states_num))
         for i in range(0, self.hidden_states_num):
             self.transition_ppb[i][i] = transition_ppb[i][0]
             self.transition_ppb[i][i+1] = transition_ppb[i][1]
 
+        # emission_ppb[j][o1] - ppb that at state i observation o1 will be produced
         self.emission_ppb = numpy.zeros(shape=(self.hidden_states_num, observation_num))
         self.observations = []
         self.observations_num = 0
-        self.initial_ppb = numpy.zeros(shape=(self.hidden_states_num))
+        self.initial_ppb = numpy.zeros(shape=self.hidden_states_num)
 
     #  Compute the probability of a state at a certain time, given the history of evidence.
     def forward_algorithm(self, observation_seq):
-
         observation_len = len(observation_seq)
 
         alfa = numpy.zeros(shape=(self.hidden_states_num, observation_len))
@@ -57,7 +59,7 @@ class HMM:
         return beta
 
     # Baum-Welch algorithm
-    def learn(self, observations):
+    def learn(self, observations, laplance_smoothing):
         observations_len = len(observations)
         obs_seq_len = len(observations[0])
 
@@ -107,28 +109,39 @@ class HMM:
             # Levinson's training equations
             # http://vision.gel.ulaval.ca/~parizeau/Publications/P971225.pdf
             for state in range(0, self.hidden_states_num):
-                self.initial_ppb[state] = 1/observations_len * sum(gamma[state][0][k] for k in range(0, observations_len))
+                self.initial_ppb[state] = (sum(gamma[state][0][k] + laplance_smoothing for k in
+                                              range(0, observations_len))) / (observations_len * laplance_smoothing)
+
+            #gamma_sum[A] - expected number of times in state As
+            gamma_sum = numpy.zeros(shape=(self.hidden_states_num))
+            for state in range(0, self.hidden_states_num):
+                gamma_sum[state] = sum(sum(gamma[state][t][k] for t in range(0, obs_seq_len - 1))
+                                       for k in range(0, observations_len))
 
             old_transition_ppb = self.transition_ppb
             for state_from in range(0, self.hidden_states_num):
                 for state_to in range(0, self.hidden_states_num):
+                    # expected number transitions from "state_from" to "state_to"
+                    exp_num = sum(sum(trajectory_ppb[t][state_from][state_to][k] for t in range(0, obs_seq_len - 1))
+                                  for k in range(0, observations_len))
+
                     self.transition_ppb[state_from][state_to] = \
-                        sum(sum(trajectory_ppb[t][state_from][state_to][k] for t in range(0, obs_seq_len - 1)) for k in range(0, observations_len)) / \
-                        sum(sum(gamma[state_from][t][k] for t in range(0, obs_seq_len - 1)) for k in range(0, observations_len))
+                        (exp_num + laplance_smoothing) / (gamma_sum[state_from] + self.hidden_states_num * laplance_smoothing)
 
             old_emission_ppb = self.emission_ppb
             for state in range(0, self.hidden_states_num):
                 for observation in self.observations:
+                    # val - expected number of times that we were in state "state" and saw symbol "observation"
                     val = 0.0
                     for k in range(0, observations_len):
                         for t in range(0, obs_seq_len):
                             if observations[k][t] == observation:
                                 val += gamma[state][t][k]
-                    val /= sum(sum(gamma[state][t][k] for t in range(0, obs_seq_len)) for k in range(0, observations_len))
-                    self.emission_ppb[state][observation] = val
+                    self.emission_ppb[state][observation] = \
+                        (val + laplance_smoothing) / (gamma_sum[state] + self.hidden_states_num * laplance_smoothing)
 
             # https: // www.mimuw.edu.pl / ~pzwiernik / docs / hmm.pdf
-            # Porównanie ( za sugestią Levisona,Rabinera,Sondhi )
+            # Porównanie (za sugestią Levisona,Rabinera,Sondhi )
             if abs(numpy.dot(old_transition_ppb, old_emission_ppb) - numpy.dot(self.transition_ppb, self.emission_ppb)) < .00001:
                 break
 
