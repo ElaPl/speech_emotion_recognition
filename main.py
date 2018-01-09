@@ -9,6 +9,7 @@ from warnings import filterwarnings
 import knn_database as knn_db
 from voice_module import VoiceModule
 from KNN import KNN
+from HMM import HMM
 
 emotions = ["anger", "boredom", "happiness", "sadness", "fear"]
 
@@ -263,27 +264,38 @@ def main(train_path_pattern, test_path_pattern, db_name):
                  summary_table[emotions[i]]["tested"], summary_table[emotions[i]]["trained"]))
 
 
-filterwarnings('ignore', category = pymysql.Warning)
+if len(sys.argv) > 1 and sys.argv[1] == 'KNN':
+    filterwarnings('ignore', category = pymysql.Warning)
+    main('Berlin_EmoDatabase/train/*/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav', knn_db.DB_NAME)
+else:
+    possible_observations = [0, 1, 2]
+    num_of_states = 3
+    trasition_ppb = [[0.2, 0.8],
+                     [0.2, 0.8],
+                     [0.2, 0]]
 
-# pitch_knn_module = KNN(emotions)
-# summary_pitch_knn_module = KNN(emotions)
-# energy_knn_module = KNN(emotions)
-main('Berlin_EmoDatabase/train/*/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav', knn_db.DB_NAME)
+    HMM_test = HMM(trasition_ppb, num_of_states, possible_observations)
+
+    training_set = [[0, 1, 2],
+                    [2, 1, 0]]
+
+    HMM_test.learn(training_set, 0.00001)
+    print(HMM_test.evaluate(training_set[0]))
+    print(HMM_test.evaluate([2, 1, 0]))
+    print(HMM_test.evaluate([0, 0, 2]))
+    print(HMM_test.evaluate([1, 2, 0]))
+
+    # for i in HMM_test.get_parameters():
+    #     print(i)
+    # print(HMM_test.evaluate(training_set[0]))
+    # print(HMM_test.evaluate([4, 3, 5]))
+    # print(HMM_test.evaluate([5, 4, 3]))
+
 
 # main('emodb/train/female/*/*.wav', 'emodb/test/female/*/*.wav', knn_db.DB_FEMALE_NAME)
 # print()
 # main('emodb/train/male/*/*.wav', 'emodb/test/male/*/*.wav', knn_db.DB_MALE_NAME)
-#
-
-# db = pymysql.connect(host="localhost", user="root", passwd="Mout", db="speech_emotion_recognition")
-# cursor = db.cursor()
-# knn_db.create_training_set(db, cursor)
 
 # draw_energy_histogram()
 # draw_freq_histogram()
 # print_feature_vector()
-# compare_feature_vectors("/home/ela/Documents/inz_proj/speech_emotion_recognition/Berlin_EmoDatabase/wav/a02/anger/*.wav")
-# compare_feature_vectors("/home/ela/Documents/inz_proj/speech_emotion_recognition/Berlin_EmoDatabase/wav/a02/fear/08a02Ab.wav")
-# compare_feature_vectors("/home/ela/Documents/inz_proj/speech_emotion_recognition/Berlin_EmoDatabase/wav/a02/happiness/13a02Fa.wav")
-# compare_feature_vectors("/home/ela/Documents/inz_proj/speech_emotion_recognition/Berlin_EmoDatabase/wav/a02/anger/03a02Wb.wav")
-
