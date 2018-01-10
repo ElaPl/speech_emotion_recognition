@@ -68,7 +68,6 @@ KNN_DB_TABLES[energy_train_set_name]['create'] = (
     "CREATE TABLE energy_train_set ("
     "standard_deviation_freq DOUBLE,"
     "crossing_rate DOUBLE,"
-    "soundVolRMS DOUBLE,"
     "rms_db DOUBLE,"
     "peak_db DOUBLE,"
     "emotion TEXT);"
@@ -78,11 +77,10 @@ KNN_DB_TABLES[energy_train_set_name]['insert'] = (
     "INSERT INTO energy_train_set("
     "standard_deviation_freq,"
     "crossing_rate,"
-    "soundVolRMS,"
     "rms_db,"
     "peak_db,"
     "emotion)"
-    "VALUES (%lf, %lf, %lf, %lf, %lf, %s);"
+    "VALUES (%lf, %lf, %lf, %lf, %s);"
 )
 
 
@@ -131,7 +129,7 @@ def save_in_dbtable(db, cursor, vect, emotion, tbname):
             cursor.execute(KNN_DB_TABLES[tbname]['insert'] % (vect[0], vect[1], vect[2], vect[3], vect[4], vect[5],
                                                               "'" + emotion + "'"))
         else:
-            cursor.execute(KNN_DB_TABLES[tbname]['insert'] % (vect[0], vect[1], vect[2], vect[3], vect[3],
+            cursor.execute(KNN_DB_TABLES[tbname]['insert'] % (vect[0], vect[1], vect[2], vect[3],
                                                               "'" + emotion + "'"))
 
         db.commit()

@@ -5,17 +5,53 @@ from wav_iterator import WavIterator
 from hanning_window import HanningWindow
 
 voice_freq_scale = [
+    {"id": 1, "min": 0, "max": 50},
+    {"id": 2, "min": 50, "max": 100},
+    {"id": 3, "min": 100, "max": 200},
+    {"id": 4, "min": 200, "max": 300},
+    {"id": 5, "min": 300, "max": 500},
+    {"id": 6, "min": 500, "max": 700},
+    {"id": 7, "min": 700, "max": 900},
+    {"id": 8, "min": 900, "max": 1300},
+    {"id": 9, "min": 1300, "max": 2000},
+    {"id": 10, "min": 2000, "max": 4000},
+    {"id": 11, "min": 4000, "max": 6000},
+    {"id": 12, "min": 6000, "max": 3000000},
+]
+
+freq_range_scale = [
     {"id": 1, "min": 0, "max": 100},
-    {"id": 2, "min": 100, "max": 200},
-    {"id": 3, "min": 200, "max": 300},
-    {"id": 4, "min": 300, "max": 500},
-    {"id": 5, "min": 500, "max": 700},
-    {"id": 6, "min": 700, "max": 900},
-    {"id": 7, "min": 900, "max": 1300},
-    {"id": 8, "min": 1300, "max": 2000},
-    {"id": 9, "min": 2000, "max": 4000},
-    {"id": 10, "min": 4000, "max": 6000},
-    {"id": 11, "min": 6000, "max": 30000},
+    {"id": 3, "min": 100, "max": 200},
+    {"id": 4, "min": 200, "max": 400},
+    {"id": 5, "min": 400, "max": 600},
+    {"id": 6, "min": 600, "max": 800},
+    {"id": 7, "min": 800, "max": 1100},
+    {"id": 9, "min": 1100, "max": 2000},
+    {"id": 10, "min": 2000, "max": 4000},
+    {"id": 11, "min": 4000, "max": 6000},
+    {"id": 12, "min": 6000, "max": 8000},
+    {"id": 13, "min": 8000, "max": 10000},
+    {"id": 14, "min": 10000, "max": 3000000},
+]
+
+dynamic_tones_scale = [
+    {"id": 1, "min": 0, "max": 5},
+    {"id": 2, "min": 5, "max": 10},
+    {"id": 3, "min": 10, "max": 15},
+    {"id": 4, "min": 15, "max": 20},
+    {"id": 5, "min": 20, "max": 25},
+    {"id": 6, "min": 25, "max": 30},
+    {"id": 7, "min": 30, "max": 35},
+    {"id": 8, "min": 35, "max": 50},
+]
+
+relative_std_deviation_scale = [
+    {"id": 1, "min": 0, "max": 50},
+    {"id": 2, "min": 50, "max": 100},
+    {"id": 3, "min": 100, "max": 150},
+    {"id": 4, "min": 150, "max": 200},
+    {"id": 5, "min": 200, "max": 250},
+    {"id": 6, "min": 250, "max": 100000},
 ]
 
 
@@ -37,7 +73,7 @@ class VoiceModule:
             return []
 
         sample_rate = wav_file.getframerate()
-        sample_in_sec_quarter = sample_rate / 4
+        sample_in_sec_quarter = sample_rate / 3
         frames_num = sample_in_sec_quarter/frame_length
         if sample_in_sec_quarter % frame_length != 0:
             frames_num += 1
@@ -197,9 +233,9 @@ class VoiceModule:
         return (sample_rate/sample_length) * max_magnitude_ind
 
     @staticmethod
-    def get_scale_id(freq):
-        for scale in voice_freq_scale:
-            if scale['min'] <= freq < scale['max']:
+    def get_scale_id(scale_dict, value):
+        for scale in scale_dict:
+            if scale['min'] <= value < scale['max']:
                 return scale['id']
 
     def get_pitch_features(self, fundamental_freq_array):
@@ -214,7 +250,7 @@ class VoiceModule:
 
         for i in range(0, len(fundamental_freq_array)):
             sum_freq += fundamental_freq_array[i]
-            freq_scale_counter[self.get_scale_id(fundamental_freq_array[i])-1] += 1
+            freq_scale_counter[self.get_scale_id(voice_freq_scale, fundamental_freq_array[i])-1] += 1
 
             max_freq = max(max_freq, fundamental_freq_array[i])
             min_freq = min(min_freq, fundamental_freq_array[i])
@@ -245,9 +281,9 @@ class VoiceModule:
         standard_deviation_frequency = sqrt(variance/(len(fundamental_freq_array)-1))
         relative_std_deviation = (standard_deviation_frequency/avg_frequency) * 100
         # print(avg_frequency)
-        return [vocal_range, self.get_scale_id(max_freq), self.get_scale_id(min_freq), self.get_scale_id(avg_frequency),
-                dynamic_tones_percent, percent_of_falling_tones, percent_of_rising_tones,
-                relative_std_deviation]
+        return [vocal_range, self.get_scale_id(voice_freq_scale, max_freq),
+                self.get_scale_id(voice_freq_scale, min_freq), self.get_scale_id(voice_freq_scale, avg_frequency),
+                dynamic_tones_percent, percent_of_falling_tones, percent_of_rising_tones, relative_std_deviation]
 
     @staticmethod
     def get_summary_pitch_feature_vector(pitch_feature_vectors):
@@ -324,4 +360,41 @@ class VoiceModule:
 
         standard_deviation = sqrt(standard_deviation/(time_domain_signal_len-1))
         relative_std_deviation = (standard_deviation/sound_vol_avg) * 100
-        return [relative_std_deviation, zero_crossing_rate, sound_vol_rms, rms_db, peak_db]
+        return [relative_std_deviation, zero_crossing_rate, rms_db, peak_db]
+
+    def create_grouped_pitch_veatures(self, pitch_features_group):
+
+        return [pitch_features_group[0], pitch_features_group[1], pitch_features_group[2],
+                self.get_scale_id(dynamic_tones_scale, pitch_features_group[3]),
+                self.get_scale_id(relative_std_deviation_scale, pitch_features_group[6])]
+
+    def to_str(self, value):
+        if (int)(value / 10) == 0:
+            return "0" + str(value)
+
+        return str(value)
+
+    def create_possible_observations(self):
+        possible_observations = []
+        for value2 in range(1, len(voice_freq_scale) + 1):
+            p2 = self.to_str(value2)
+            for value3 in range(1, len(voice_freq_scale) + 1):
+                p3 = p2 + self.to_str(value3)
+                for value4 in range(1, len(voice_freq_scale) + 1):
+                    p4 = p3 + self.to_str(value4)
+                    for value5 in range(1, len(dynamic_tones_scale) + 1):
+                        p5 = p4 + self.to_str(value5)
+                        # for value6 in range(1, 11):
+                        #     p6 = p5 + self.to_str(value6)
+                        #     for value7 in range(1, 11):
+                        #         p7 = p6 + self.to_str(value7)
+                        for value8 in range(1, len(relative_std_deviation_scale) + 1):
+                            p8 = p5 + self.to_str(value8)
+                            possible_observations.append(p8)
+
+        return possible_observations
+
+                                #
+        # return [vocal_range, self.get_scale_id(voice_freq_scale, max_freq),
+        #         self.get_scale_id(voice_freq_scale, min_freq), self.get_scale_id(voice_freq_scale, avg_frequency),
+        #         dynamic_tones_percent, percent_of_falling_tones, percent_of_rising_tones, relative_std_deviation]

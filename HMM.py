@@ -217,8 +217,10 @@ class HMM:
             gamma_sumB[state] = sum(sum(gamma[state][t][k] for t in range(0, obs_seq_len))
                                     for k in range(0, observations_num))
 
+        # print("Reestimation def_praram")
         # Reestimate emission_ppb table
         for state in range(0, self.hidden_states_num):
+            # print(state, end=" ")
             for observation, observation_id in self.observation_dict.items():
                 # val - expected number of times that we were in state "state" and saw symbol "observation"
                 val = 0.0
@@ -251,7 +253,8 @@ class HMM:
         old_likehood = 0
         new_likehood = 0
 
-        for estimation_iteration in range(0, 10):
+        for estimation_iteration in range(0, 7):
+            print("Estimation iteration %d", estimation_iteration)
             # old_likehood += sum(log(self.evaluate(obs)) for obs in training_set)
             # old_likehood /= observations_num
 

@@ -11,7 +11,7 @@ from voice_module import VoiceModule
 from KNN import KNN
 from HMM import HMM
 
-emotions = ["anger", "boredom", "happiness", "sadness", "fear"]
+emotions = ["anger", "boredom", "happiness", "sadness"]
 
 
 def build_file_set(pattern):
@@ -87,20 +87,20 @@ def print_feature_vector():
             print(feature_vector[j], end=" ")
         print("\n")
 
-
-def train(file):
-    train_set = build_file_set(file)
-
-    voice_m = VoiceModule(512)
-    knn_module = KNN(emotions, 8)
-
-    for i in range(0, len(train_set)):
-        print_progress_bar(i + 1, len(train_set), prefix='Training progress:', suffix='Complete', length=50)
-        feature_vector = voice_m.get_feature_vector(train_set[i][0])
-        for j in range(0, len(feature_vector)):
-            knn_module.train(feature_vector[j], train_set[i][1])
-
-    return knn_module
+#
+# def train(file):
+#     train_set = build_file_set(file)
+#
+#     voice_m = VoiceModule(512)
+#     knn_module = KNN(emotions, 8)
+#
+#     for i in range(0, len(train_set)):
+#         print_progress_bar(i + 1, len(train_set), prefix='Training progress:', suffix='Complete', length=50)
+#         feature_vector = voice_m.get_feature_vector(train_set[i][0])
+#         for j in range(0, len(feature_vector)):
+#             knn_module.train(feature_vector[j], train_set[i][1])
+#
+#     return knn_module
 
 def are_equal(vecA, vecB):
     if len(vecA) != len(vecB):
@@ -109,7 +109,7 @@ def are_equal(vecA, vecB):
     else:
         for i in range(0, len(vecA)):
             if vecA[i] != vecB[i]:
-                print("Not THe same")
+                print("Not the same")
                 return False
 
     return True
@@ -196,7 +196,7 @@ def train(train_path_pattern, voice_m, db_name, pitch_knn_module, summary_pitch_
     return db
 
 
-def main(train_path_pattern, test_path_pattern, db_name):
+def main_KNN(train_path_pattern, test_path_pattern, db_name):
     summary_table = {}
     for i in range(0, len(emotions)):
         summary_table[emotions[i]] = {"neutral": 0, "anger": 0, "boredom": 0, "disgust": 0, "fear": 0, "happiness": 0,
@@ -215,7 +215,6 @@ def main(train_path_pattern, test_path_pattern, db_name):
 
     for i in range(0, len(input_set)):
         print_progress_bar(i + 1, len(input_set), prefix='Computing progress:', suffix='Complete', length=50)
-        sample_rate = voice_m.get_sample_rate(input_set[i][0])
 
         pitch_feature_vectors = voice_m.get_pitch_feature_vector(input_set[i][0], frame_length)
         summary_pitch_feature_vector = []
@@ -228,15 +227,7 @@ def main(train_path_pattern, test_path_pattern, db_name):
         energy_feature_vectors = voice_m.get_energy_feature_vector(input_set[i][0])
         energy_possible_emotions = []
         if len(energy_feature_vectors) > 0:
-            energy_possible_emotions = energy_knn_module.compute_emotion(energy_feature_vectors, 15)
-
-        # print("\n" + input_set[i][0])
-        # print("\npitch_possible_emotions")
-        # print(pitch_possible_emotions)
-        # print("summary_pitch_possible_emotions")
-        # print(summary_pitch_possible_emotions)
-        # print("energy_possible_emotions")
-        # print(energy_possible_emotions)
+            energy_possible_emotions = energy_knn_module.compute_emotion(energy_feature_vectors, 12)
 
         possible_emotions = pitch_possible_emotions
         possible_emotions.extend(summary_pitch_possible_emotions)
@@ -253,37 +244,138 @@ def main(train_path_pattern, test_path_pattern, db_name):
 
         summary_table[input_set[i][1]][computed_emotion] += 1
 
+    print_summary(summary_table)
+
+
+def print_summary(summary_table):
     print()
     for i in range(0, len(emotions)):
-        print("emo: %s\t, neutral: %d\t, anger: %d\t, boredom: %d\t, disgust: %d\t, fear: %d\t, happiness: %d\t, "
+        print("emo: %s\t, anger: %d\t, boredom: %d\t,  happiness: %d\t, "
               "sadness: %d\t, guessed:%d\t, tested: %d\t, trained: %d\n"
-              % (emotions[i], summary_table[emotions[i]]["neutral"], summary_table[emotions[i]]["anger"],
-                 summary_table[emotions[i]]["boredom"], summary_table[emotions[i]]["disgust"],
-                 summary_table[emotions[i]]["fear"], summary_table[emotions[i]]["happiness"],
+              % (emotions[i], summary_table[emotions[i]]["anger"],
+                 summary_table[emotions[i]]["boredom"], summary_table[emotions[i]]["happiness"],
                  summary_table[emotions[i]]["sadness"], summary_table[emotions[i]]["guessed"],
                  summary_table[emotions[i]]["tested"], summary_table[emotions[i]]["trained"]))
 
 
-if len(sys.argv) > 1 and sys.argv[1] == 'KNN':
-    filterwarnings('ignore', category = pymysql.Warning)
-    main('Berlin_EmoDatabase/train/*/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav', knn_db.DB_NAME)
-else:
-    possible_observations = [0, 1, 2]
-    num_of_states = 3
+def convert_vector_to_number(vector):
+    num = ""
+    for i in range(len(vector)):
+        if int(vector[i] / 10) == 0:
+            num += "0" + str(vector[i])
+        else:
+            num += str(vector[i])
+
+    return num
+
+
+def prepare_set(train_path_pattern, voice_m, frame_length):
+    train_set = build_file_set(train_path_pattern)
+    training_observations = {"anger": [], "boredom": [], "happiness": [], "sadness": []}
+
+    for i in range(0, len(train_set)):
+        print_progress_bar(i + 1, len(train_set), prefix='Computing progress:', suffix='Complete', length=50)
+        pitch_feature_vectors = voice_m.get_pitch_feature_vector(train_set[i][0], frame_length)
+        grouped_pitch_feature_vectors = []
+        for j in range(0, len(pitch_feature_vectors)):
+            grouped_vector = voice_m.create_grouped_pitch_veatures(
+                pitch_feature_vectors[j][1:5] + pitch_feature_vectors[-1])
+            grouped_pitch_feature_vectors.append(convert_vector_to_number(grouped_vector))
+
+        grouped_pitch_feature_vectors_len = len(grouped_pitch_feature_vectors)
+        if grouped_pitch_feature_vectors_len > 6:
+            training_observations[train_set[i][1]].append(
+                grouped_pitch_feature_vectors[grouped_pitch_feature_vectors_len - 6:grouped_pitch_feature_vectors_len])
+        elif grouped_pitch_feature_vectors_len == 6:
+            training_observations[train_set[i][1]].append(grouped_pitch_feature_vectors)
+        else:
+            for k in range(0, 6 - len(grouped_pitch_feature_vectors)):
+                grouped_pitch_feature_vectors.append("0" * 10)
+            training_observations[train_set[i][1]].append(grouped_pitch_feature_vectors)
+
+    return training_observations
+
+
+def main_HMM(train_path_pattern, test_path_pattern):
+    voice_m = VoiceModule()
+    frame_length = 512
+
+    num_of_states = 6
     trasition_ppb = [[0.2, 0.8],
+                     [0.2, 0.8],
+                     [0.2, 0.8],
+                     [0.2, 0.8],
                      [0.2, 0.8],
                      [0.2, 0]]
 
-    HMM_test = HMM(trasition_ppb, num_of_states, possible_observations)
+    print("Creating possible obserwations")
+    possible_observations = voice_m.create_possible_observations()
+    possible_observations.append("0"*10)
 
-    training_set = [[0, 1, 2],
-                    [2, 1, 0]]
+    HMM_modules = {}
+    print("Creating HMM")
+    HMM_modules["anger"] = HMM(trasition_ppb, num_of_states, possible_observations)
+    HMM_modules["boredom"] = HMM(trasition_ppb, num_of_states, possible_observations)
+    HMM_modules["happiness"] = HMM(trasition_ppb, num_of_states, possible_observations)
+    HMM_modules["sadness"] = HMM(trasition_ppb, num_of_states, possible_observations)
 
-    HMM_test.learn(training_set, 0.00001)
-    print(HMM_test.evaluate(training_set[0]))
-    print(HMM_test.evaluate([2, 1, 0]))
-    print(HMM_test.evaluate([0, 0, 2]))
-    print(HMM_test.evaluate([1, 2, 0]))
+    summary_table = {}
+    for i in range(0, len(emotions)):
+        summary_table[emotions[i]] = {"anger": 0, "boredom": 0, "happiness": 0, "sadness": 0,
+                                      "guessed": 0, "tested": 0, "trained": 0}
+
+    print("Creating training observations")
+    training_observations = prepare_set(train_path_pattern, voice_m, frame_length)
+
+    print("Traning HMM")
+    for key, value in HMM_modules.items():
+        print("Training %s hmm module" %(key))
+        HMM_modules[key].learn(training_observations[key], 0.001)
+
+    print("Preparing test observations")
+    test_observations = prepare_set(test_path_pattern, voice_m, frame_length)
+
+    print("Testing")
+    for tested_emo in test_observations:
+        for observation in test_observations[tested_emo]:
+            most_ppb_emotion = tested_emo
+            max_ppb = 0
+            for emotion, hmm_module in HMM_modules.items():
+                value = hmm_module.evaluate(observation)
+                if value > max_ppb:
+                    max_ppb = value
+                    most_ppb_emotion = emotion
+
+            summary_table[tested_emo]["tested"] += 1
+            summary_table[tested_emo][most_ppb_emotion] += 1
+            if most_ppb_emotion == tested_emo:
+                summary_table[tested_emo]["guessed"] += 1
+
+    print_summary(summary_table)
+    # print(summary_table)
+
+
+if len(sys.argv) > 1 and sys.argv[1] == 'KNN':
+    filterwarnings('ignore', category = pymysql.Warning)
+    main_KNN('Berlin_EmoDatabase/train/*/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav', knn_db.DB_NAME)
+else:
+    main_HMM('Berlin_EmoDatabase/train/male/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav')
+    # possible_observations = [0, 1, 2]
+    # num_of_states = 3
+    # trasition_ppb = [[0.2, 0.8],
+    #                  [0.2, 0.8],
+    #                  [0.2, 0]]
+    #
+    # HMM_test = HMM(trasition_ppb, num_of_states, possible_observations)
+    #
+    # training_set = [[0, 1, 2],
+    #                 [2, 1, 0]]
+    #
+    # HMM_test.learn(training_set, 0.00001)
+    # print(HMM_test.evaluate(training_set[0]))
+    # print(HMM_test.evaluate([2, 1, 0]))
+    # print(HMM_test.evaluate([0, 0, 2]))
+    # print(HMM_test.evaluate([1, 2, 0]))
 
     # for i in HMM_test.get_parameters():
     #     print(i)
