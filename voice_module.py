@@ -364,9 +364,11 @@ class VoiceModule:
 
     def create_grouped_pitch_veatures(self, pitch_features_group):
 
-        return [pitch_features_group[0], pitch_features_group[1], pitch_features_group[2],
-                self.get_scale_id(dynamic_tones_scale, pitch_features_group[3]),
-                self.get_scale_id(relative_std_deviation_scale, pitch_features_group[6])]
+        return [self.get_scale_id(freq_range_scale, pitch_features_group[0]), pitch_features_group[1],
+                pitch_features_group[2], pitch_features_group[3],
+                self.get_scale_id(dynamic_tones_scale, pitch_features_group[4]), (int)(pitch_features_group[5]/10) + 1,
+                (int)(pitch_features_group[6] / 10) + 1,
+                self.get_scale_id(relative_std_deviation_scale, pitch_features_group[7])]
 
     def to_str(self, value):
         if (int)(value / 10) == 0:
@@ -374,7 +376,7 @@ class VoiceModule:
 
         return str(value)
 
-    def create_possible_observations(self):
+    def create_pitch_possible_observations_a(self):
         possible_observations = []
         for value2 in range(1, len(voice_freq_scale) + 1):
             p2 = self.to_str(value2)
@@ -393,8 +395,3 @@ class VoiceModule:
                             possible_observations.append(p8)
 
         return possible_observations
-
-                                #
-        # return [vocal_range, self.get_scale_id(voice_freq_scale, max_freq),
-        #         self.get_scale_id(voice_freq_scale, min_freq), self.get_scale_id(voice_freq_scale, avg_frequency),
-        #         dynamic_tones_percent, percent_of_falling_tones, percent_of_rising_tones, relative_std_deviation]

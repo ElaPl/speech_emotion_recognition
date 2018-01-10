@@ -253,8 +253,8 @@ class HMM:
         old_likehood = 0
         new_likehood = 0
 
-        for estimation_iteration in range(0, 7):
-            print("Estimation iteration %d", estimation_iteration)
+        for estimation_iteration in range(0, 1):
+            # print("Estimation iteration %d", estimation_iteration)
             # old_likehood += sum(log(self.evaluate(obs)) for obs in training_set)
             # old_likehood /= observations_num
 

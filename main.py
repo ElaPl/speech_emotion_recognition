@@ -87,20 +87,6 @@ def print_feature_vector():
             print(feature_vector[j], end=" ")
         print("\n")
 
-#
-# def train(file):
-#     train_set = build_file_set(file)
-#
-#     voice_m = VoiceModule(512)
-#     knn_module = KNN(emotions, 8)
-#
-#     for i in range(0, len(train_set)):
-#         print_progress_bar(i + 1, len(train_set), prefix='Training progress:', suffix='Complete', length=50)
-#         feature_vector = voice_m.get_feature_vector(train_set[i][0])
-#         for j in range(0, len(feature_vector)):
-#             knn_module.train(feature_vector[j], train_set[i][1])
-#
-#     return knn_module
 
 def are_equal(vecA, vecB):
     if len(vecA) != len(vecB):
@@ -113,6 +99,7 @@ def are_equal(vecA, vecB):
                 return False
 
     return True
+
 
 def compare_feature_vectors(file):
     knn_moduleA = train('Berlin_EmoDatabase/wav/a*/*/*.wav')
@@ -268,32 +255,33 @@ def convert_vector_to_number(vector):
 
     return num
 
+def fill_up_to_six(list_of_elem):
+    list_len = len(list_of_elem)
+
+    if list_len > 6:
+        return list_of_elem[(list_len - 6):list_len]
+    elif list_len < 6:
+        for k in range(0, 6 - list_len):
+            list_of_elem.append("0" * 10)
+
+    return list_of_elem
 
 def prepare_set(train_path_pattern, voice_m, frame_length):
     train_set = build_file_set(train_path_pattern)
-    training_observations = {"anger": [], "boredom": [], "happiness": [], "sadness": []}
+    pitch_training_observations_a = {"anger": [], "boredom": [], "happiness": [], "sadness": []}
 
     for i in range(0, len(train_set)):
         print_progress_bar(i + 1, len(train_set), prefix='Computing progress:', suffix='Complete', length=50)
         pitch_feature_vectors = voice_m.get_pitch_feature_vector(train_set[i][0], frame_length)
-        grouped_pitch_feature_vectors = []
+
+        grouped_pitch_feature_vectors_a = []
         for j in range(0, len(pitch_feature_vectors)):
-            grouped_vector = voice_m.create_grouped_pitch_veatures(
-                pitch_feature_vectors[j][1:5] + pitch_feature_vectors[-1])
-            grouped_pitch_feature_vectors.append(convert_vector_to_number(grouped_vector))
+            grouped_vector = voice_m.create_grouped_pitch_veatures(pitch_feature_vectors[j])
+            grouped_pitch_feature_vectors_a.append(convert_vector_to_number(grouped_vector[1:5] + grouped_vector[-1:]))
 
-        grouped_pitch_feature_vectors_len = len(grouped_pitch_feature_vectors)
-        if grouped_pitch_feature_vectors_len > 6:
-            training_observations[train_set[i][1]].append(
-                grouped_pitch_feature_vectors[grouped_pitch_feature_vectors_len - 6:grouped_pitch_feature_vectors_len])
-        elif grouped_pitch_feature_vectors_len == 6:
-            training_observations[train_set[i][1]].append(grouped_pitch_feature_vectors)
-        else:
-            for k in range(0, 6 - len(grouped_pitch_feature_vectors)):
-                grouped_pitch_feature_vectors.append("0" * 10)
-            training_observations[train_set[i][1]].append(grouped_pitch_feature_vectors)
+        pitch_training_observations_a[train_set[i][1]].append(fill_up_to_six(grouped_pitch_feature_vectors_a))
 
-    return training_observations
+    return pitch_training_observations_a
 
 
 def main_HMM(train_path_pattern, test_path_pattern):
@@ -308,39 +296,37 @@ def main_HMM(train_path_pattern, test_path_pattern):
                      [0.2, 0.8],
                      [0.2, 0]]
 
-    print("Creating possible obserwations")
-    possible_observations = voice_m.create_possible_observations()
-    possible_observations.append("0"*10)
+    print("Creating possible observations")
+    pitch_possible_observations_a = voice_m.create_pitch_possible_observations_a()
+    pitch_possible_observations_a.append("0"*10)
 
-    HMM_modules = {}
     print("Creating HMM")
-    HMM_modules["anger"] = HMM(trasition_ppb, num_of_states, possible_observations)
-    HMM_modules["boredom"] = HMM(trasition_ppb, num_of_states, possible_observations)
-    HMM_modules["happiness"] = HMM(trasition_ppb, num_of_states, possible_observations)
-    HMM_modules["sadness"] = HMM(trasition_ppb, num_of_states, possible_observations)
-
+    pitch_HMM_modules = {}
     summary_table = {}
-    for i in range(0, len(emotions)):
-        summary_table[emotions[i]] = {"anger": 0, "boredom": 0, "happiness": 0, "sadness": 0,
-                                      "guessed": 0, "tested": 0, "trained": 0}
+
+    for emotion in emotions:
+        pitch_HMM_modules[emotion] = HMM(trasition_ppb, num_of_states, pitch_possible_observations_a)
+        summary_table[emotion] = {"anger": 0, "boredom": 0, "happiness": 0, "sadness": 0, "guessed": 0, "tested": 0,
+                                  "trained": 0}
 
     print("Creating training observations")
-    training_observations = prepare_set(train_path_pattern, voice_m, frame_length)
+    pitch_training_observations_a = prepare_set(train_path_pattern, voice_m, frame_length)
 
     print("Traning HMM")
-    for key, value in HMM_modules.items():
-        print("Training %s hmm module" %(key))
-        HMM_modules[key].learn(training_observations[key], 0.001)
+    for emotion in emotions:
+        print("Training %s hmm module" %(emotion))
+        pitch_HMM_modules[emotion].learn(pitch_training_observations_a[emotion], 0.001)
 
     print("Preparing test observations")
     test_observations = prepare_set(test_path_pattern, voice_m, frame_length)
 
+
     print("Testing")
-    for tested_emo in test_observations:
+    for tested_emo in emotions:
         for observation in test_observations[tested_emo]:
             most_ppb_emotion = tested_emo
             max_ppb = 0
-            for emotion, hmm_module in HMM_modules.items():
+            for emotion, hmm_module in pitch_HMM_modules.items():
                 value = hmm_module.evaluate(observation)
                 if value > max_ppb:
                     max_ppb = value
@@ -360,28 +346,8 @@ if len(sys.argv) > 1 and sys.argv[1] == 'KNN':
     main_KNN('Berlin_EmoDatabase/train/*/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav', knn_db.DB_NAME)
 else:
     main_HMM('Berlin_EmoDatabase/train/male/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav')
-    # possible_observations = [0, 1, 2]
-    # num_of_states = 3
-    # trasition_ppb = [[0.2, 0.8],
-    #                  [0.2, 0.8],
-    #                  [0.2, 0]]
-    #
-    # HMM_test = HMM(trasition_ppb, num_of_states, possible_observations)
-    #
-    # training_set = [[0, 1, 2],
-    #                 [2, 1, 0]]
-    #
-    # HMM_test.learn(training_set, 0.00001)
-    # print(HMM_test.evaluate(training_set[0]))
-    # print(HMM_test.evaluate([2, 1, 0]))
-    # print(HMM_test.evaluate([0, 0, 2]))
-    # print(HMM_test.evaluate([1, 2, 0]))
 
-    # for i in HMM_test.get_parameters():
-    #     print(i)
-    # print(HMM_test.evaluate(training_set[0]))
-    # print(HMM_test.evaluate([4, 3, 5]))
-    # print(HMM_test.evaluate([5, 4, 3]))
+
 
 
 # main('emodb/train/female/*/*.wav', 'emodb/test/female/*/*.wav', knn_db.DB_FEMALE_NAME)
