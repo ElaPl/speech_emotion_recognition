@@ -13,6 +13,9 @@ from HMM import HMM
 
 emotions = ["anger", "boredom", "happiness", "sadness"]
 
+# If True than debug print will be displayed
+debug = False
+
 
 def build_file_set(pattern):
     train_set = []
@@ -22,11 +25,6 @@ def build_file_set(pattern):
             emotion = os.path.basename(path)
             train_set.append([path_and_file, emotion])
     return train_set
-
-
-def print2DArray(array_2D):
-    for row in range(0, len(array_2D)):
-        print(array_2D[row][0] + " " + array_2D[row][1])
 
 
 def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█'):
@@ -75,50 +73,8 @@ def draw_freq_histogram():
 
         plt.show()
 
-
-def print_feature_vector():
-    train_set = build_file_set('Berlin_EmoDatabase/wav/' + sys.argv[1] + '/*.wav')
-    frame_size = 512
-    voice_m = VoiceModule(frame_size)
-
-    for i in range(0, len(train_set)):
-        feature_vector = voice_m.get_feature_vector(train_set[i][0], 512)
-        for j in range(0, len(feature_vector)):
-            print(feature_vector[j], end=" ")
-        print("\n")
-
-
-def are_equal(vecA, vecB):
-    if len(vecA) != len(vecB):
-        print("Not equal")
-        return False
-    else:
-        for i in range(0, len(vecA)):
-            if vecA[i] != vecB[i]:
-                print("Not the same")
-                return False
-
-    return True
-
-
-def compare_feature_vectors(file):
-    knn_moduleA = train('Berlin_EmoDatabase/wav/a*/*/*.wav')
-    knn_moduleB = train('Berlin_EmoDatabase/wav/a*/*/*.wav')
-
-    for i in range(0, len(knn_moduleA.training_set)):
-        if (False == are_equal(knn_moduleA.training_set[i]["training_vec"], knn_moduleB.training_set[i]["training_vec"])
-            or False == are_equal(knn_moduleA.training_set[i]["norm_vec"], knn_moduleB.training_set[i]["norm_vec"])
-            or knn_moduleA.training_set[i]["min"] != knn_moduleB.training_set[i]["min"]
-            or knn_moduleA.training_set[i]["max"] != knn_moduleB.training_set[i]["max"]
-            or (False == are_equal(knn_moduleA.training_set[i]["state"], knn_moduleB.training_set[i]["state"]))):
-            print("Not equal")
-            break
-        print("Equal")
-
-
 def draw_energy_histogram():
     train_set = build_file_set('Berlin_EmoDatabase/wav/' + sys.argv[1] + '/*.wav')
-    frame_size = 512
     voice_m = VoiceModule()
 
     for i in range(0, len(train_set)):
@@ -133,103 +89,123 @@ def draw_energy_histogram():
 
         plt.show()
 
+def safe_in_database(database, cursor, table, db_table_name):
+    for row in table:
+        knn_db.save_in_dbtable(database, cursor, row[0], row[1], db_table_name)
 
-def train(train_path_pattern, voice_m, db_name, pitch_knn_module, summary_pitch_knn_module,
-          energy_knn_module ,summary_table, frame_length):
+def print_debug(text):
+    if debug is True:
+        print(text)
 
-    db = pymysql.connect(host="localhost", user="root", passwd="Mout", db=db_name)
-    cursor = db.cursor()
+def get_train_set_KNN(train_path_pattern, voice_module, db_name, db_password, summary_table):
+    if debug:
+        print_debug("train")
+    is_connection = True
 
-    if knn_db.is_training_set_exists(cursor):
-        print_progress_bar(1, 3, prefix='Training progress:', suffix='Complete', length=50)
+    try:
+        db = pymysql.connect(host="localhost", user="root", passwd=db_password, db=db_name)
+    except pymysql.Error as e:
+        print_debug("Can't connect to db")
+        is_connection = False
+
+    if is_connection is True:
+        print_debug("Connected to db")
+        cursor = db.cursor()
+
+    all_pitch_features_vector = []
+    all_energy_features_vector = []
+    all_summary_pitch_features_vector = []
+
+    if (is_connection is True) and (knn_db.is_training_set_exists(cursor) is True):
+        print_debug("Train set exists, start downloading data")
         for row in knn_db.train_knn_from_db(cursor, knn_db.pitch_train_set_name):
-            pitch_knn_module.train(row[0: -1], row[-1])
+            all_pitch_features_vector.append([list(row[0: -1]), row[-1]])
             summary_table[row[-1]]["trained"] += 1
 
         print_progress_bar(2, 3, prefix='Training progress:', suffix='Complete', length=50)
         for row in knn_db.train_knn_from_db(cursor, knn_db.summary_pitch_train_set_name):
-            summary_pitch_knn_module.train(row[0: -1], row[-1])
-            summary_table[row[-1]]["trained"] += 1
+            all_summary_pitch_features_vector.append([list(row[0: -1]), row[-1]])
 
         print_progress_bar(3, 3, prefix='Training progress:', suffix='Complete', length=50)
         for row in knn_db.train_knn_from_db(cursor, knn_db.energy_train_set_name):
-            energy_knn_module.train(row[0: -1], row[-1])
-            summary_table[row[-1]]["trained"] += 1
+            all_energy_features_vector.append([list(row[0: -1]), row[-1]])
 
     else:
+        print_debug("Train set doesn't exist, start computing data")
+
+        test_set = build_file_set(train_path_pattern)
+        num_files = len(test_set)
+        for i in range(num_files):
+            print_progress_bar(i + 1, num_files, prefix='Training progress:', suffix='Complete', length=50)
+            file = test_set[i][0]
+            emotion = test_set[i][1]
+            summary_table[emotion]["trained"] += 1
+
+            pitch_feature_vectors, energy_feature_vectors, summary_pitch_feature_vector \
+                = voice_module.get_feature_vectors(file)
+
+            for vec in pitch_feature_vectors:
+                all_pitch_features_vector.append([vec, emotion])
+
+            for vec in energy_feature_vectors:
+                all_energy_features_vector.append([vec, emotion])
+
+            all_summary_pitch_features_vector.append([summary_pitch_feature_vector, emotion])
+
+    if is_connection and (knn_db.is_training_set_exists(cursor) is False):
+        print_debug("Saving in db")
         knn_db.create_training_set(db, cursor)
-        train_set = build_file_set(train_path_pattern)
+        print_progress_bar(0, 3, prefix='Saving in database:', suffix='Complete', length=50)
+        safe_in_database(db, cursor, all_pitch_features_vector, knn_db.pitch_train_set_name)
+        print_progress_bar(1, 3, prefix='Saving in database:', suffix='Complete', length=50)
+        safe_in_database(db, cursor, all_energy_features_vector, knn_db.energy_train_set_name)
+        print_progress_bar(2, 3, prefix='Saving in database:', suffix='Complete', length=50)
+        safe_in_database(db, cursor, all_summary_pitch_features_vector, knn_db.summary_pitch_train_set_name)
+        print_progress_bar(3, 3, prefix='Saving in database:', suffix='Complete', length=50)
 
-        for i in range(0, len(train_set)):
-            print_progress_bar(i + 1, len(train_set), prefix='Training progress:', suffix='Complete', length=50)
-            summary_table[train_set[i][1]]["trained"] += 1
-
-            sample_rate = voice_m.get_sample_rate(train_set[i][0])
-            pitch_feature_vectors = voice_m.get_pitch_feature_vector(train_set[i][0], frame_length)
-            for j in range(0, len(pitch_feature_vectors)):
-                pitch_knn_module.train(pitch_feature_vectors[j], train_set[i][1])
-                knn_db.save_in_dbtable(db, cursor, pitch_feature_vectors[j], train_set[i][1],  knn_db.pitch_train_set_name)
-
-            summary_pitch_feature_vector = voice_m.get_summary_pitch_feature_vector(pitch_feature_vectors)
-            for j in range(0, len(summary_pitch_feature_vector)):
-                summary_pitch_knn_module.train(summary_pitch_feature_vector, train_set[i][1])
-                knn_db.save_in_dbtable(db, cursor, summary_pitch_feature_vector, train_set[i][1], knn_db.summary_pitch_train_set_name)
-
-            energy_feature_vectors = voice_m.get_energy_feature_vector(train_set[i][0])
-            for j in range(0, len(energy_feature_vectors)):
-                energy_knn_module.train(energy_feature_vectors[j], train_set[i][1])
-                knn_db.save_in_dbtable(db, cursor, energy_feature_vectors[j], train_set[i][1], knn_db.energy_train_set_name)
-
-    return db
+    return all_pitch_features_vector, all_energy_features_vector, all_summary_pitch_features_vector
 
 
-def main_KNN(train_path_pattern, test_path_pattern, db_name):
+def main_KNN(train_path_pattern, test_path_pattern, db_name, db_password):
     summary_table = {}
-    for i in range(0, len(emotions)):
-        summary_table[emotions[i]] = {"neutral": 0, "anger": 0, "boredom": 0, "disgust": 0, "fear": 0, "happiness": 0,
-                                      "sadness": 0, "guessed": 0, "tested": 0, "trained": 0}
-    frame_length = 512
+    for emotion in emotions:
+        summary_table[emotion] = {"anger": 0, "boredom": 0, "happiness": 0, "sadness": 0, "guessed": 0,
+                                  "tested": 0, "trained": 0}
 
-    pitch_knn_module = KNN(emotions)
-    summary_pitch_knn_module = KNN(emotions)
-    energy_knn_module = KNN(emotions)
-    voice_m = VoiceModule()
+    voice_module = VoiceModule()
 
-    db = train(train_path_pattern, voice_m, db_name, pitch_knn_module, summary_pitch_knn_module, energy_knn_module,
-               summary_table, frame_length)
+    print_debug("Prepare training set")
+    all_pitch_features_vector, all_energy_features_vector, all_summary_pitch_features_vector = \
+        get_train_set_KNN(train_path_pattern, voice_module, db_name, db_password, summary_table)
 
-    input_set = build_file_set(test_path_pattern)
+    print_debug("Training")
+    pitch_knn_module = KNN(emotions, all_pitch_features_vector)
+    summary_pitch_knn_module = KNN(emotions, all_summary_pitch_features_vector)
+    energy_knn_module = KNN(emotions, all_energy_features_vector)
 
-    for i in range(0, len(input_set)):
-        print_progress_bar(i + 1, len(input_set), prefix='Computing progress:', suffix='Complete', length=50)
+    print_debug("Computing emotions")
+    test_set = build_file_set(test_path_pattern)
+    num_files = len(test_set)
 
-        pitch_feature_vectors = voice_m.get_pitch_feature_vector(input_set[i][0], frame_length)
-        summary_pitch_feature_vector = []
-        if len(pitch_feature_vectors) > 0:
-            pitch_possible_emotions = pitch_knn_module.compute_emotion(pitch_feature_vectors, 15)
+    for i in range(num_files):
+        print_progress_bar(i+1, num_files, prefix='Computing progress:', suffix='Complete', length=50)
+        file = test_set[i][0]
+        emotion = test_set[i][1]
 
-            summary_pitch_feature_vector.extend(voice_m.get_summary_pitch_feature_vector(pitch_feature_vectors))
-            summary_pitch_possible_emotions = summary_pitch_knn_module.get_emotion(summary_pitch_feature_vector, 4)
+        pitch_feature_vectors, energy_feature_vectors, summary_pitch_feature_vector \
+            = voice_module.get_feature_vectors(file)
 
-        energy_feature_vectors = voice_m.get_energy_feature_vector(input_set[i][0])
-        energy_possible_emotions = []
-        if len(energy_feature_vectors) > 0:
-            energy_possible_emotions = energy_knn_module.compute_emotion(energy_feature_vectors, 12)
-
-        possible_emotions = pitch_possible_emotions
-        possible_emotions.extend(summary_pitch_possible_emotions)
-        possible_emotions.extend(energy_possible_emotions)
+        possible_emotions = pitch_knn_module.compute_emotion(pitch_feature_vectors, 15)
+        possible_emotions.extend(summary_pitch_knn_module.get_emotion(summary_pitch_feature_vector, 4))
+        possible_emotions.extend(energy_knn_module.compute_emotion(energy_feature_vectors, 12))
 
         computed_emotion = get_most_frequent_emotion(possible_emotions)
 
-        if computed_emotion == "":
-            computed_emotion = pitch_possible_emotions[0]
-
-        summary_table[input_set[i][1]]["tested"] += 1
-        if computed_emotion == input_set[i][1]:
-            summary_table[input_set[i][1]]["guessed"] += 1
-
-        summary_table[input_set[i][1]][computed_emotion] += 1
+        summary_table[emotion]["tested"] += 1
+        if computed_emotion == emotion:
+            summary_table[emotion]["guessed"] += 1
+        else:
+            summary_table[emotion][computed_emotion] += 1
 
     print_summary(summary_table)
 
@@ -237,7 +213,7 @@ def main_KNN(train_path_pattern, test_path_pattern, db_name):
 def print_summary(summary_table):
     print()
     for i in range(0, len(emotions)):
-        print("emo: %s\t, anger: %d\t, boredom: %d\t,  happiness: %d\t, "
+        print("tested emotion: %s\t, anger: %d\t, boredom: %d\t,  happiness: %d\t, "
               "sadness: %d\t, guessed:%d\t, tested: %d\t, trained: %d\n"
               % (emotions[i], summary_table[emotions[i]]["anger"],
                  summary_table[emotions[i]]["boredom"], summary_table[emotions[i]]["happiness"],
@@ -270,16 +246,20 @@ def prepare_set(train_path_pattern, voice_m, frame_length):
     train_set = build_file_set(train_path_pattern)
     pitch_training_observations_a = {"anger": [], "boredom": [], "happiness": [], "sadness": []}
 
-    for i in range(0, len(train_set)):
+    for i in range(len(train_set)):
+        file = train_set[i][0]
+        emotion = train_set[i][1]
         print_progress_bar(i + 1, len(train_set), prefix='Computing progress:', suffix='Complete', length=50)
-        pitch_feature_vectors = voice_m.get_pitch_feature_vector(train_set[i][0], frame_length)
+
+
+        pitch_feature_vectors = voice_m.get_pitch_feature_vector(file, frame_length)
 
         grouped_pitch_feature_vectors_a = []
         for j in range(0, len(pitch_feature_vectors)):
             grouped_vector = voice_m.create_grouped_pitch_veatures(pitch_feature_vectors[j])
             grouped_pitch_feature_vectors_a.append(convert_vector_to_number(grouped_vector[1:5] + grouped_vector[-1:]))
 
-        pitch_training_observations_a[train_set[i][1]].append(fill_up_to_six(grouped_pitch_feature_vectors_a))
+        pitch_training_observations_a[emotion].append(fill_up_to_six(grouped_pitch_feature_vectors_a))
 
     return pitch_training_observations_a
 
@@ -341,12 +321,21 @@ def main_HMM(train_path_pattern, test_path_pattern):
     # print(summary_table)
 
 
-if len(sys.argv) > 1 and sys.argv[1] == 'KNN':
-    filterwarnings('ignore', category = pymysql.Warning)
-    main_KNN('Berlin_EmoDatabase/train/*/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav', knn_db.DB_NAME)
-else:
-    main_HMM('Berlin_EmoDatabase/train/male/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav')
+filterwarnings('ignore', category=pymysql.Warning)
+# main_KNN('Berlin_EmoDatabase/train/*/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav', knn_db.DB_NAME)
 
+if len(sys.argv) > 1 and sys.argv[1] == 'KNN':
+    if len(sys.argv) == 4:
+        db_name = sys.argv[2]
+        db_password = sys.argv[3]
+    else:
+        db_name = knn_db.DB_NAME
+        db_password = "Mout"
+
+    main_KNN('Berlin_EmoDatabase/train/*/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav', db_name, db_password)
+# else:
+#     main_HMM('Berlin_EmoDatabase/train/male/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav')
+#
 
 
 

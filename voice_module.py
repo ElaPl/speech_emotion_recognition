@@ -3,6 +3,7 @@ import numpy as np
 from math import sqrt, log10
 from wav_iterator import WavIterator
 from hanning_window import HanningWindow
+import struct
 
 voice_freq_scale = [
     {"id": 1, "min": 0, "max": 50},
@@ -62,81 +63,78 @@ def print_signal(signal):
 
 
 class VoiceModule:
+    # Odczytaj określoną ilość próbek z jednego channelu z pliku wav
+    def read_from_wav_file(self, wav_file, length):
+        sizes = {1: 'B', 2: 'h', 4: 'i'}
+        fmt_size = sizes[wav_file.getsampwidth()]
 
-    def get_pitch_feature_vector(self, filename, frame_length):
-        window = HanningWindow(frame_length)
+        fmt = "<" + fmt_size * length * wav_file.getnchannels()
+
+        decoded = struct.unpack(fmt, wav_file.readframes(length))
+        decoded_on_channel = []
+
+        for i in range(0, len(decoded), wav_file.getnchannels()):
+            decoded_on_channel.append(decoded[i])
+        return decoded_on_channel
+
+    # Dziwięk dzielimy na kawałki o długości ~0,25ms
+    #
+    def get_feature_vectors(self, file):
 
         try:
-            wav_file = wave.open(filename, 'rb')
+            wav_file = wave.open(file, 'rb')
         except IOError:
-            print("Can't open file " + filename)
+            print("Can't open file " + file)
             return []
 
-        sample_rate = wav_file.getframerate()
-        sample_in_sec_quarter = sample_rate / 3
-        frames_num = sample_in_sec_quarter/frame_length
-        if sample_in_sec_quarter % frame_length != 0:
-            frames_num += 1
+        # liczba sampli / sek
+        frame_rate = wav_file.getframerate()
 
-        features_vectors_container = []
-        frame_counter = 0
-        wav_iter = WavIterator(wav_file, frame_length)
+        frame_length = 512
+
+        # liczba ramek w 0,25 ms
+        frame_num = int(frame_rate / 4 / frame_length)
+
+        # ilosć sampli w 0,25 ms
+        sample_len = frame_num * frame_length
+
+        try:
+            sample = self.read_from_wav_file(wav_file, sample_len)
+        except wave.Error:
+            return []
+
+        pitch_window = HanningWindow(frame_length)
+        energy_window = HanningWindow(sample_len)
+
+        pitch_feature_vectors = [self.get_pitch_feature_vector(sample, frame_length, pitch_window, frame_rate)]
+        energy_feature_vectors = [self.get_energy_feature_vector(sample, energy_window)]
+
+        sample_len = int(sample_len / 2)
+
+        while wav_file.tell() + sample_len < wav_file.getnframes():
+            sample_next = sample[sample_len:]
+            sample_next.extend(self.read_from_wav_file(wav_file, sample_len))
+            pitch_feature_vectors.append(self.get_pitch_feature_vector(sample_next, frame_length, pitch_window, frame_rate))
+            energy_feature_vectors.append(self.get_energy_feature_vector(sample_next, energy_window))
+            sample = sample_next
+
+        summary_pitch_feature_vectors = self.get_summary_pitch_feature_vector(pitch_feature_vectors)
+
+        return pitch_feature_vectors, energy_feature_vectors, summary_pitch_feature_vectors
+
+    def get_pitch_feature_vector(self, sample, frame_length, window, frame_rate):
         fundamental_freq_array = []
-        for time_domain_vector in wav_iter:
-            time_domain_vect_size = len(time_domain_vector)
-            signal = []
-            if time_domain_vect_size == frame_length:
-                signal = window.plot(time_domain_vector)
-                frame_counter += 1
-            elif time_domain_vect_size >= 128:
-                tmp_hanning_module = HanningWindow(len(time_domain_vector))
-                signal = tmp_hanning_module.plot(time_domain_vector)
-                frame_counter += 1
+        sample_len = len(sample)
+        sample_pointer = 0
+        while sample_pointer + frame_length < sample_len:
+            frame = sample[sample_pointer:(sample_pointer + frame_length)]
+            sample_pointer += frame_length
+            signal = window.plot(frame)
+            frequency_domain_vector = np.fft.rfft(signal)
+            fundamental_freq_array.append(
+                self.get_fundamental_freq(frequency_domain_vector, frame_rate, frame_length))
 
-            if signal and time_domain_vect_size != 0:
-                frequency_domain_vector = np.fft.rfft(signal)
-                fundamental_freq_array.append(
-                    self.get_fundamental_freq(frequency_domain_vector, wav_file.getframerate(),
-                                              len(time_domain_vector)))
-
-            if frame_counter >= frames_num or (time_domain_vect_size == 0 and frame_counter != 0):
-                frame_counter = 0
-                pitch_feature_vec = self.get_pitch_features(fundamental_freq_array)
-                if len(pitch_feature_vec) != 0:
-                    features_vector = pitch_feature_vec
-                    features_vectors_container.append(features_vector)
-                fundamental_freq_array = []
-
-        wav_file.close()
-        return features_vectors_container
-
-    def get_energy_feature_vector(self, filename):
-        try:
-            wav_file = wave.open(filename, 'rb')
-        except IOError:
-            print("Can't open file " + filename)
-            return []
-
-        sample_rate = wav_file.getframerate()
-        frame_length = int(sample_rate / 3)
-        window = HanningWindow(frame_length)
-        features_vectors_container = []
-        wav_iter = WavIterator(wav_file, frame_length)
-        for time_domain_vector in wav_iter:
-            if len(time_domain_vector) == frame_length:
-                signal = window.plot(time_domain_vector)
-            elif len(time_domain_vector) > 100:
-                tmp_hanning_module = HanningWindow(len(time_domain_vector))
-                signal = tmp_hanning_module.plot(time_domain_vector)
-            else:
-                break
-
-            energy_feature_vec = self.get_energy_features(signal)
-            if len(energy_feature_vec) > 0:
-                features_vectors_container.append(energy_feature_vec)
-
-        wav_file.close()
-        return features_vectors_container
+        return self.get_pitch_features(fundamental_freq_array)
 
     @staticmethod
     def get_file_info(filename):
@@ -319,8 +317,8 @@ class VoiceModule:
 
         return [freq_range, max_freq_range, min_freq_range, avg_range, dynamic_tones_percent, relative_std_deviation]
 
-    @staticmethod
-    def get_energy_features(time_domain_signal):
+    def get_energy_feature_vector(self, sample, window):
+        time_domain_signal = window.plot(sample)
         time_domain_signal_len = len(time_domain_signal)
         if time_domain_signal_len == 0:
             return []
