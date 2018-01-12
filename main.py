@@ -8,13 +8,14 @@ from warnings import filterwarnings
 
 import knn_database as knn_db
 from voice_module import VoiceModule
-from KNN import KNN
+from KNN import KNN, normalize_vector, normalize, euclidean_distance
 from HMM import HMM
+from sklearn.cluster import KMeans
 
 emotions = ["anger", "boredom", "happiness", "sadness"]
 
 # If True than debug print will be displayed
-debug = False
+debug = True
 
 
 def build_file_set(pattern):
@@ -97,9 +98,8 @@ def print_debug(text):
     if debug is True:
         print(text)
 
-def get_train_set_KNN(train_path_pattern, voice_module, db_name, db_password, summary_table):
-    if debug:
-        print_debug("train")
+def get_train_set(train_path_pattern, voice_module, db_name, db_password, summary_table):
+    print_debug("train")
     is_connection = True
 
     try:
@@ -176,7 +176,7 @@ def main_KNN(train_path_pattern, test_path_pattern, db_name, db_password):
 
     print_debug("Prepare training set")
     all_pitch_features_vector, all_energy_features_vector, all_summary_pitch_features_vector = \
-        get_train_set_KNN(train_path_pattern, voice_module, db_name, db_password, summary_table)
+        get_train_set(train_path_pattern, voice_module, db_name, db_password, summary_table)
 
     print_debug("Training")
     pitch_knn_module = KNN(emotions, all_pitch_features_vector)
@@ -213,7 +213,7 @@ def main_KNN(train_path_pattern, test_path_pattern, db_name, db_password):
 def print_summary(summary_table):
     print()
     for i in range(0, len(emotions)):
-        print("tested emotion: %s\t, anger: %d\t, boredom: %d\t,  happiness: %d\t, "
+        print("tested emo: %s\t, anger: %d\t, boredom: %d\t,  happiness: %d\t, "
               "sadness: %d\t, guessed:%d\t, tested: %d\t, trained: %d\n"
               % (emotions[i], summary_table[emotions[i]]["anger"],
                  summary_table[emotions[i]]["boredom"], summary_table[emotions[i]]["happiness"],
@@ -264,9 +264,74 @@ def prepare_set(train_path_pattern, voice_m, frame_length):
     return pitch_training_observations_a
 
 
-def main_HMM(train_path_pattern, test_path_pattern):
-    voice_m = VoiceModule()
-    frame_length = 512
+def get_possible_observations(feature_vector_set):
+
+    min_features_vec, max_features_vec = normalize(feature_vector_set)
+
+    kmeans = KMeans(n_clusters=1000).fit(
+        [feature_vector_set[i][0] for i in range(len(feature_vector_set))])
+
+    observations = (kmeans.cluster_centers_).tolist()
+
+    return observations, min_features_vec, max_features_vec
+
+
+def claster(vector, data):
+    min_dist = euclidean_distance(vector, data[0])
+    min_vector = data[0]
+    for vec in data:
+        dist = euclidean_distance(vector, vec)
+        if dist < min_dist:
+            min_dist = dist
+            min_vector = vec
+
+    return min_vector
+
+
+def get_observations_vectors(file, voice_module, feature, min_features_vec, max_features_vec,
+                             possible_observations):
+
+    pitch_feature_vectors, energy_feature_vectors, summary_pitch_feature_vector \
+        = voice_module.get_feature_vectors(file)
+
+    normalized_observations = []
+    if feature == "pitch":
+        for vec in pitch_feature_vectors:
+            normalize_vector(vec, min_features_vec, max_features_vec)
+            normalized_observations.append(claster(vec, possible_observations))
+    else:
+        for vec in energy_feature_vectors:
+            normalize_vector(vec, min_features_vec, max_features_vec)
+            normalized_observations.append(claster(vec, possible_observations))
+
+    observation_sequence_vec = []
+    #biorę 1,5 sek wektory obserwacji wypowiedzi
+    for i in range(len(normalized_observations) - 2*6 - 2):
+        observation = [normalized_observations[j + i] for j in range(0, 12, 2)]
+        observation_sequence_vec.append(observation)
+
+    return observation_sequence_vec
+
+
+def main_HMM(train_path_pattern, test_path_pattern, db_name, db_password):
+    summary_table = {}
+    for emotion in emotions:
+        summary_table[emotion] = {"anger": 0, "boredom": 0, "happiness": 0, "sadness": 0, "guessed": 0,
+                                  "tested": 0, "trained": 0}
+
+    voice_module = VoiceModule()
+
+    all_pitch_features_vector, all_energy_features_vector, all_summary_pitch_features_vector = \
+        get_train_set(train_path_pattern, voice_module, db_name, db_password, summary_table)
+
+    features = ["pitch", "energy"]
+    possible_observations = {}
+    min_max_features = {"pitch": {}, "energy": {}}
+
+    possible_observations["pitch"], min_max_features["pitch"]["min"], min_max_features["pitch"]["max"] = \
+        get_possible_observations(all_pitch_features_vector)
+    possible_observations["energy"], min_max_features["energy"]["min"], min_max_features["energy"]["max"] = \
+        get_possible_observations(all_energy_features_vector)
 
     num_of_states = 6
     trasition_ppb = [[0.2, 0.8],
@@ -276,66 +341,87 @@ def main_HMM(train_path_pattern, test_path_pattern):
                      [0.2, 0.8],
                      [0.2, 0]]
 
-    print("Creating possible observations")
-    pitch_possible_observations_a = voice_m.create_pitch_possible_observations_a()
-    pitch_possible_observations_a.append("0"*10)
+    HMM_modules = {}
+    for f in features:
+        HMM_modules[f] = {}
 
-    print("Creating HMM")
-    pitch_HMM_modules = {}
-    summary_table = {}
+    for feature in features:
+        for emotion in emotions:
+            print(feature + " " + emotion)
+            HMM_modules[feature][emotion] = HMM(trasition_ppb, num_of_states, possible_observations[feature])
 
-    for emotion in emotions:
-        pitch_HMM_modules[emotion] = HMM(trasition_ppb, num_of_states, pitch_possible_observations_a)
-        summary_table[emotion] = {"anger": 0, "boredom": 0, "happiness": 0, "sadness": 0, "guessed": 0, "tested": 0,
-                                  "trained": 0}
+    file_set = build_file_set(train_path_pattern)
+    num_files = len(file_set)
+    train_set = {}
+    for feature in features:
+        train_set[feature] = {}
+        for emotion in emotions:
+            train_set[feature][emotion] = []
 
-    print("Creating training observations")
-    pitch_training_observations_a = prepare_set(train_path_pattern, voice_m, frame_length)
+    for i in range(num_files):
+        print_progress_bar(i + 1, num_files, prefix='Preparing:', suffix='Complete', length=50)
+        file = file_set[i][0]
+        trained_emotion = file_set[i][1]
 
-    print("Traning HMM")
-    for emotion in emotions:
-        print("Training %s hmm module" %(emotion))
-        pitch_HMM_modules[emotion].learn(pitch_training_observations_a[emotion], 0.001)
+        for feature in features:
+            obs_vec = get_observations_vectors(file, voice_module, feature, min_max_features[feature]["min"],
+                                               min_max_features[feature]["max"], possible_observations[feature])
+            for obs in obs_vec:
+                train_set[feature][trained_emotion].append(obs)
 
-    print("Preparing test observations")
-    test_observations = prepare_set(test_path_pattern, voice_m, frame_length)
+    for feature in features:
+        for emotion in emotions:
+            if train_set[feature][emotion]:
+                HMM_modules[feature][emotion].learn(train_set[feature][emotion], 0.0001)
 
+    file_set = build_file_set(test_path_pattern)
+    num_files = len(file_set)
+    for i in range(num_files):
+        print_progress_bar(i + 1, num_files, prefix='Testing progress:', suffix='Complete', length=50)
+        file = file_set[i][0]
+        tested_emotion = file_set[i][1]
+        possible_emotions = []
 
-    print("Testing")
-    for tested_emo in emotions:
-        for observation in test_observations[tested_emo]:
-            most_ppb_emotion = tested_emo
-            max_ppb = 0
-            for emotion, hmm_module in pitch_HMM_modules.items():
-                value = hmm_module.evaluate(observation)
-                if value > max_ppb:
-                    max_ppb = value
-                    most_ppb_emotion = emotion
+        for feature in features:
+            obs_vec = get_observations_vectors(file, voice_module, feature, min_max_features[feature]["min"],
+                                               min_max_features[feature]["max"], possible_observations[feature])
 
-            summary_table[tested_emo]["tested"] += 1
-            summary_table[tested_emo][most_ppb_emotion] += 1
-            if most_ppb_emotion == tested_emo:
-                summary_table[tested_emo]["guessed"] += 1
+            for obs in obs_vec:
+                max_ppb = 0
+                for emotion, hmm_module in HMM_modules[feature].items():
+                    value = hmm_module.evaluate(obs)
+                    if value > max_ppb:
+                        max_ppb = value
+                        most_ppb_emotion = emotion
+
+                possible_emotions.append(most_ppb_emotion)
+
+        computed_emotion = get_most_frequent_emotion(possible_emotions)
+        summary_table[tested_emotion]["tested"] += 1
+        summary_table[tested_emotion][computed_emotion] += 1
+
+        if computed_emotion == tested_emotion:
+            summary_table[tested_emotion]["guessed"] += 1
 
     print_summary(summary_table)
-    # print(summary_table)
 
 
 filterwarnings('ignore', category=pymysql.Warning)
-# main_KNN('Berlin_EmoDatabase/train/*/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav', knn_db.DB_NAME)
+db_name = knn_db.DB_NAME
+db_password = "Mout"
 
-if len(sys.argv) > 1 and sys.argv[1] == 'KNN':
-    if len(sys.argv) == 4:
-        db_name = sys.argv[2]
-        db_password = sys.argv[3]
-    else:
-        db_name = knn_db.DB_NAME
-        db_password = "Mout"
+if len(sys.argv) == 1:
+    print("Use either KNN or HMM option")
 
+if len(sys.argv) > 4:
+    db_name = sys.argv[2]
+    db_password = sys.argv[3]
+
+if sys.argv[1] == 'KNN':
     main_KNN('Berlin_EmoDatabase/train/*/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav', db_name, db_password)
-# else:
-#     main_HMM('Berlin_EmoDatabase/train/male/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav')
-#
+else:
+    main_HMM('Berlin_EmoDatabase/train/*/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav', db_name, db_password)
+
 
 
 

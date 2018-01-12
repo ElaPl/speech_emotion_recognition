@@ -13,7 +13,7 @@ class HMM:
         self.transition_ppb = self.create_transition_ppb(states_num, transition_ppb)
 
         # emission_ppb[j][o1] - ppb that at state i observation o1 will be produced
-        self.emission_ppb = self.create_emission_ppb(states_num, self.observations_num)
+        self.emission_ppb = self.create_emission_ppb()
 
         # initial_ppb[i] - ppb of transition from initial state to state i
         self.initial_ppb = self.create_initial_ppb(states_num)
@@ -21,9 +21,15 @@ class HMM:
     def create_observation_dict(self, observations):
         observation_dict = {}
         observation_id = 0
-        for observation in observations:
-            observation_dict[observation] = observation_id
-            observation_id += 1
+        if isinstance(observations[0], str):
+            for obs in observations:
+                observation_dict[obs] = observation_id
+                observation_id += 1
+        else:
+            for obs in observations:
+                observation_dict[str(obs)] = observation_id
+                observation_id += 1
+
         return observation_dict
 
     def create_transition_ppb(self, states_num, given_transition_ppb):
@@ -35,11 +41,11 @@ class HMM:
 
         return transition_ppb
 
-    def create_emission_ppb(self, hidden_states_num, observation_num):
-        emission_ppb = numpy.zeros(shape=(hidden_states_num, observation_num))
-        for state in range(0, hidden_states_num):
-            for observation in range(0, observation_num):
-                emission_ppb[state][observation] = 1 / observation_num
+    def create_emission_ppb(self):
+        emission_ppb = numpy.zeros(shape=(self.hidden_states_num, self.observations_num))
+        for state in range(0, self.hidden_states_num):
+            for observation_id in self.observation_dict.values():
+                emission_ppb[state][observation_id] = 1 / self.observations_num
 
         return emission_ppb
 
@@ -114,10 +120,15 @@ class HMM:
         trajectory_ppb = numpy.zeros(
             shape=(obs_seq_len - 1, self.hidden_states_num, self.hidden_states_num, observations_num))
 
+        # print(observations_num)
         # Expectation
         observation_id = 0
         for obs_sequence in observations:
-
+            # print(len(observations))
+            # print(observation_id)
+            # print(obs_sequence)
+            # for obs in obs_sequence:
+            #     print(type(obs))
             obs_sequence_id = [self.observation_dict[obs_sequence[i]] for i in range(0, obs_seq_len)]
 
             # alfa => [n][len(obs_sequence)]
@@ -217,10 +228,7 @@ class HMM:
             gamma_sumB[state] = sum(sum(gamma[state][t][k] for t in range(0, obs_seq_len))
                                     for k in range(0, observations_num))
 
-        # print("Reestimation def_praram")
-        # Reestimate emission_ppb table
         for state in range(0, self.hidden_states_num):
-            # print(state, end=" ")
             for observation, observation_id in self.observation_dict.items():
                 # val - expected number of times that we were in state "state" and saw symbol "observation"
                 val = 0.0
@@ -228,15 +236,9 @@ class HMM:
                     for t in range(0, obs_seq_len):
                         if observations[k][t] == observation:
                             val += gamma[state][t][k]
-                            # print("state %d, observation_id: %d, t: %d, k: %d, val: %lf" %( state, observation_id, t, k, val))
 
                 self.emission_ppb[state][observation_id] = \
                     (val + laplance_smoothing) / (gamma_sumB[state] + self.observations_num * laplance_smoothing)
-        if debug:
-            print("Emmision ppb")
-            print(self.emission_ppb)
-        # print("\nAfter reestimation")
-        # self.print_params()
 
     def print_params(self):
         print("\nInitial")
@@ -250,33 +252,42 @@ class HMM:
     def learn(self, training_set, laplance_smoothing):
         observations_num = len(training_set)
         obs_seq_len = len(training_set[0])
-        old_likehood = 0
-        new_likehood = 0
 
-        for estimation_iteration in range(0, 1):
-            # print("Estimation iteration %d", estimation_iteration)
-            # old_likehood += sum(log(self.evaluate(obs)) for obs in training_set)
-            # old_likehood /= observations_num
+        training_set_str = []
+        if not isinstance(training_set[0][0], str):
+            for obs_seq in training_set:
+                obs_seq_str = list(map(str, obs_seq))
+                training_set_str.append(obs_seq_str)
+        else:
+            training_set_str = training_set
+
+        for estimation_iteration in range(0, 7):
+            old_likehood = sum(log(self.evaluate(obs)) for obs in training_set)
+            old_likehood /= observations_num
 
             # file: Training Hidden Markov Models with Multiple Observations – A Combinatorial Method
-            self.baum_welch_algorithm(training_set, observations_num, obs_seq_len, laplance_smoothing)
+            self.baum_welch_algorithm(training_set_str, observations_num, obs_seq_len, laplance_smoothing)
             #
-            # new_likehood += sum(log(self.evaluate(obs)) for obs in training_set)
-            # new_likehood /= observations_num
+            new_likehood = sum(log(self.evaluate(obs)) for obs in training_set)
+            new_likehood /= observations_num
 
-            # reliability = abs(old_likehood - new_likehood)
-            # if reliability < .00001:
-            #     break
+            reliability = abs(old_likehood - new_likehood)
+            if reliability < .00001:
+                break
 
     # Oblicza prawdopodobieństwo, żę dana sekwencja obserwacji została wyprodukowana przez ten model
     def evaluate(self, obs_sequence):
         # print("Evaluate")
 
-        obs_sequence_id = [self.observation_dict[obs_sequence[i]] for i in range(0, len(obs_sequence))]
-        # print(self.transition_ppb)
-        # print("Alfa")
+        # obs_sequence_str = []
+        if not isinstance(obs_sequence, str):
+            obs_sequence_str = list(map(str, obs_sequence))
+        else:
+            obs_sequence_str = obs_sequence
+
+        obs_sequence_id = [self.observation_dict[obs_sequence_str[i]] for i in range(0, len(obs_sequence_str))]
+
         alfa = self.forward_algorithm(obs_sequence_id)
-        # print(alfa)
 
         ppb = sum(alfa[state][len(obs_sequence)-1] for state in range(self.hidden_states_num))
         return ppb

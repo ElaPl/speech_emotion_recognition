@@ -2,9 +2,13 @@
 
 Wymagania:
 * python 3.5
-
-Opcjonalnie
+* scikit-learn
+* numpy
 * pymysql
+
+Instalacja
+* pip3 install -U scikit-learn
+
 
 Aby rozpocząć testowanie używając algorytmu KNN należy wpisać jedną z poniższych komand:
 ```

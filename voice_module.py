@@ -78,7 +78,7 @@ class VoiceModule:
         return decoded_on_channel
 
     # Dziwięk dzielimy na kawałki o długości ~0,25ms
-    #
+    # Zwraca listę features z każdych 25ms pliku
     def get_feature_vectors(self, file):
 
         try:
