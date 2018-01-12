@@ -5,20 +5,6 @@ from wav_iterator import WavIterator
 from hanning_window import HanningWindow
 import struct
 
-voice_freq_scale = [
-    {"id": 1, "min": 0, "max": 50},
-    {"id": 2, "min": 50, "max": 100},
-    {"id": 3, "min": 100, "max": 200},
-    {"id": 4, "min": 200, "max": 300},
-    {"id": 5, "min": 300, "max": 500},
-    {"id": 6, "min": 500, "max": 700},
-    {"id": 7, "min": 700, "max": 900},
-    {"id": 8, "min": 900, "max": 1300},
-    {"id": 9, "min": 1300, "max": 2000},
-    {"id": 10, "min": 2000, "max": 4000},
-    {"id": 11, "min": 4000, "max": 6000},
-    {"id": 12, "min": 6000, "max": 3000000},
-]
 
 # Odczytaj określoną ilość próbek z jednego channelu z pliku wav
 def read_from_wav_file(wav_file, length):
@@ -235,21 +221,18 @@ def get_pitch_features(fundamental_freq_array):
     standard_deviation_frequency = sqrt(variance/(len(fundamental_freq_array)-1))
     relative_std_deviation = (standard_deviation_frequency/avg_frequency) * 100
     # print(avg_frequency)
-    return [vocal_range, get_scale_id(voice_freq_scale, max_freq),
-            get_scale_id(voice_freq_scale, min_freq), get_scale_id(voice_freq_scale, avg_frequency),
-            dynamic_tones_percent, percent_of_falling_tones, percent_of_rising_tones, relative_std_deviation]
+    return [vocal_range, max_freq, min_freq, avg_frequency, dynamic_tones_percent, percent_of_falling_tones,
+            percent_of_rising_tones, relative_std_deviation]
 
 
 def get_summary_pitch_feature_vector(pitch_feature_vectors):
     pitch_feature_vectors_size = len(pitch_feature_vectors)
-    max_freq_range = 1
-    min_freq_range = len(voice_freq_scale)
-    freq_scale_counter = [0] * len(voice_freq_scale)
+    max_freq_range = pitch_feature_vectors[0][3]
+    min_freq_range = pitch_feature_vectors[0][3]
     avg_range = 0
     dynamic_tones_percent = 0
 
     for i in range(0, pitch_feature_vectors_size):
-        freq_scale_counter.append(pitch_feature_vectors[i][3])
         avg_range += pitch_feature_vectors[i][3]
 
         if pitch_feature_vectors[i][1] > max_freq_range:

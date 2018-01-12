@@ -18,21 +18,25 @@ emotions = ["anger", "boredom", "happiness", "sadness"]
 
 def print_summary(summary_table):
     print()
-    for i in range(0, len(emotions)):
-        print("tested emo: %s\t, anger: %d\t, boredom: %d\t,  happiness: %d\t, "
-              "sadness: %d\t, guessed:%d\t, tested: %d\t, trained: %d\n"
-              % (emotions[i], summary_table[emotions[i]]["anger"],
-                 summary_table[emotions[i]]["boredom"], summary_table[emotions[i]]["happiness"],
-                 summary_table[emotions[i]]["sadness"], summary_table[emotions[i]]["guessed"],
-                 summary_table[emotions[i]]["tested"], summary_table[emotions[i]]["trained"]))
+    for emotion in summary_table.keys():
+        string = emotion + ':\t'
+        for sum_key, value in summary_table[emotion].items():
+            string += sum_key + ": " + str(value) + ',\t'
+        print(string)
 
 
 def create_summary_table():
     summary_table = {}
     for emotion in emotions:
-        summary_table[emotion] = {"anger": 0, "boredom": 0, "happiness": 0, "sadness": 0, "guessed": 0,
-                                  "tested": 0, "trained": 0}
+        summary_table[emotion] = {}
+        for result_emotion in emotions:
+            summary_table[emotion][result_emotion] = 0
+        summary_table[emotion]["guessed"] = 0
+        summary_table[emotion]["tested"] = 0
+        summary_table[emotion]["trained"] = 0
+
     return summary_table
+
 
 def draw_freq_histogram():
     train_set = build_file_set('Berlin_EmoDatabase/wav/' + sys.argv[1] + '/*.wav')
@@ -138,10 +142,7 @@ def get_train_set(train_path_pattern, db_name, db_password, summary_table):
 
 
 def main_KNN(train_path_pattern, test_path_pattern, db_name, db_password):
-    summary_table = {}
-    for emotion in emotions:
-        summary_table[emotion] = {"anger": 0, "boredom": 0, "happiness": 0, "sadness": 0, "guessed": 0,
-                                  "tested": 0, "trained": 0}
+    summary_table = create_summary_table()
 
     print_debug("Prepare training set")
     all_pitch_features_vector, all_energy_features_vector, all_summary_pitch_features_vector = \
@@ -338,13 +339,3 @@ if sys.argv[1] == 'KNN':
 else:
     main_HMM('Berlin_EmoDatabase/train/*/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav', db_name, db_password)
 
-
-
-
-# main('emodb/train/female/*/*.wav', 'emodb/test/female/*/*.wav', knn_db.DB_FEMALE_NAME)
-# print()
-# main('emodb/train/male/*/*.wav', 'emodb/test/male/*/*.wav', knn_db.DB_MALE_NAME)
-
-# draw_energy_histogram()
-# draw_freq_histogram()
-# print_feature_vector()
