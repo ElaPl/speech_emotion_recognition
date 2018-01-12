@@ -1,43 +1,4 @@
-## \file KNN.py
-## \brief Zawiera klasę algorytm, oraz funckje pomocnicze;
-
-from math import pow, sqrt
-
-
-# Oblicza odległosć euklidesową pomiedzy dwoma wektorami
-def euclidean_distance(vec1, vec2):
-    if len(vec1) != len(vec2):
-        print("Wektory mają różną długosc?")
-    dist = 0
-    for i in range(0, len(vec1)):
-        dist += pow(vec1[i] - vec2[i], 2)
-
-    return sqrt(dist)
-
-
-def normalize(table):
-    min_table = []
-    max_table = []
-
-    feature_vec_len = len(table[0][0])
-
-    for feature_id in range(len(table[0][0])):
-        min_table.append(min(table[i][0][feature_id] for i in range(0, len(table))))
-        max_table.append(max(table[i][0][feature_id] for i in range(0, len(table))))
-
-    for i in range(len(table)):
-        for feature_id in range(feature_vec_len):
-            if max_table[feature_id] != min_table[feature_id]:
-                table[i][0][feature_id] = (table[i][0][feature_id] - min_table[feature_id]) / (max_table[feature_id] - min_table[feature_id])
-
-    return min_table, max_table
-
-
-# Normalizuje wektor testowy wartościami podanymi jako argumenty
-def normalize_vector(test, min_features, max_features):
-    for feature_id in range(len(test)):
-        if (max_features[feature_id] != min_features[feature_id]):
-            test[feature_id] = (test[feature_id] - min_features[feature_id]) / (max_features[feature_id] - min_features[feature_id])
+from helper_file import euclidean_distance, normalize, normalize_vector
 
 
 class KNN:

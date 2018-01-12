@@ -1,86 +1,64 @@
-import os
-import glob
 import numpy as np
 from matplotlib import pyplot as plt
 import sys
 import pymysql
 from warnings import filterwarnings
+from sklearn.cluster import KMeans
 
 import knn_database as knn_db
-from voice_module import VoiceModule
-from KNN import KNN, normalize_vector, normalize, euclidean_distance
+from voice_module import *
+from KNN import KNN
 from HMM import HMM
-from sklearn.cluster import KMeans
+from helper_file import normalize_vector, normalize, euclidean_distance, print_progress_bar, build_file_set, \
+    get_most_frequent_emotion, print_debug, safe_in_database
+
 
 emotions = ["anger", "boredom", "happiness", "sadness"]
 
-# If True than debug print will be displayed
-debug = True
+
+def print_summary(summary_table):
+    print()
+    for i in range(0, len(emotions)):
+        print("tested emo: %s\t, anger: %d\t, boredom: %d\t,  happiness: %d\t, "
+              "sadness: %d\t, guessed:%d\t, tested: %d\t, trained: %d\n"
+              % (emotions[i], summary_table[emotions[i]]["anger"],
+                 summary_table[emotions[i]]["boredom"], summary_table[emotions[i]]["happiness"],
+                 summary_table[emotions[i]]["sadness"], summary_table[emotions[i]]["guessed"],
+                 summary_table[emotions[i]]["tested"], summary_table[emotions[i]]["trained"]))
 
 
-def build_file_set(pattern):
-    train_set = []
-    for path_and_file in glob.iglob(pattern, recursive=True):
-        if path_and_file.endswith('.wav'):
-            path, filename = os.path.split(path_and_file)
-            emotion = os.path.basename(path)
-            train_set.append([path_and_file, emotion])
-    return train_set
-
-
-def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█'):
-    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
-    filled_length = int(length * iteration // total)
-    bar = fill * filled_length + '-' * (length - filled_length)
-    print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end='\r')
-    if iteration == total:
-        print()
-
-
-def get_most_frequent_emotion(possible_emotions):
-    emotion_counter = {}
+def create_summary_table():
+    summary_table = {}
     for emotion in emotions:
-        emotion_counter[emotion] = 0
-
-    for emotion in possible_emotions:
-        emotion_counter[emotion] += 1
-
-    computed_emotion = emotions[0]
-    computed_emotion_occurance = emotion_counter[computed_emotion]
-    for emotion, num_occurance in emotion_counter.items():
-        if num_occurance > computed_emotion_occurance:
-            computed_emotion = emotion
-            computed_emotion_occurance = num_occurance
-
-    return computed_emotion
-
+        summary_table[emotion] = {"anger": 0, "boredom": 0, "happiness": 0, "sadness": 0, "guessed": 0,
+                                  "tested": 0, "trained": 0}
+    return summary_table
 
 def draw_freq_histogram():
     train_set = build_file_set('Berlin_EmoDatabase/wav/' + sys.argv[1] + '/*.wav')
     frame_size = 512
-    voice_m = VoiceModule()
 
     for i in range(0, len(train_set)):
-        freq_vector = voice_m.get_freq_vector(train_set[i][0], 512)
+        freq_vector = get_freq_vector(train_set[i][0], 512)
         print(freq_vector)
         print()
-        sample_rate = voice_m.get_sample_rate(train_set[i][0])
+        sample_rate = get_sample_rate(train_set[i][0])
 
         bins = np.arange(0, len(freq_vector), 1)  # fixed bin size
         plt.plot(bins, freq_vector)
-        plt.title('Fundamental freq of '+train_set[i][0])
-        plt.xlabel('time, frame_length= ' + str(sample_rate/frame_size))
+        plt.title('Fundamental freq of ' + train_set[i][0])
+        plt.xlabel('time, frame_length= ' + str(sample_rate / frame_size))
         plt.ylabel('Frequency')
 
         plt.show()
 
+
 def draw_energy_histogram():
     train_set = build_file_set('Berlin_EmoDatabase/wav/' + sys.argv[1] + '/*.wav')
-    voice_m = VoiceModule()
 
     for i in range(0, len(train_set)):
-        sample_rate = voice_m.get_sample_rate(train_set[i][0])
-        energy_vector = voice_m.get_energy_vector(train_set[i][0], int(sample_rate/4))
+        sample_rate = get_sample_rate(train_set[i][0])
+        energy_vector = get_energy_vector(train_set[i][0], int(sample_rate / 4))
 
         bins = np.arange(0, len(energy_vector), 1)
         plt.plot(bins, energy_vector)
@@ -90,15 +68,8 @@ def draw_energy_histogram():
 
         plt.show()
 
-def safe_in_database(database, cursor, table, db_table_name):
-    for row in table:
-        knn_db.save_in_dbtable(database, cursor, row[0], row[1], db_table_name)
 
-def print_debug(text):
-    if debug is True:
-        print(text)
-
-def get_train_set(train_path_pattern, voice_module, db_name, db_password, summary_table):
+def get_train_set(train_path_pattern, db_name, db_password, summary_table):
     print_debug("train")
     is_connection = True
 
@@ -142,7 +113,7 @@ def get_train_set(train_path_pattern, voice_module, db_name, db_password, summar
             summary_table[emotion]["trained"] += 1
 
             pitch_feature_vectors, energy_feature_vectors, summary_pitch_feature_vector \
-                = voice_module.get_feature_vectors(file)
+                = get_feature_vectors(file)
 
             for vec in pitch_feature_vectors:
                 all_pitch_features_vector.append([vec, emotion])
@@ -172,11 +143,9 @@ def main_KNN(train_path_pattern, test_path_pattern, db_name, db_password):
         summary_table[emotion] = {"anger": 0, "boredom": 0, "happiness": 0, "sadness": 0, "guessed": 0,
                                   "tested": 0, "trained": 0}
 
-    voice_module = VoiceModule()
-
     print_debug("Prepare training set")
     all_pitch_features_vector, all_energy_features_vector, all_summary_pitch_features_vector = \
-        get_train_set(train_path_pattern, voice_module, db_name, db_password, summary_table)
+        get_train_set(train_path_pattern, db_name, db_password, summary_table)
 
     print_debug("Training")
     pitch_knn_module = KNN(emotions, all_pitch_features_vector)
@@ -193,13 +162,13 @@ def main_KNN(train_path_pattern, test_path_pattern, db_name, db_password):
         emotion = test_set[i][1]
 
         pitch_feature_vectors, energy_feature_vectors, summary_pitch_feature_vector \
-            = voice_module.get_feature_vectors(file)
+            = get_feature_vectors(file)
 
         possible_emotions = pitch_knn_module.compute_emotion(pitch_feature_vectors, 15)
         possible_emotions.extend(summary_pitch_knn_module.get_emotion(summary_pitch_feature_vector, 4))
         possible_emotions.extend(energy_knn_module.compute_emotion(energy_feature_vectors, 12))
 
-        computed_emotion = get_most_frequent_emotion(possible_emotions)
+        computed_emotion = get_most_frequent_emotion(possible_emotions, emotions)
 
         summary_table[emotion]["tested"] += 1
         if computed_emotion == emotion:
@@ -208,60 +177,6 @@ def main_KNN(train_path_pattern, test_path_pattern, db_name, db_password):
             summary_table[emotion][computed_emotion] += 1
 
     print_summary(summary_table)
-
-
-def print_summary(summary_table):
-    print()
-    for i in range(0, len(emotions)):
-        print("tested emo: %s\t, anger: %d\t, boredom: %d\t,  happiness: %d\t, "
-              "sadness: %d\t, guessed:%d\t, tested: %d\t, trained: %d\n"
-              % (emotions[i], summary_table[emotions[i]]["anger"],
-                 summary_table[emotions[i]]["boredom"], summary_table[emotions[i]]["happiness"],
-                 summary_table[emotions[i]]["sadness"], summary_table[emotions[i]]["guessed"],
-                 summary_table[emotions[i]]["tested"], summary_table[emotions[i]]["trained"]))
-
-
-def convert_vector_to_number(vector):
-    num = ""
-    for i in range(len(vector)):
-        if int(vector[i] / 10) == 0:
-            num += "0" + str(vector[i])
-        else:
-            num += str(vector[i])
-
-    return num
-
-def fill_up_to_six(list_of_elem):
-    list_len = len(list_of_elem)
-
-    if list_len > 6:
-        return list_of_elem[(list_len - 6):list_len]
-    elif list_len < 6:
-        for k in range(0, 6 - list_len):
-            list_of_elem.append("0" * 10)
-
-    return list_of_elem
-
-def prepare_set(train_path_pattern, voice_m, frame_length):
-    train_set = build_file_set(train_path_pattern)
-    pitch_training_observations_a = {"anger": [], "boredom": [], "happiness": [], "sadness": []}
-
-    for i in range(len(train_set)):
-        file = train_set[i][0]
-        emotion = train_set[i][1]
-        print_progress_bar(i + 1, len(train_set), prefix='Computing progress:', suffix='Complete', length=50)
-
-
-        pitch_feature_vectors = voice_m.get_pitch_feature_vector(file, frame_length)
-
-        grouped_pitch_feature_vectors_a = []
-        for j in range(0, len(pitch_feature_vectors)):
-            grouped_vector = voice_m.create_grouped_pitch_veatures(pitch_feature_vectors[j])
-            grouped_pitch_feature_vectors_a.append(convert_vector_to_number(grouped_vector[1:5] + grouped_vector[-1:]))
-
-        pitch_training_observations_a[emotion].append(fill_up_to_six(grouped_pitch_feature_vectors_a))
-
-    return pitch_training_observations_a
 
 
 def average_observations(feature_vector_set):
@@ -288,11 +203,10 @@ def claster(vector, data):
     return min_vector
 
 
-def get_observations_vectors(file, voice_module, feature, min_features_vec, max_features_vec,
-                             possible_observations):
+def get_observations_vectors(file, feature, min_features_vec, max_features_vec, possible_observations):
 
     pitch_feature_vectors, energy_feature_vectors, summary_pitch_feature_vector \
-        = voice_module.get_feature_vectors(file)
+        = get_feature_vectors(file)
 
     normalized_observations = []
     if feature == "pitch":
@@ -312,9 +226,9 @@ def get_observations_vectors(file, voice_module, feature, min_features_vec, max_
 
     return observation_sequence_vec
 
-def get_possible_observations(train_path_pattern, voice_module, db_name, db_password, summary_table):
+def get_possible_observations(train_path_pattern, db_name, db_password, summary_table):
     all_pitch_features_vector, all_energy_features_vector, all_summary_pitch_features_vector = \
-        get_train_set(train_path_pattern, voice_module, db_name, db_password, summary_table)
+        get_train_set(train_path_pattern, db_name, db_password, summary_table)
 
     possible_observations = {}
     min_max_features = {"pitch": {}, "energy": {}}
@@ -326,14 +240,7 @@ def get_possible_observations(train_path_pattern, voice_module, db_name, db_pass
 
     return possible_observations, min_max_features
 
-def create_summary_table():
-    summary_table = {}
-    for emotion in emotions:
-        summary_table[emotion] = {"anger": 0, "boredom": 0, "happiness": 0, "sadness": 0, "guessed": 0,
-                                  "tested": 0, "trained": 0}
-    return summary_table
-
-def get_hmm_train_set(train_path_pattern, voice_module, features, min_max_features, possible_observations):
+def get_hmm_train_set(train_path_pattern, features, min_max_features, possible_observations):
     file_set = build_file_set(train_path_pattern)
     num_files = len(file_set)
     train_set = {}
@@ -348,7 +255,7 @@ def get_hmm_train_set(train_path_pattern, voice_module, features, min_max_featur
         trained_emotion = file_set[i][1]
 
         for feature in features:
-            obs_vec = get_observations_vectors(file, voice_module, feature, min_max_features[feature]["min"],
+            obs_vec = get_observations_vectors(file, feature, min_max_features[feature]["min"],
                                                min_max_features[feature]["max"], possible_observations[feature])
             for obs in obs_vec:
                 train_set[feature][trained_emotion].append(obs)
@@ -358,10 +265,9 @@ def get_hmm_train_set(train_path_pattern, voice_module, features, min_max_featur
 
 def main_HMM(train_path_pattern, test_path_pattern, db_name, db_password):
     summary_table = create_summary_table()
-    voice_module = VoiceModule()
     features = ["pitch", "energy"]
-    possible_observations, min_max_features = get_possible_observations(train_path_pattern, voice_module,
-                                                                        db_name, db_password, summary_table)
+    possible_observations, min_max_features = get_possible_observations(train_path_pattern, db_name, db_password,
+                                                                        summary_table)
     num_of_states = 6
     trasition_ppb = [[0.2, 0.8],
                      [0.2, 0.8],
@@ -378,7 +284,7 @@ def main_HMM(train_path_pattern, test_path_pattern, db_name, db_password):
         for emotion in emotions:
             HMM_modules[feature][emotion] = HMM(trasition_ppb, num_of_states, possible_observations[feature])
 
-    train_set = get_hmm_train_set(train_path_pattern, voice_module, features, min_max_features, possible_observations)
+    train_set = get_hmm_train_set(train_path_pattern, features, min_max_features, possible_observations)
     for feature in features:
         for emotion in emotions:
             if train_set[feature][emotion]:
@@ -393,7 +299,7 @@ def main_HMM(train_path_pattern, test_path_pattern, db_name, db_password):
         possible_emotions = []
 
         for feature in features:
-            obs_vec = get_observations_vectors(file, voice_module, feature, min_max_features[feature]["min"],
+            obs_vec = get_observations_vectors(file, feature, min_max_features[feature]["min"],
                                                min_max_features[feature]["max"], possible_observations[feature])
 
             for obs in obs_vec:
@@ -406,7 +312,7 @@ def main_HMM(train_path_pattern, test_path_pattern, db_name, db_password):
 
                 possible_emotions.append(most_ppb_emotion)
 
-        computed_emotion = get_most_frequent_emotion(possible_emotions)
+        computed_emotion = get_most_frequent_emotion(possible_emotions, emotions)
         summary_table[tested_emotion]["tested"] += 1
         summary_table[tested_emotion][computed_emotion] += 1
 
