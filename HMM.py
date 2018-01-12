@@ -145,15 +145,6 @@ class HMM:
                 for t in range(0, obs_seq_len):
                     gamma[state][t][observation_id] += (alfa[state][t] * beta[state][t]) / ppb_of_any_path
 
-            if debug:
-                print("Alfa")
-                print(alfa)
-                print("Beta")
-                print(beta)
-                print("ppb_any")
-                print(ppb_of_any_path)
-                print("Gamma")
-                print(gamma)
 
             # Compute trajectory -
             # trajectory_ppb[t][stateA][stateB] - prawdopodobieństwo bycia w casie t w stanie A i przejścia do stanu
@@ -161,23 +152,15 @@ class HMM:
             for t in range(0, obs_seq_len - 1):
                 # prawdopodobieństwo przejśćia w czasie t z dowolnego stanu i do dowolnego stanu j
                 for state_from in range(0, self.hidden_states_num):
-                    if debug:
-                        print("Time: %d, state_from: %d" %(t, state_from))
                     if state_from + 1 == self.hidden_states_num:
                         trajectory_ppb[t][state_from][state_from][observation_id] \
                             = (alfa[state_from][t] * self.transition_ppb[state_from][state_from] *
                                self.emission_ppb[state_from][obs_sequence_id[t + 1]] * beta[state_from][t + 1]) / ppb_of_any_path
-                        if debug:
-                            print("153: %lf %lf %lf %lf / %lf" %(alfa[state_from][t], self.transition_ppb[state_from][state_from],
-                                                                 self.emission_ppb[state_from][obs_sequence_id[t + 1]], beta[state_from][t + 1], ppb_of_any_path))
                     else:
                         for state_to in [state_from, state_from + 1]:
                             trajectory_ppb[t][state_from][state_to][observation_id] \
                                 = (alfa[state_from][t] * self.transition_ppb[state_from][state_to] *
                                    self.emission_ppb[state_to][obs_sequence_id[t + 1]] * beta[state_to][t + 1]) / ppb_of_any_path
-                            if debug:
-                                print("160: %lf %lf %lf %lf / %lf" %(alfa[state_from][t], self.transition_ppb[state_from][state_to],
-                                                                     self.emission_ppb[state_to][obs_sequence_id[t + 1]], beta[state_to][t + 1], ppb_of_any_path))
             observation_id += 1
 
         # Maksimalization
@@ -189,11 +172,6 @@ class HMM:
             exp = sum(gamma[state][0][k] for k in range(observations_num))
             self.initial_ppb[state] = (exp + laplance_smoothing) / \
                                       (1/observations_num + self.hidden_states_num * laplance_smoothing)
-
-        if debug:
-            print("Initial state")
-            print(self.initial_ppb)
-            print(sum(self.initial_ppb[i] for i in range(self.hidden_states_num)))
 
         # gamma_sum[A] - czestość pobytów w stanie i w czasie 0, T-2
         gamma_sum = numpy.zeros(shape=self.hidden_states_num)
@@ -220,9 +198,6 @@ class HMM:
 
                 self.transition_ppb[state_from][state_from] = (exp_num + laplance_smoothing) / \
                                                               (gamma_sum[state_from] + 2 * laplance_smoothing)
-        if debug:
-            print("Transition ppb")
-            print(self.transition_ppb)
 
         gamma_sumB = numpy.zeros(shape=self.hidden_states_num)
         for state in range(0, self.hidden_states_num):

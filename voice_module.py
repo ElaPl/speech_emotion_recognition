@@ -1,7 +1,6 @@
 import wave
 import numpy as np
 from math import sqrt, log10
-from wav_iterator import WavIterator
 from hanning_window import HanningWindow
 import struct
 
@@ -19,6 +18,7 @@ def read_from_wav_file(wav_file, length):
     for i in range(0, len(decoded), wav_file.getnchannels()):
         decoded_on_channel.append(decoded[i])
     return decoded_on_channel
+
 
 # Dziwięk dzielimy na kawałki o długości ~0,25ms
 # Zwraca listę features z każdych 25ms pliku
@@ -64,6 +64,7 @@ def get_feature_vectors(file):
     summary_pitch_feature_vectors = get_summary_pitch_feature_vector(pitch_feature_vectors)
 
     return pitch_feature_vectors, energy_feature_vectors, summary_pitch_feature_vectors
+
 
 def get_pitch_feature_vector(sample, frame_length, window, frame_rate):
     fundamental_freq_array = []

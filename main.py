@@ -9,9 +9,7 @@ import knn_database as knn_db
 from voice_module import *
 from KNN import KNN
 from HMM import HMM
-from helper_file import normalize_vector, normalize, euclidean_distance, print_progress_bar, build_file_set, \
-    get_most_frequent_emotion, print_debug, safe_in_database
-
+from helper_file import *
 
 emotions = ["anger", "boredom", "happiness", "sadness"]
 
@@ -19,9 +17,12 @@ emotions = ["anger", "boredom", "happiness", "sadness"]
 def print_summary(summary_table):
     print()
     for emotion in summary_table.keys():
-        string = emotion + ':\t'
-        for sum_key, value in summary_table[emotion].items():
-            string += sum_key + ": " + str(value) + ',\t'
+        string = emotion + '  :\t'
+        for i in range(len(emotions)):
+            string += emotions[i] + ": " + str(summary_table[emotion][emotions[i]]) + ',\t'
+        string += "guessed: " + str(summary_table[emotion]["guessed"]) + ',\t'
+        string += "tested: " + str(summary_table[emotion]["tested"]) + ',\t'
+        string += "trained: " + str(summary_table[emotion]["trained"])
         print(string)
 
 
@@ -128,7 +129,6 @@ def get_train_set(train_path_pattern, db_name, db_password, summary_table):
             all_summary_pitch_features_vector.append([summary_pitch_feature_vector, emotion])
 
     if is_connection and (knn_db.is_training_set_exists(cursor) is False):
-        print_debug("Saving in db")
         knn_db.create_training_set(db, cursor)
         print_progress_bar(0, 3, prefix='Saving in database:', suffix='Complete', length=50)
         safe_in_database(db, cursor, all_pitch_features_vector, knn_db.pitch_train_set_name)
@@ -144,11 +144,9 @@ def get_train_set(train_path_pattern, db_name, db_password, summary_table):
 def main_KNN(train_path_pattern, test_path_pattern, db_name, db_password):
     summary_table = create_summary_table()
 
-    print_debug("Prepare training set")
     all_pitch_features_vector, all_energy_features_vector, all_summary_pitch_features_vector = \
         get_train_set(train_path_pattern, db_name, db_password, summary_table)
 
-    print_debug("Training")
     pitch_knn_module = KNN(emotions, all_pitch_features_vector)
     summary_pitch_knn_module = KNN(emotions, all_summary_pitch_features_vector)
     energy_knn_module = KNN(emotions, all_energy_features_vector)
@@ -227,6 +225,7 @@ def get_observations_vectors(file, feature, min_features_vec, max_features_vec, 
 
     return observation_sequence_vec
 
+
 def get_possible_observations(train_path_pattern, db_name, db_password, summary_table):
     all_pitch_features_vector, all_energy_features_vector, all_summary_pitch_features_vector = \
         get_train_set(train_path_pattern, db_name, db_password, summary_table)
@@ -240,6 +239,7 @@ def get_possible_observations(train_path_pattern, db_name, db_password, summary_
         average_observations(all_energy_features_vector)
 
     return possible_observations, min_max_features
+
 
 def get_hmm_train_set(train_path_pattern, features, min_max_features, possible_observations):
     file_set = build_file_set(train_path_pattern)
