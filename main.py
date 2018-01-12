@@ -264,7 +264,7 @@ def prepare_set(train_path_pattern, voice_m, frame_length):
     return pitch_training_observations_a
 
 
-def get_possible_observations(feature_vector_set):
+def average_observations(feature_vector_set):
 
     min_features_vec, max_features_vec = normalize(feature_vector_set)
 
@@ -312,44 +312,28 @@ def get_observations_vectors(file, voice_module, feature, min_features_vec, max_
 
     return observation_sequence_vec
 
-
-def main_HMM(train_path_pattern, test_path_pattern, db_name, db_password):
-    summary_table = {}
-    for emotion in emotions:
-        summary_table[emotion] = {"anger": 0, "boredom": 0, "happiness": 0, "sadness": 0, "guessed": 0,
-                                  "tested": 0, "trained": 0}
-
-    voice_module = VoiceModule()
-
+def get_possible_observations(train_path_pattern, voice_module, db_name, db_password, summary_table):
     all_pitch_features_vector, all_energy_features_vector, all_summary_pitch_features_vector = \
         get_train_set(train_path_pattern, voice_module, db_name, db_password, summary_table)
 
-    features = ["pitch", "energy"]
     possible_observations = {}
     min_max_features = {"pitch": {}, "energy": {}}
 
     possible_observations["pitch"], min_max_features["pitch"]["min"], min_max_features["pitch"]["max"] = \
-        get_possible_observations(all_pitch_features_vector)
+        average_observations(all_pitch_features_vector)
     possible_observations["energy"], min_max_features["energy"]["min"], min_max_features["energy"]["max"] = \
-        get_possible_observations(all_energy_features_vector)
+        average_observations(all_energy_features_vector)
 
-    num_of_states = 6
-    trasition_ppb = [[0.2, 0.8],
-                     [0.2, 0.8],
-                     [0.2, 0.8],
-                     [0.2, 0.8],
-                     [0.2, 0.8],
-                     [0.2, 0]]
+    return possible_observations, min_max_features
 
-    HMM_modules = {}
-    for f in features:
-        HMM_modules[f] = {}
+def create_summary_table():
+    summary_table = {}
+    for emotion in emotions:
+        summary_table[emotion] = {"anger": 0, "boredom": 0, "happiness": 0, "sadness": 0, "guessed": 0,
+                                  "tested": 0, "trained": 0}
+    return summary_table
 
-    for feature in features:
-        for emotion in emotions:
-            print(feature + " " + emotion)
-            HMM_modules[feature][emotion] = HMM(trasition_ppb, num_of_states, possible_observations[feature])
-
+def get_hmm_train_set(train_path_pattern, voice_module, features, min_max_features, possible_observations):
     file_set = build_file_set(train_path_pattern)
     num_files = len(file_set)
     train_set = {}
@@ -369,10 +353,36 @@ def main_HMM(train_path_pattern, test_path_pattern, db_name, db_password):
             for obs in obs_vec:
                 train_set[feature][trained_emotion].append(obs)
 
+    return train_set
+
+
+def main_HMM(train_path_pattern, test_path_pattern, db_name, db_password):
+    summary_table = create_summary_table()
+    voice_module = VoiceModule()
+    features = ["pitch", "energy"]
+    possible_observations, min_max_features = get_possible_observations(train_path_pattern, voice_module,
+                                                                        db_name, db_password, summary_table)
+    num_of_states = 6
+    trasition_ppb = [[0.2, 0.8],
+                     [0.2, 0.8],
+                     [0.2, 0.8],
+                     [0.2, 0.8],
+                     [0.2, 0.8],
+                     [0.2, 0]]
+
+    HMM_modules = {}
+    for f in features:
+        HMM_modules[f] = {}
+
+    for feature in features:
+        for emotion in emotions:
+            HMM_modules[feature][emotion] = HMM(trasition_ppb, num_of_states, possible_observations[feature])
+
+    train_set = get_hmm_train_set(train_path_pattern, voice_module, features, min_max_features, possible_observations)
     for feature in features:
         for emotion in emotions:
             if train_set[feature][emotion]:
-                HMM_modules[feature][emotion].learn(train_set[feature][emotion], 0.0001)
+                HMM_modules[feature][emotion].learn(train_set[feature][emotion], 0.001)
 
     file_set = build_file_set(test_path_pattern)
     num_files = len(file_set)
