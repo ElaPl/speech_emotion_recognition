@@ -1,10 +1,10 @@
-from helper_file import euclidean_distance, normalize, normalize_vector
+from helper_file import euclidean_distance, normalize_vector
 
 
 class KNN:
     def __init__(self, states, train_set):
         self.states = states
-        self.min_features, self.max_features = normalize(train_set)
+        self.min_features, self.max_features = self.normalize(train_set)
 
         self.training_set = []
         for row in train_set:
@@ -61,3 +61,30 @@ class KNN:
                 possible_emotions.append(emotion)
 
         return possible_emotions
+
+    @staticmethod
+    def normalize(feature_vector_set):
+        """
+        :param: feature_vector_set: Zbiór wektorów cech do znormalizowania
+        :return: * wektor najmniejszych wartości z każdej cechy
+                 * wektor największych wartości z każdej cechy
+        """
+        min_features_vector = []
+        max_features_vector = []
+
+        feature_vec_len = len(feature_vector_set[0][0])
+
+        for feature_id in range(len(feature_vector_set[0][0])):
+            min_features_vector.append(
+                min(feature_vector_set[i][0][feature_id] for i in range(0, len(feature_vector_set))))
+            max_features_vector.append(
+                max(feature_vector_set[i][0][feature_id] for i in range(0, len(feature_vector_set))))
+
+        for i in range(len(feature_vector_set)):
+            for feature_id in range(feature_vec_len):
+                if max_features_vector[feature_id] != min_features_vector[feature_id]:
+                    feature_vector_set[i][0][feature_id] = (feature_vector_set[i][0][feature_id] - min_features_vector[
+                        feature_id]) / (max_features_vector[feature_id] - min_features_vector[feature_id])
+
+        return min_features_vector, max_features_vector
+

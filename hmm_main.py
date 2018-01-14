@@ -1,27 +1,27 @@
 from helper_file import create_summary_table, connect_to_database, build_file_set, print_progress_bar, \
-     get_most_frequent_emotion, euclidean_distance, print_summary, print_debug
+    get_most_frequently_occurring, euclidean_distance, print_summary, print_debug
 
 from HMM import HMM
 import knn_database as knn_db
 from voice_module import get_feature_vectors
 from sklearn.cluster import KMeans
-from helper_file import normalize_vector, save_features_set_in_database
+from helper_file import normalize_vector
 
 
 hmm_features = {
     "pitch": {
-        "db_table_name": knn_db.pitch_train_set_name,
+        "db_table_name": knn_db.pitch_hmm_train_db_table,
     },
 
     "energy": {
-        "db_table_name": knn_db.energy_train_set_name,
+        "db_table_name": knn_db.energy_hmm_train_db_table,
     }
 }
 
 
 def hmm_main(train_path_pattern, test_path_pattern, db_name, db_password, emotions):
     """Główna funkcja hmm. Dla każdego zestawu cech i kazdej emocji tworzy model HMM i trenuje go wektorami obserwacji
-    pobranymi z bazie danych db_name, lub jeżeli nie istnieją, obliczonymi z plików znajdujacych sie w katalogu
+    pobranymi z bazie danych db_name jeżeli istnieją, lub w przeciwnym wypadku obliczonymi z plików znajdujacych sie w katalogu
     train_path_pattern.
     Następnie testuje ich działanie wektorami obserwacji obliczonymi z plików znajdujących się w test_path_pattern
 
@@ -60,10 +60,15 @@ def hmm_main(train_path_pattern, test_path_pattern, db_name, db_password, emotio
             HMM_modules[feature][emotion] = HMM(trasition_ppb, num_of_states, possible_observations[feature])
 
     train_set = hmm_get_train_set(train_path_pattern, min_max_features, possible_observations, emotions, summary_table)
+
+    num_of_hmm_models = len(hmm_features) * len(emotions)
+    counter = 1
     for feature in hmm_features.keys():
         for emotion in emotions:
+            print_progress_bar(counter, num_of_hmm_models, prefix='Training progress:', suffix='Complete', length=50)
             if train_set[feature][emotion]:
                 HMM_modules[feature][emotion].learn(train_set[feature][emotion], 0.001)
+            counter += 1
 
     file_set = build_file_set(test_path_pattern)
     num_files = len(file_set)
@@ -85,7 +90,7 @@ def hmm_main(train_path_pattern, test_path_pattern, db_name, db_password, emotio
 
                 possible_emotions.append(most_ppb_emotion)
 
-        computed_emotion = get_most_frequent_emotion(possible_emotions, emotions)
+        computed_emotion = get_most_frequently_occurring(possible_emotions)
         summary_table[tested_emotion]["tested"] += 1
         summary_table[tested_emotion][computed_emotion] += 1
 
@@ -106,9 +111,9 @@ def hmm_get_train_set(path_pattern, min_max_features, all_possible_observations,
     :type all_possible_observations: string
     :param emotions: Lista emocji
     :type emotions: list
-    :return: Słownik, zwierający dla każdego zestawu cech i każdej emocji, zbiór sekwencji obserwacji (wektorów cech) z
+    :return: Słownik, zwierający dla każdego zestawu cech i każdej emocji, listę sekwencji obserwacji (wektorów cech) z
         wszystkich plików z katalogu "path_pattern".
-    :rtype: feature_dict{emotion_dict{[[observation_vector]]}}
+    :rtype: dictionary
     """
 
     train_set = {}
@@ -120,7 +125,7 @@ def hmm_get_train_set(path_pattern, min_max_features, all_possible_observations,
     file_set = build_file_set(path_pattern)
     num_files = len(file_set)
     for i in range(num_files):
-        print_progress_bar(i + 1, num_files, prefix='Preparing:', suffix='Complete', length=50)
+        print_progress_bar(i + 1, num_files, prefix='Preparing training set:', suffix='Complete', length=50)
         file = file_set[i][0]
         trained_emotion = file_set[i][1]
         summary_table[trained_emotion]["trained"] += 1
@@ -143,10 +148,10 @@ def hmm_get_observations_vectors(file, min_max_features_vec, all_possible_observ
     :param all_possible_observations: Dla każdej cechy wszystkie możliwe w HMM zbiory cech wektorów
     :type all_possible_observations: vector[vector]
 
-    :return: Słownik zawierający dla każdego zestawu cech sekwencję obserwacji wygenerowanych z pliku "file".
+    :return: Słownik zawierający dla każdego zestawu cech listę sekwencję obserwacji wygenerowanych z pliku "file".
         Każda sekwencja obserwacji jest ok 1,5sek wypowiedzią i składa się z 6 wektorów cech,
         z których każdy reprezentuje 0,25s wypowiedzi.
-    :rtype: feature_dict{[[observation_sequence]]}
+    :rtype: dictionary
     """
 
     feature_vectors = {}
@@ -168,6 +173,7 @@ def hmm_get_observations_vectors(file, min_max_features_vec, all_possible_observ
             observation_sequence_vec[feature].append(observation)
 
     return observation_sequence_vec
+
 
 def hmm_get_nearest_neighbour(vec, data):
     """Funkcja porównuje dystans pomiędzy wektorem vec a każdym z wektórów "data".
@@ -198,9 +204,9 @@ def hmm_claster(feature_vector_set):
     :param feature_vector_set: zbiór wektoróch cech
     :type feature_vector_set: list[vector]
     :return:
-        * zbiór sklasteryzowancyh wektorów cech
+        * lista sklasteryzowancyh wektorów cech
         * wektor najmniejszych wartości z każdej cechy
-        * wektor największych wartości z każdej cechy, użytych do normalizacji danych wektorów cech
+        * wektor największych wartości z każdej cechy
     """
 
     min_feature_vec, max_feature_vec = hmm_normalize(feature_vector_set)
@@ -218,8 +224,8 @@ def hmm_normalize(feature_vector_set):
     :param: feature_vector_set: Zbiór wektorów cech do znormalizowania
     :type: feature_vector_set: list[vector]
     :return:
-             * wektor najmniejszych wartości z każdej cechy
-             * wektor największych wartości z każdej cechy
+             * wektor najmniejszych wartości każdej cechy
+             * wektor największych wartości każdej cechy
     """
     min_features_vector = []
     max_features_vector = []
@@ -254,18 +260,23 @@ def hmm_get_all_possible_observations(train_path_pattern, db_name, db_password):
     :type emotions: list
 
     :return:
-        * dla każdego zestawu cech zbiór możliwych obserwacji
-        * wektor najmniejszych i największych wartości każdej z cech, użytych do normalizacji wektorów obserwacji
+        * dla każdego zestawu cech lista możliwych obserwacji
+        * dla każdego zestawu cech wektor najmniejszych i największych wartości każdej z cech
     """
 
     feature_set = {}
     db, cursor = connect_to_database(db_name, db_password)
-    if (cursor is not None) and knn_db.is_training_set_exists(cursor):
+    if (cursor is not None) and knn_db.is_training_set_exists(cursor, knn_db.HMM_DB_TABLES):
+        print("exist")
         feature_set = hmm_get_features_vectors_from_db(cursor)
     else:
+        print("not exist")
         feature_set = hmm_get_features_vector_from_dir(train_path_pattern)
         if db is not None:
-            save_features_set_in_database(db, cursor, feature_set)
+            knn_db.prepare_db_table(db, cursor, knn_db.HMM_DB_TABLES)
+            for feature in hmm_features:
+                for i in range(len(feature_set[feature])):
+                    knn_db.save_in_dbtable(db, cursor, feature_set[feature][i], hmm_features[feature]["db_table_name"])
 
     min_max_features = {}
     possible_observations = {}
@@ -285,19 +296,16 @@ def hmm_get_features_vectors_from_db(cursor):
     :param: path_pattern: kursor na bazę danych
 
     :return: Dla każdego zbioru cech, zbiór wektorów cech
-    :rtype: feature_dict[vector]
+    :rtype: dictionary
     """
-
 
     feature_set = {}
     for feature in hmm_features.keys():
         feature_set[feature] = []
 
-    if (cursor is not None) and knn_db.is_training_set_exists(cursor):
-        print_debug("Train set exists, start downloading data")
-        for feature in hmm_features.keys():
-            for row in knn_db.select_all_from_db(cursor, hmm_features[feature]["db_table_name"]):
-                feature_set[feature].extend([list(row[0: -1])])
+    for feature in hmm_features.keys():
+        for row in knn_db.select_all_from_db(cursor, hmm_features[feature]["db_table_name"]):
+            feature_set[feature].extend([list(row)])
 
     return feature_set
 
@@ -308,8 +316,8 @@ def hmm_get_features_vector_from_dir(path_pattern):
     :param path_pattern: ściażka do katalogu z plikami z których należy wygenerować wektory cech
     :type path_pattern: basestring
 
-    :return: Dla każdego zbioru cech, zbiór wektorów cech
-    :rtype: feature_dict[vector]
+    :return: Dla każdego zbioru cech, lista wektorów cech
+    :rtype: dictionary
     """
 
     features_set = {}
@@ -319,7 +327,7 @@ def hmm_get_features_vector_from_dir(path_pattern):
     test_set = build_file_set(path_pattern)
     num_files = len(test_set)
     for i in range(num_files):
-        print_progress_bar(i + 1, num_files, prefix='Training progress:', suffix='Complete', length=50)
+        print_progress_bar(i + 1, num_files, prefix='Preparing observations:', suffix='Complete', length=50)
         file = test_set[i][0]
 
         feature_vectors = {}
