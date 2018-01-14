@@ -40,6 +40,11 @@ class KNN:
         return possible_emotions
 
     def compute_emotion(self, obs_sequence, num_of_nearest_neighbour):
+        if not isinstance(obs_sequence[0], list):
+            return self.get_emotion(obs_sequence, num_of_nearest_neighbour)
+        # if len(obs_sequence) == 1:
+        #     return self.get_emotion(obs_sequence, num_of_nearest_neighbour)
+
         emotion_counter = {}
         for emotion in self.states:
             emotion_counter[emotion] = 0

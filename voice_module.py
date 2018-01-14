@@ -61,9 +61,7 @@ def get_feature_vectors(file):
         energy_feature_vectors.append(get_energy_feature_vector(sample_next, energy_window))
         sample = sample_next
 
-    summary_pitch_feature_vectors = get_summary_pitch_feature_vector(pitch_feature_vectors)
-
-    return pitch_feature_vectors, energy_feature_vectors, summary_pitch_feature_vectors
+    return pitch_feature_vectors, energy_feature_vectors
 
 
 def get_pitch_feature_vector(sample, frame_length, window, frame_rate):

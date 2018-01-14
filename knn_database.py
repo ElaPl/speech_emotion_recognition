@@ -1,7 +1,5 @@
 import pymysql, sys
 
-from KNN import KNN
-
 DB_NAME = 'speech_emotion_recognition'
 DB_FEMALE_NAME = 'female_speech_emo'
 DB_MALE_NAME = 'male_speech_emo'
@@ -110,7 +108,7 @@ def is_training_set_exists(cursor):
     return True
 
 
-def train_knn_from_db(cursor, table_name):
+def select_all_from_db(cursor, table_name):
     try:
         cursor.execute("SELECT * FROM %s;" % table_name)
     except pymysql.Error as e:

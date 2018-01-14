@@ -8,6 +8,7 @@ class HMM:
     def __init__(self, transition_ppb, states_num, observations):
         self.hidden_states_num = states_num
         self.observations_num = len(observations)
+        self.observations = observations
         self.observation_dict = self.create_observation_dict(observations)
 
         # transition_ppb[i][j] - ppb of transition from state i to state j
