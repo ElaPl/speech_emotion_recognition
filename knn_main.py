@@ -27,7 +27,7 @@ def knn_main(train_path_pattern, test_path_pattern, db_name, db_password, emotio
     train_path_pattern.
     Następnie testuje ich działanie wektorami obserwacji obliczonymi z plików znajdujących się w test_path_pattern
 
-    :param train_train_path_pattern: Ścieżka do folderu zawierające pliki dźwiękowe, z których mają
+    :param train_path_pattern: Ścieżka do folderu zawierające pliki dźwiękowe, z których mają
         być wygenerowane dane trenujące
     :type train_path_pattern: basestring
     :param test_path_pattern: Ścieżka do folderu zawierające pliki dźwiękowe, z których mają
@@ -48,7 +48,6 @@ def knn_main(train_path_pattern, test_path_pattern, db_name, db_password, emotio
     else:
         training_set = knn_get_training_feature_set_from_dir(train_path_pattern)
         if db is not None:
-
             knn_db.prepare_db_table(db, cursor, knn_db.KNN_DB_TABLES)
             for feature in knn_features:
                 for i in range(len(training_set[feature])):
@@ -63,7 +62,7 @@ def knn_main(train_path_pattern, test_path_pattern, db_name, db_password, emotio
 
     KNN_modules = {}
     for feature in knn_features:
-        KNN_modules[feature] = KNN(emotions, training_set[feature])
+        KNN_modules[feature] = KNN(training_set[feature])
 
     knn_compute_emotions(test_path_pattern, KNN_modules, summary_table, emotions)
 

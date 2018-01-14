@@ -64,7 +64,7 @@ if __name__ == "__main__":
     if len(sys.argv) == 1:
         print("Use either KNN or HMM option")
 
-    if len(sys.argv) > 4:
+    if len(sys.argv) > 2:
         db_name = sys.argv[2]
         db_password = sys.argv[3]
 
