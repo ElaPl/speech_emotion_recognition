@@ -6,6 +6,8 @@ from warnings import filterwarnings
 
 from hmm_main import hmm_main
 from knn_main import knn_main
+import knn_database as knn_db
+
 from helper_file import *
 
 emotions = ["anger", "boredom", "happiness", "sadness"]
