@@ -77,7 +77,7 @@ def hmm_main(train_path_pattern, test_path_pattern, db_name, db_password, emotio
         for emotion in emotions:
             print_progress_bar(counter, num_of_hmm_models, prefix='Training progress:', suffix='Complete', length=50)
             if train_set[feature][emotion]:
-                HMM_modules[feature][emotion].learn(train_set[feature][emotion], 0.001)
+                HMM_modules[feature][emotion].learn(train_set[feature][emotion], 0.0001)
             counter += 1
 
     file_set = build_file_set(test_path_pattern)
@@ -221,7 +221,7 @@ def hmm_claster(feature_vector_set):
 
     min_feature_vec, max_feature_vec = hmm_normalize(feature_vector_set)
 
-    kmeans = KMeans(n_clusters=30).fit(feature_vector_set)
+    kmeans = KMeans(n_clusters=1000).fit(feature_vector_set)
 
     observations = (kmeans.cluster_centers_).tolist()
 
@@ -274,13 +274,10 @@ def hmm_get_all_possible_observations(train_path_pattern, db_name, db_password):
         * dla każdego zestawu cech wektor najmniejszych i największych wartości każdej z cech
     """
 
-    feature_set = {}
     db, cursor = connect_to_database(db_name, db_password)
     if (cursor is not None) and knn_db.is_training_set_exists(cursor, knn_db.HMM_DB_TABLES):
-        print("exist")
         feature_set = hmm_get_features_vectors_from_db(cursor)
     else:
-        print("not exist")
         feature_set = hmm_get_features_vector_from_dir(train_path_pattern)
         if db is not None:
             knn_db.prepare_db_table(db, cursor, knn_db.HMM_DB_TABLES)

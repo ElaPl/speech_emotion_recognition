@@ -6,9 +6,8 @@ from warnings import filterwarnings
 
 from hmm_main import hmm_main
 from knn_main import knn_main
+from mm_main import mm_main
 import knn_database as knn_db
-
-from helper_file import *
 
 emotions = ["anger", "boredom", "happiness", "sadness"]
 
@@ -27,7 +26,10 @@ if __name__ == "__main__":
     if sys.argv[1] == 'KNN':
         knn_main('Berlin_EmoDatabase/train/*/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav', db_name, db_password,
                  emotions)
-    else:
+    elif sys.argv[1] == 'HMM':
         hmm_main('Berlin_EmoDatabase/train/*/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav', db_name, db_password,
                  emotions)
+    else:
+        mm_main('Berlin_EmoDatabase/train/*/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav', db_name, db_password,
+                emotions)
 
