@@ -6,14 +6,17 @@ Wymagania:
 * numpy
 * pymysql
 
-Instalacja
-* pip3 install -U scikit-learn
-
 
 Aby rozpocząć testowanie używając algorytmu KNN należy wpisać jedną z poniższych komand:
 ```
 $ python main.py KNN
 $ python main.py KNN "name of database" "password to database" (Aby zapisać cześć informacji w bazie danych i przyspieszyć działanie programu)
+
+Aby rozpocząć testowanie używając algorytmu HMM należy wpisać jedną z poniższych komand:
+```
+$ python main.py HMM
+$ python main.py HMM "name of database" "password to database" (Aby zapisać cześć informacji w bazie danych i przyspieszyć działanie programu)
+
 ```
 
 Example output:

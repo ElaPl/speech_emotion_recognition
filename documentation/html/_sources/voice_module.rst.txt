@@ -1,0 +1,7 @@
+voice\_module module
+====================
+
+.. automodule:: voice_module
+    :members:
+    :undoc-members:
+    :show-inheritance:

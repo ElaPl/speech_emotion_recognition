@@ -1,0 +1,125 @@
+\begin{sphinxtheindex}
+\def\bigletter#1{{\Large\sffamily#1}\nopagebreak\vspace{1mm}}
+
+  \bigletter {Symbols}
+  \item \_\_init\_\_() (HMM.HMM metoda), \hyperpage{1}
+  \item \_\_init\_\_() (KNN.KNN metoda), \hyperpage{4}
+  \item \_\_init\_\_() (hanning\_window.HanningWindow metoda), \hyperpage{5}
+
+  \indexspace
+  \bigletter B
+  \item backward\_algorithm() (HMM.HMM metoda), \hyperpage{2}
+  \item baum\_welch\_algorithm() (HMM.HMM metoda), \hyperpage{2}
+  \item build\_file\_set() (w module helper\_file), \hyperpage{5}
+
+  \indexspace
+  \bigletter C
+  \item compute\_emotion() (KNN.KNN metoda), \hyperpage{4}
+  \item connect\_to\_database() (w module helper\_file), \hyperpage{5}
+  \item create\_emission\_ppb() (HMM.HMM metoda), \hyperpage{2}
+  \item create\_initial\_ppb() (HMM.HMM metoda), \hyperpage{2}
+  \item create\_observation\_dict() (HMM.HMM metoda), \hyperpage{2}
+  \item create\_summary\_table() (w module helper\_file), \hyperpage{5}
+  \item create\_transition\_ppb() (HMM.HMM metoda), \hyperpage{3}
+
+  \indexspace
+  \bigletter D
+  \item draw\_energy\_histogram() (w module main), \hyperpage{9}
+  \item draw\_freq\_histogram() (w module main), \hyperpage{9}
+
+  \indexspace
+  \bigletter E
+  \item euclidean\_distance() (w module helper\_file), \hyperpage{5}
+  \item evaluate() (HMM.HMM metoda), \hyperpage{3}
+
+  \indexspace
+  \bigletter F
+  \item forward\_algorithm() (HMM.HMM metoda), \hyperpage{3}
+
+  \indexspace
+  \bigletter G
+  \item get\_emotion() (KNN.KNN metoda), \hyperpage{4}
+  \item get\_energy\_feature\_vector() (w module voice\_module), \hyperpage{10}
+  \item get\_energy\_vector() (w module voice\_module), \hyperpage{10}
+  \item get\_feature\_vectors() (w module voice\_module), \hyperpage{10}
+  \item get\_file\_info() (w module voice\_module), \hyperpage{10}
+  \item get\_freq\_vector() (w module voice\_module), \hyperpage{10}
+  \item get\_fundamental\_freq() (w module voice\_module), \hyperpage{10}
+  \item get\_most\_frequently\_occurring() (w module helper\_file), \hyperpage{5}
+  \item get\_parameters() (HMM.HMM metoda), \hyperpage{3}
+  \item get\_pitch\_feature\_vector() (w module voice\_module), \hyperpage{10}
+  \item get\_pitch\_features() (w module voice\_module), \hyperpage{10}
+  \item get\_sample\_rate() (w module voice\_module), \hyperpage{10}
+  \item get\_scale\_id() (w module voice\_module), \hyperpage{10}
+  \item get\_summary\_pitch\_feature\_vector() (w module voice\_module), \hyperpage{10}
+
+  \indexspace
+  \bigletter H
+  \item hanning\_window (modu\IeC {\l }), \hyperpage{5}
+  \item HanningWindow (klasa w module hanning\_window), \hyperpage{5}
+  \item helper\_file (modu\IeC {\l }), \hyperpage{5}
+  \item HMM (klasa w module HMM), \hyperpage{1}
+  \item HMM (modu\IeC {\l }), \hyperpage{1}
+  \item hmm\_claster() (w module hmm\_main), \hyperpage{6}
+  \item hmm\_get\_all\_possible\_observations() (w module hmm\_main), \hyperpage{6}
+  \item hmm\_get\_features\_vector\_from\_dir() (w module hmm\_main), \hyperpage{6}
+  \item hmm\_get\_features\_vectors\_from\_db() (w module hmm\_main), \hyperpage{7}
+  \item hmm\_get\_nearest\_neighbour() (w module hmm\_main), \hyperpage{7}
+  \item hmm\_get\_observations\_vectors() (w module hmm\_main), \hyperpage{7}
+  \item hmm\_get\_train\_set() (w module hmm\_main), \hyperpage{7}
+  \item hmm\_main (modu\IeC {\l }), \hyperpage{6}
+  \item hmm\_main() (w module hmm\_main), \hyperpage{7}
+  \item hmm\_normalize() (w module hmm\_main), \hyperpage{8}
+
+  \indexspace
+  \bigletter I
+  \item is\_training\_set\_exists() (w module knn\_database), \hyperpage{8}
+
+  \indexspace
+  \bigletter K
+  \item KNN (klasa w module KNN), \hyperpage{4}
+  \item KNN (modu\IeC {\l }), \hyperpage{4}
+  \item knn\_compute\_emotions() (w module knn\_main), \hyperpage{9}
+  \item knn\_database (modu\IeC {\l }), \hyperpage{8}
+  \item knn\_get\_training\_feature\_set\_from\_db() (w module knn\_main), \hyperpage{9}
+  \item knn\_get\_training\_feature\_set\_from\_dir() (w module knn\_main), \hyperpage{9}
+  \item knn\_main (modu\IeC {\l }), \hyperpage{9}
+  \item knn\_main() (w module knn\_main), \hyperpage{9}
+
+  \indexspace
+  \bigletter L
+  \item learn() (HMM.HMM metoda), \hyperpage{3}
+
+  \indexspace
+  \bigletter M
+  \item main (modu\IeC {\l }), \hyperpage{9}
+
+  \indexspace
+  \bigletter N
+  \item normalize() (KNN.KNN metoda statyczna), \hyperpage{5}
+  \item normalize\_vector() (w module helper\_file), \hyperpage{5}
+
+  \indexspace
+  \bigletter P
+  \item plot() (hanning\_window.HanningWindow metoda), \hyperpage{5}
+  \item prepare\_db\_table() (w module knn\_database), \hyperpage{8}
+  \item print\_debug() (w module helper\_file), \hyperpage{6}
+  \item print\_params() (HMM.HMM metoda), \hyperpage{4}
+  \item print\_progress\_bar() (w module helper\_file), \hyperpage{6}
+  \item print\_summary() (w module helper\_file), \hyperpage{6}
+  \item project\_documentation (modu\IeC {\l }), \hyperpage{9}
+
+  \indexspace
+  \bigletter R
+  \item read\_from\_wav\_file() (w module voice\_module), \hyperpage{10}
+
+  \indexspace
+  \bigletter S
+  \item save\_in\_dbtable() (w module knn\_database), \hyperpage{8}
+  \item select\_all\_from\_db() (w module knn\_database), \hyperpage{8}
+
+  \indexspace
+  \bigletter V
+  \item voice\_module (modu\IeC {\l }), \hyperpage{10}
+
+\end{sphinxtheindex}

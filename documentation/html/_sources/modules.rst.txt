@@ -1,0 +1,15 @@
+speech_emotion_recognition
+==========================
+
+.. toctree::
+   :maxdepth: 4
+
+   HMM
+   KNN
+   hanning_window
+   helper_file
+   hmm_main
+   knn_database
+   knn_main
+   main
+   voice_module

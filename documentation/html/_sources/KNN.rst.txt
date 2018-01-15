@@ -1,0 +1,7 @@
+KNN module
+==========
+
+.. automodule:: KNN
+    :members:
+    :undoc-members:
+    :show-inheritance:

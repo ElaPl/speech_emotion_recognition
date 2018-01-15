@@ -2,7 +2,7 @@ from helper_file import euclidean_distance, normalize_vector
 
 
 class KNN:
-    """Ta klasa implementuje algorytm K najbliższych sąsiadów dla problemu znajodwania najbliższych sąsiadów
+    """Klasa implementująca algorytm K najbliższych sąsiadów dla problemu rozpoznawania emocji z głosu
 
     Dany jest zbiór uczący zawieracjący obserwację (wektory cech), z któżych każda ma przypisaną emocję jaką dany wektor
     reprezentuje. Zbiór uczący zostaje znormalizowany a zmienne użyte do normalizacje zapisane jako parametry obiektu.
@@ -64,7 +64,7 @@ class KNN:
         return [key for key in emotion_counter if emotion_counter[key] == max_num_of_occurrence]
 
     def compute_emotion(self, obs_sequence, num_of_nearest_neighbour):
-        """Funkcja dla każdego wektora z zbioru obserwacji, sumuje stany jakie reprezentują.
+        """Funkcja dla każdego wektora z zbioru obserwacji, zlicza prawdopodobne stany jakie reprezentują.
 
         :param list obs_sequence: lista obserwacji (wektorów) reprezentujących wypowiedź, której stan emocjonalny trzeba
             rozpoznać

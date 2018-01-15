@@ -1,0 +1,180 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pl">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>knn_main module &#8212; Speech emotion recognition 1.0 - dokumentacja</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/translations.js"></script>
+    <link rel="index" title="Indeks" href="genindex.html" />
+    <link rel="search" title="Szukaj" href="search.html" />
+    <link rel="next" title="main module" href="main.html" />
+    <link rel="prev" title="knn_database module" href="knn_database.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-knn_main">
+<span id="knn-main-module"></span><h1>knn_main module<a class="headerlink" href="#module-knn_main" title="Stały odnośnik do tego nagłówka">¶</a></h1>
+<dl class="function">
+<dt id="knn_main.knn_compute_emotions">
+<code class="descclassname">knn_main.</code><code class="descname">knn_compute_emotions</code><span class="sig-paren">(</span><em>path_pattern</em>, <em>KNN_modules</em>, <em>summary_table</em>, <em>emotions</em><span class="sig-paren">)</span><a class="headerlink" href="#knn_main.knn_compute_emotions" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dd><p>Funckja dla każdego pliku z path_pattern, pobiera wektory obserwacji, a nastepnie testuje nimi
+każdy z modelów KNN w celu odganięcia najbardziej prawdopodobnej emocji jaką reprezentuje plik</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><ul class="first last simple">
+<li><strong>path_pattern</strong> (<em>basestring</em>) – ściażka do katalogu z plikami z których należy wygenerować wektory cech</li>
+<li><strong>KNN_modules</strong> (<em>dictionary</em>) – Zbiór wytrenowanych obiektów KNN, dla każdej emocji jednej obiekt obiekt&nbsp;KNN</li>
+<li><strong>summary_table</strong> (<em>list</em>) – Pomocnicza tablica do zapisywania wyników testów</li>
+<li><strong>summary_table</strong> – Lista emocji do przetestowania</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="knn_main.knn_get_training_feature_set_from_db">
+<code class="descclassname">knn_main.</code><code class="descname">knn_get_training_feature_set_from_db</code><span class="sig-paren">(</span><em>cursor</em><span class="sig-paren">)</span><a class="headerlink" href="#knn_main.knn_get_training_feature_set_from_db" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dd><p>Funkcja dla każdego z dla każdego zbioru cech tworzy wektor cech z plików w katalogu „path_pattern”</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><strong>path_pattern</strong> (<em>basestring</em>) – ściażka do katalogu z plikami z których należy wygenerować wektory cech</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body">Dla każdego zbioru cech lista [wektor cech , emocja]</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Typ zwracany:</th><td class="field-body">dicttionary</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="knn_main.knn_get_training_feature_set_from_dir">
+<code class="descclassname">knn_main.</code><code class="descname">knn_get_training_feature_set_from_dir</code><span class="sig-paren">(</span><em>path_pattern</em><span class="sig-paren">)</span><a class="headerlink" href="#knn_main.knn_get_training_feature_set_from_dir" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dd><p>Funkcja dla każdego z dla każdego zbioru cech pobiera wektor cech oraz emocję jaką reprezentuje
+z bazy danych na którą wskazuje cursor</p>
+<blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">param:</th><td class="field-body">path_pattern: kursor na bazę danych</td>
+</tr>
+<tr class="field-even field"><th class="field-name">return:</th><td class="field-body">Dla każdego zbioru cech lista [wektor cech , emocja]</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">rtype:</th><td class="field-body">dictionary</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="knn_main.knn_main">
+<code class="descclassname">knn_main.</code><code class="descname">knn_main</code><span class="sig-paren">(</span><em>train_path_pattern</em>, <em>test_path_pattern</em>, <em>db_name</em>, <em>db_password</em>, <em>emotions</em><span class="sig-paren">)</span><a class="headerlink" href="#knn_main.knn_main" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dd><p>Główna funckja knn. Dla każdej emocji tworzy model KNN i trenuje go wektorami obserwacji
+pobranymi z bazie danych db_name jeżeli istnieją, lub w przeciwnym wypadku obliczonymi z plików znajdujacych sie w katalogu
+train_path_pattern.
+Następnie testuje ich działanie wektorami obserwacji obliczonymi z plików znajdujących się w test_path_pattern</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><ul class="first last simple">
+<li><strong>train_path_pattern</strong> (<em>basestring</em>) – Ścieżka do folderu zawierające pliki dźwiękowe, z których mają
+być wygenerowane dane trenujące</li>
+<li><strong>test_path_pattern</strong> (<em>basestring</em>) – Ścieżka do folderu zawierające pliki dźwiękowe, z których mają
+być wygenerowane dane testujące</li>
+<li><strong>db_name</strong> (<em>basestring</em>) – nazwa bazy danych</li>
+<li><strong>db_password</strong> (<em>basestring</em>) – hasło do bazy danych</li>
+<li><strong>emotions</strong> (<em>list</em>) – zbiór emocji do rozpoznania</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">speech_emotion_recognition</a><ul>
+      <li>Previous: <a href="knn_database.html" title="poprzedni rozdział">knn_database module</a></li>
+      <li>Next: <a href="main.html" title="następny rozdział">main module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Szybkie wyszukiwanie</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Szukaj" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Elżbieta Plaszczyk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/knn_main.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

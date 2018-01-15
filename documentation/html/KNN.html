@@ -1,0 +1,195 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pl">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>KNN module &#8212; Speech emotion recognition 1.0 - dokumentacja</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/translations.js"></script>
+    <link rel="index" title="Indeks" href="genindex.html" />
+    <link rel="search" title="Szukaj" href="search.html" />
+    <link rel="next" title="hanning_window module" href="hanning_window.html" />
+    <link rel="prev" title="HMM module" href="HMM.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-KNN">
+<span id="knn-module"></span><h1>KNN module<a class="headerlink" href="#module-KNN" title="Stały odnośnik do tego nagłówka">¶</a></h1>
+<dl class="class">
+<dt id="KNN.KNN">
+<em class="property">class </em><code class="descclassname">KNN.</code><code class="descname">KNN</code><span class="sig-paren">(</span><em>train_set</em><span class="sig-paren">)</span><a class="headerlink" href="#KNN.KNN" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dd><p>Klasy bazowe: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Klasa implementująca algorytm K najbliższych sąsiadów dla problemu rozpoznawania emocji z głosu</p>
+<p>Dany jest zbiór uczący zawieracjący obserwację (wektory cech), z któżych każda ma przypisaną emocję jaką dany wektor
+reprezentuje. Zbiór uczący zostaje znormalizowany a zmienne użyte do normalizacje zapisane jako parametry obiektu.</p>
+<dl class="docutils">
+<dt>Dany jest zbiór obserwacji C = (c_1, c_2 … c_k}. Celem jest na podstawie informacji z zbioru uczącego</dt>
+<dd>przewidzenie jaką emocję reprezentuje dany zbiór obserwacji.</dd>
+</dl>
+<p>S = [] - zbiór stanów wynikowych</p>
+<p>Algorytm predycji:
+Dla każdej obserwacji c_i :</p>
+<blockquote>
+<div><ul class="simple">
+<li>c_i zostaje znormalizowane wartościami którymi znormalizowany został zbiór uczący.</li>
+<li>Obliczana jest odległość euklidesowa pomiedczy c_i a każdym wektorem z zbioru uczącego</li>
+<li>Z zbioru uczącego wybierane jest k wektorów, których odległość do c_i jest najmniejsza.</li>
+<li>Sumowane są stany które reprezentują zbiór k wektorów.</li>
+<li>Stany które wystąpiły najczęściej dodawane są do S</li>
+</ul>
+</div></blockquote>
+<p>Stany które wystąpiły najczęściej w S są zwracane jako możliwe stany reprezentujace dany zbiór obserwacji</p>
+<dl class="method">
+<dt id="KNN.KNN.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>train_set</em><span class="sig-paren">)</span><a class="headerlink" href="#KNN.KNN.__init__" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dd><p>Konstruktor klasy.
+Normalizuje i zapisuje zbiór uczący</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><strong>train_set</strong> (<em>list</em>) – zbiór uczący dany model KNN -&gt; lista wektorów postaci
+[wektor_cech, emocja jaką reprezentuje]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="KNN.KNN.compute_emotion">
+<code class="descname">compute_emotion</code><span class="sig-paren">(</span><em>obs_sequence</em>, <em>num_of_nearest_neighbour</em><span class="sig-paren">)</span><a class="headerlink" href="#KNN.KNN.compute_emotion" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dd><p>Funkcja dla każdego wektora z zbioru obserwacji, zlicza prawdopodobne stany jakie reprezentują.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><ul class="first last simple">
+<li><strong>obs_sequence</strong> (<em>list</em>) – lista obserwacji (wektorów) reprezentujących wypowiedź, której stan emocjonalny trzeba
+rozpoznać</li>
+<li><strong>num_num_of_nearest_neighbour</strong> (<em>int</em>) – liczba najbliższych sąsiadów.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>:return stany najczęściej występujące w podanej sekwencji obserwacji.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="KNN.KNN.get_emotion">
+<code class="descname">get_emotion</code><span class="sig-paren">(</span><em>test_vector</em>, <em>num_of_nearest_neighbour</em><span class="sig-paren">)</span><a class="headerlink" href="#KNN.KNN.get_emotion" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dd><p>Funkcja porównuje podany wektor emocji z każdym z zbioru trenującego i wybiera k najbliższych.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><ul class="first last simple">
+<li><strong>test_vector</strong> (<em>vector</em>) – wektor, którego stan należy odgadnąć</li>
+<li><strong>num_num_of_nearest_neighbour</strong> (<em>int</em>) – liczba najbliższych sąsiadów, z których należy wziąć stan do porównania.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>:return lista stanów których wektory pojawiły sie najczęściej w grupie k najbliższych wektorów.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="KNN.KNN.normalize">
+<em class="property">static </em><code class="descname">normalize</code><span class="sig-paren">(</span><em>feature_vector_set</em><span class="sig-paren">)</span><a class="headerlink" href="#KNN.KNN.normalize" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dd><p>Normalizuje zbiór listę wektórów postaci [wektor_cecg, emocja]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Param:</th><td class="field-body">feature_vector_set: Zbiór wektorów cech do znormalizowania</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body"><ul class="simple">
+<li>wektor najmniejszych wartości z każdej cechy</li>
+<li>wektor największych wartości z każdej cechy</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">speech_emotion_recognition</a><ul>
+      <li>Previous: <a href="HMM.html" title="poprzedni rozdział">HMM module</a></li>
+      <li>Next: <a href="hanning_window.html" title="następny rozdział">hanning_window module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Szybkie wyszukiwanie</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Szukaj" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Elżbieta Plaszczyk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/KNN.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

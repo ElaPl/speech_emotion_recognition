@@ -23,7 +23,17 @@ def hmm_main(train_path_pattern, test_path_pattern, db_name, db_password, emotio
     """Główna funkcja hmm. Dla każdego zestawu cech i kazdej emocji tworzy model HMM i trenuje go wektorami obserwacji
     pobranymi z bazie danych db_name jeżeli istnieją, lub w przeciwnym wypadku obliczonymi z plików znajdujacych sie w katalogu
     train_path_pattern.
-    Następnie testuje ich działanie wektorami obserwacji obliczonymi z plików znajdujących się w test_path_pattern
+
+    Następnie dla każdej wypowiedzi z katalogu test_path_pattern próbuje przewidzieć jaką emocję reprezentuje ta
+    wypowiedź, w następujący sposób.
+    Dla każdego pliku
+        1) Dla każdego zestawu cech oblicz listę sekwencji obserwacji
+        2) Dla każdej sekwencji obserwacji:
+            2_1) Dla każdej emocji oblicza prawdopodobieństwo wygenerowania sekwencji obserwacji w modelu hmm
+                reprezentującym emocje.
+            2_2) Jako prawdopodobną emocję uznaje emocję reprezentującą przez model HMM, który zwrócił największe
+                prawdopodobieńśtwo wygenerowania tej sekwencji obserwacji.
+        3) Za emocję reprezentującą ten plik uznaje emocję, która wystąpiła największą ilosć razy
 
     :param train_train_path_pattern: Ścieżka do folderu zawierające pliki dźwiękowe, z których mają
         być wygenerowane dane trenujące

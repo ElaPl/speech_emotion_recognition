@@ -1,0 +1,7 @@
+hanning\_window module
+======================
+
+.. automodule:: hanning_window
+    :members:
+    :undoc-members:
+    :show-inheritance:

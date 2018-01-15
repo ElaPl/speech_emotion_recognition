@@ -7,6 +7,21 @@ import struct
 
 # Odczytaj określoną ilość próbek z jednego channelu z pliku wav
 def read_from_wav_file(wav_file, length):
+    """Funkcja odczytuje określoną ilość próbek pochodzących z jednego chanellu z pliku wav.
+
+    :param wav_file wskaźnik na plik wav
+    :param int length: liczba sampli jaką chcemy odczytać
+
+    :return [list] - lista sampli długości length, pochądzących z jednego channella.
+
+    Ponieważ rozmary sampli w pliku .wav mają różną długość należy odczytywać 1 próbkę należy odczytać określoną ilość bitów.
+    DO tego służy tablica ftm_size
+
+    Sample w pliku wav są umieszczone następująco: s1_c1, s1_c2, s2_c1, s2_c2, gdzie s1 oznacza sample_1, a c1 channel_1.
+
+    Aby więc odczytać informację o długości n należy odczytać (fmt_size * length * wav_file.getnchannels()) bitów, a
+    następnie wziąć co x-ty element x-ty element, gdzie x to liczba channeli.
+    """
     sizes = {1: 'B', 2: 'h', 4: 'i'}
     fmt_size = sizes[wav_file.getsampwidth()]
 
@@ -23,6 +38,16 @@ def read_from_wav_file(wav_file, length):
 # Dziwięk dzielimy na kawałki o długości ~0,25ms
 # Zwraca listę features z każdych 25ms pliku
 def get_feature_vectors(file):
+    """ Funckja otwiera plik wav i dzieli go na kawałki o długości ~0,25s, biorąc sample co ~0,125s, czyli
+    kawałki nachodzą na siebie - w celu zwiększenia liczby obserwacji.
+    Dla każdego kawałka wypowiedzi oblicza na podstawie niego wektor cech częstotliwości i energii.
+
+    :param str file: ścieżka do pliku z którego mają być wygenerowane wektory cech
+    :return
+        * lista wektorów cech częstotliwości
+        * lista wektorów cech energii
+    """
+
 
     try:
         wav_file = wave.open(file, 'rb')
@@ -65,6 +90,16 @@ def get_feature_vectors(file):
 
 
 def get_pitch_feature_vector(sample, frame_length, window, frame_rate):
+    """
+    Funkcja dla każdej rammki z sample, dłguośći frame_length przygotowuje fft i oblicza z tego częstotliwość bazową.
+    Następnie tworzy listę częstotliwości bazowych i oblicza wektor cech na podsawie tych danych.
+
+    :param sample: lista sampli, z ktorych ma być obliczony wetor cech częstotliwości
+    :param frame_length: Dłguosć ramki do fft
+    :param window: Funkcja okna
+    :param frame_rate: Czestotliwość samplowania
+    :return: Wektor cech częstliwośći dla podanego zbioru sampli
+    """
     fundamental_freq_array = []
     sample_len = len(sample)
     sample_pointer = 0
@@ -80,6 +115,10 @@ def get_pitch_feature_vector(sample, frame_length, window, frame_rate):
 
 
 def get_file_info(filename):
+    """
+    :param str filename: Ścieżka do pliku
+    :return: parametry pliku
+    """
     try:
         wav_file = wave.open(filename, 'rb')
     except IOError:
@@ -93,6 +132,11 @@ def get_file_info(filename):
 
 
 def get_sample_rate(filename):
+    """
+
+    :param str filename: ścieżka do pliku
+    :return: częstotliwość samplowania
+    """
     try:
         wav_file = wave.open(filename, 'rb')
     except IOError:
@@ -104,63 +148,16 @@ def get_sample_rate(filename):
     wav_file.close()
     return sample_rate
 
-def get_freq_vector(filename, frame_length):
-    window = HanningWindow(frame_length)
-
-    try:
-        wav_file = wave.open(filename, 'rb')
-    except IOError:
-        print("Can't open file " + filename)
-        return []
-
-    wav_iter = WavIterator(wav_file, frame_length)
-
-    fundamental_freq_array = []
-    for time_domain_vector in wav_iter:
-        if len(time_domain_vector) == frame_length:
-            signal = window.plot(time_domain_vector)
-        elif len(time_domain_vector) > 1:
-            tmp_hanning_module = HanningWindow(len(time_domain_vector))
-            signal = tmp_hanning_module.plot(time_domain_vector)
-        else:
-            break
-        frequency_domain_vector = np.fft.rfft(signal)
-        fundamental_freq_array.append(get_fundamental_freq(frequency_domain_vector, wav_file.getframerate(),
-                                                           len(time_domain_vector)))
-
-    wav_file.close()
-
-    return fundamental_freq_array
-
-
-def get_energy_vector(filename, frame_length):
-    window = HanningWindow(frame_length)
-
-    try:
-        wav_file = wave.open(filename, 'rb')
-    except IOError:
-        print("Can't open file " + filename)
-        return []
-
-    wav_iter = WavIterator(wav_file, frame_length)
-
-    energy_array = []
-    for time_domain_vector in wav_iter:
-        if len(time_domain_vector) == frame_length:
-            signal = window.plot(time_domain_vector)
-        elif len(time_domain_vector) > 1:
-            tmp_hanning_module = HanningWindow(len(time_domain_vector))
-            signal = tmp_hanning_module.plot(time_domain_vector)
-        else:
-            break
-        energy_array.extend(signal)
-
-    wav_file.close()
-
-    return energy_array
-
 
 def get_fundamental_freq(freq_domain_vect, sample_rate, sample_length):
+    """
+    Funkcja oblicza częśtotliwość bazową dla danego funkcji w domenie częsttliwości
+
+    :param vector freq_domain_vect: wektor reprezentujacy funkcję w domenie częstotliowści
+    :param int sample_rate: częstotliwość próbkowania dźwięku z którego pochodzi funkcja
+    :param int sample_length: długosć ramki z której została wygenerowana funkcja
+    :return float: częstotliwość bazowa dla podanej funkcji
+    """
     max_magnitude = sqrt(np.power(np.real(freq_domain_vect[1]), 2) + np.power(np.imag(freq_domain_vect[1]), 2))
     max_magnitude_ind = 1
     for i in range(1, len(freq_domain_vect)):
@@ -173,13 +170,13 @@ def get_fundamental_freq(freq_domain_vect, sample_rate, sample_length):
     return (sample_rate/sample_length) * max_magnitude_ind
 
 
-def get_scale_id(scale_dict, value):
-    for scale in scale_dict:
-        if scale['min'] <= value < scale['max']:
-            return scale['id']
-
-
 def get_pitch_features(fundamental_freq_array):
+    """
+    Funkcja na podstawie podanej listy częstotliwość bazowych oblicza wektor cech dla tych danych
+    :param vector fundamental_freq_array: wektor częstotliowści bazowych
+    :return: lista cech wektora
+    """
+
     if len(fundamental_freq_array) == 0:
         return []
     max_freq = fundamental_freq_array[0]
@@ -203,7 +200,6 @@ def get_pitch_features(fundamental_freq_array):
     if sum_freq == 0:
         return []
 
-    # print(sum_freq)
     vocal_range = max_freq - min_freq
     avg_frequency = sum_freq/len(fundamental_freq_array)
     percent_of_rising_tones = 100 * (rising_tones_counter / len(fundamental_freq_array))
@@ -219,12 +215,18 @@ def get_pitch_features(fundamental_freq_array):
     dynamic_tones_percent = (dynamic_tones_percent / len(fundamental_freq_array)) * 100
     standard_deviation_frequency = sqrt(variance/(len(fundamental_freq_array)-1))
     relative_std_deviation = (standard_deviation_frequency/avg_frequency) * 100
-    # print(avg_frequency)
+
     return [vocal_range, max_freq, min_freq, avg_frequency, dynamic_tones_percent, percent_of_falling_tones,
             percent_of_rising_tones, relative_std_deviation]
 
 
 def get_summary_pitch_feature_vector(pitch_feature_vectors):
+    """
+    Funkcja na podstawie danych oblicza wektor cech częstotliwośći bazowych
+    :param pitch_feature_vectors: lista wektorów cech częstotliowśći bazowych
+    :return: wektor cech
+    """
+
     pitch_feature_vectors_size = len(pitch_feature_vectors)
     max_freq_range = pitch_feature_vectors[0][3]
     min_freq_range = pitch_feature_vectors[0][3]
@@ -256,6 +258,12 @@ def get_summary_pitch_feature_vector(pitch_feature_vectors):
     return [freq_range, max_freq_range, min_freq_range, avg_range, dynamic_tones_percent, relative_std_deviation]
 
 def get_energy_feature_vector(sample, window):
+    """
+        Funkcja na podstawie podanej listy amplitude w domenie czasu oblicza wektor cech dla tych danych
+        :param vector sample: lista zmian energii w domenie czasu
+        :param window: funkcja okna
+        :return: lista cech na podstawie wprowadzonych danych
+    """
     time_domain_signal = window.plot(sample)
     time_domain_signal_len = len(time_domain_signal)
     if time_domain_signal_len == 0:

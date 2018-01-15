@@ -1,0 +1,7 @@
+hmm\_main module
+================
+
+.. automodule:: hmm_main
+    :members:
+    :undoc-members:
+    :show-inheritance:
