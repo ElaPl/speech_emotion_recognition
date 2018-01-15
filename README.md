@@ -20,6 +20,10 @@ Aby rozpocząć testowanie używając algorytmu HMM należy wpisać jedną z pon
 $ python main.py HMM
 $ python main.py HMM "name of database" "password to database" (Aby zapisać cześć informacji w bazie danych i przyspieszyć działanie programu)
 
+Aby rozpocząć testowanie używając modelu Markova należy wpisać jedną z poniższych komand:
+$ python main.py MM
+$ python main.py MM "name of database" "password to database" (Aby zapisać cześć informacji w bazie danych i przyspieszyć działanie programu)
+
 ```
 
 Przykłądowy wynik:

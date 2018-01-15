@@ -29,7 +29,9 @@ if __name__ == "__main__":
     elif sys.argv[1] == 'HMM':
         hmm_main('Berlin_EmoDatabase/train/*/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav', db_name, db_password,
                  emotions)
-    else:
+    elif sys.argv[1] == 'MM':
         mm_main('Berlin_EmoDatabase/train/*/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav', db_name, db_password,
                 emotions)
+    else:
+        print("Nieznana komenda. Dozwolone komendy KNN, HMM, MM")
 
