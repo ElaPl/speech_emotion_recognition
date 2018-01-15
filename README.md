@@ -2,10 +2,13 @@
 
 Wymagania:
 * python 3.5
-* scikit-learn
-* numpy
-* pymysql
+* pip3
 
+Polecane:
+* virtualenv
+
+W celu pobrania wszystkich zależności należy włączyć i wpisać komendę (najlepiej w środowisku wirtualnym)
+* pip3 install -r requirements.txt
 
 Aby rozpocząć testowanie używając algorytmu KNN należy wpisać jedną z poniższych komand:
 ```
@@ -36,7 +39,4 @@ tested emotion: sadness	 , anger: 0	 , boredom: 1	,  happiness: 0	, sadness: 0	,
 * guessed - ile testów przeszło poprawnie (algorytm poprawnie obliczył jaką emocję ten plik reprezentuje)
 * kolumny z emocjami - jakie emocje wyliczył algorytm dla każdego z testowanych plików (na przykład:
 w wierszu 1, "happiness: 4" oznacza, że algorytm dla 4 plików reprezentujących anger obliczył happiness.
-
-
-Algorytm HMM wymaga poprawy i jest tymczasowo wyłaczony
 

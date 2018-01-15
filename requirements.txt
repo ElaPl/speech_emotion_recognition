@@ -1,0 +1,4 @@
+matplotlib
+pymysql
+sklearn
+scipy
