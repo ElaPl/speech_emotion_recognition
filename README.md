@@ -16,13 +16,13 @@ $ python main.py KNN
 $ python main.py KNN "name of database" "password to database" (Aby zapisać cześć informacji w bazie danych i przyspieszyć działanie programu)
 
 Aby rozpocząć testowanie używając algorytmu HMM należy wpisać jedną z poniższych komand:
-```
+
 $ python main.py HMM
 $ python main.py HMM "name of database" "password to database" (Aby zapisać cześć informacji w bazie danych i przyspieszyć działanie programu)
 
 ```
 
-Example output:
+Przykłądowy wynik:
 ```
 tested emotion: anger	 , anger: 0	 , boredom: 0	,  happiness: 4	, sadness: 0	, guessed:36	, tested: 40	, trained: 37
 
@@ -40,3 +40,8 @@ tested emotion: sadness	 , anger: 0	 , boredom: 1	,  happiness: 0	, sadness: 0	,
 * kolumny z emocjami - jakie emocje wyliczył algorytm dla każdego z testowanych plików (na przykład:
 w wierszu 1, "happiness: 4" oznacza, że algorytm dla 4 plików reprezentujących anger obliczył happiness.
 
+Dokumentacja:
+
+Do projektu została stworzona dokumentacje w postacji html i pdf.
+Aby otworzyć dokumentację w postaci html, należy w dowolnej przeglądarce otworzyć plik documentation/index.html
+Dokumentacja w postaci pdf znajduje się w katalogu documentation/pdf/Speechemotionrecognition.pdf

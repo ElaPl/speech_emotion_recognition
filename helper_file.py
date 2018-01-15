@@ -2,9 +2,9 @@ from math import sqrt, pow
 import glob
 import os
 import operator
-import knn_database as knn_db
 import pymysql
-from voice_module import get_feature_vectors
+from matplotlib import pyplot as plt
+
 
 # If True than debug print will be displayed
 debug = True
@@ -12,6 +12,7 @@ debug = True
 def print_debug(text):
     if debug is True:
         print(text)
+
 
 # Oblicza odległosć euklidesową pomiedzy dwoma wektorami
 def euclidean_distance(vec1, vec2):
@@ -134,3 +135,38 @@ def connect_to_database(db_name, db_password):
     except pymysql.Error as e:
         print_debug("Can't connect to db")
         return None, None
+
+
+# def draw_freq_histogram():
+#     train_set = build_file_set('Berlin_EmoDatabase/wav/' + sys.argv[1] + '/*.wav')
+#     frame_size = 512
+#
+#     for i in range(0, len(train_set)):
+#         freq_vector = get_freq_vector(train_set[i][0], 512)
+#         print(freq_vector)
+#         print()
+#         sample_rate = get_sample_rate(train_set[i][0])
+#
+#         bins = np.arange(0, len(freq_vector), 1)  # fixed bin size
+#         plt.plot(bins, freq_vector)
+#         plt.title('Fundamental freq of ' + train_set[i][0])
+#         plt.xlabel('time, frame_length= ' + str(sample_rate / frame_size))
+#         plt.ylabel('Frequency')
+#
+#         plt.show()
+#
+#
+# def draw_energy_histogram():
+#     train_set = build_file_set('Berlin_EmoDatabase/wav/' + sys.argv[1] + '/*.wav')
+#
+#     for i in range(0, len(train_set)):
+#         sample_rate = get_sample_rate(train_set[i][0])
+#         energy_vector = get_energy_vector(train_set[i][0], int(sample_rate / 4))
+#
+#         bins = np.arange(0, len(energy_vector), 1)
+#         plt.plot(bins, energy_vector)
+#         plt.title('Energy histogram of ' + train_set[i][0])
+#         plt.xlabel('Time')
+#         plt.ylabel('Energy')
+#
+#         plt.show()
