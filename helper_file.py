@@ -137,36 +137,29 @@ def connect_to_database(db_name, db_password):
         return None, None
 
 
-# def draw_freq_histogram():
-#     train_set = build_file_set('Berlin_EmoDatabase/wav/' + sys.argv[1] + '/*.wav')
-#     frame_size = 512
-#
-#     for i in range(0, len(train_set)):
-#         freq_vector = get_freq_vector(train_set[i][0], 512)
-#         print(freq_vector)
-#         print()
-#         sample_rate = get_sample_rate(train_set[i][0])
-#
-#         bins = np.arange(0, len(freq_vector), 1)  # fixed bin size
-#         plt.plot(bins, freq_vector)
-#         plt.title('Fundamental freq of ' + train_set[i][0])
-#         plt.xlabel('time, frame_length= ' + str(sample_rate / frame_size))
-#         plt.ylabel('Frequency')
-#
-#         plt.show()
-#
-#
-# def draw_energy_histogram():
-#     train_set = build_file_set('Berlin_EmoDatabase/wav/' + sys.argv[1] + '/*.wav')
-#
-#     for i in range(0, len(train_set)):
-#         sample_rate = get_sample_rate(train_set[i][0])
-#         energy_vector = get_energy_vector(train_set[i][0], int(sample_rate / 4))
-#
-#         bins = np.arange(0, len(energy_vector), 1)
-#         plt.plot(bins, energy_vector)
-#         plt.title('Energy histogram of ' + train_set[i][0])
-#         plt.xlabel('Time')
-#         plt.ylabel('Energy')
-#
-#         plt.show()
+def normalize(feature_vector_set):
+    """ Normalizuje zbiór listę wektórów postaci [data, target], nie naruszając ich kolejności
+
+    :param: feature_vector_set: Zbiór wektorów cech do znormalizowania
+    :return: * wektor najmniejszych wartości z każdej cechy
+             * wektor największych wartości z każdej cechy
+    """
+    min_features_vector = []
+    max_features_vector = []
+
+    feature_vec_len = len(feature_vector_set[0][0])
+
+    for feature_id in range(len(feature_vector_set[0][0])):
+        min_features_vector.append(
+            min(feature_vector_set[i][0][feature_id] for i in range(0, len(feature_vector_set))))
+        max_features_vector.append(
+            max(feature_vector_set[i][0][feature_id] for i in range(0, len(feature_vector_set))))
+
+    for i in range(len(feature_vector_set)):
+        for feature_id in range(feature_vec_len):
+            if max_features_vector[feature_id] != min_features_vector[feature_id]:
+                feature_vector_set[i][0][feature_id] = (feature_vector_set[i][0][feature_id] - min_features_vector[
+                    feature_id]) / (max_features_vector[feature_id] - min_features_vector[feature_id])
+
+    return min_features_vector, max_features_vector
+

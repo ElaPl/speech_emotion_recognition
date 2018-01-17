@@ -14,8 +14,8 @@ def read_from_wav_file(wav_file, length):
 
     :return [list] - lista sampli długości length, pochądzących z jednego channella.
 
-    Ponieważ rozmary sampli w pliku .wav mają różną długość należy odczytywać 1 próbkę należy odczytać określoną ilość bitów.
-    DO tego służy tablica ftm_size
+    Ponieważ rozmary sampli w pliku .wav mają różną długość należy odczytywać 1 próbkę należy odczytać określoną
+    ilość bitów.Do tego służy tablica ftm_size
 
     Sample w pliku wav są umieszczone następująco: s1_c1, s1_c2, s2_c1, s2_c2, gdzie s1 oznacza sample_1, a c1 channel_1.
 
@@ -35,8 +35,6 @@ def read_from_wav_file(wav_file, length):
     return decoded_on_channel
 
 
-# Dziwięk dzielimy na kawałki o długości ~0,25ms
-# Zwraca listę features z każdych 25ms pliku
 def get_feature_vectors(file):
     """ Funckja otwiera plik wav i dzieli go na kawałki o długości ~0,25s, biorąc sample co ~0,125s, czyli
     kawałki nachodzą na siebie - w celu zwiększenia liczby obserwacji.
@@ -74,7 +72,8 @@ def get_feature_vectors(file):
     pitch_window = HanningWindow(frame_length)
     energy_window = HanningWindow(sample_len)
 
-    pitch_feature_vectors = [get_pitch_feature_vector(sample, frame_length, pitch_window, frame_rate)]
+    pitch_feature_vectors = [get_pitch_features(get_fundamental_freq_form_time_domain
+                                                (sample, frame_length, pitch_window, frame_rate))]
     energy_feature_vectors = [get_energy_feature_vector(sample, energy_window)]
 
     sample_len = int(sample_len / 2)
@@ -82,36 +81,12 @@ def get_feature_vectors(file):
     while wav_file.tell() + sample_len < wav_file.getnframes():
         sample_next = sample[sample_len:]
         sample_next.extend(read_from_wav_file(wav_file, sample_len))
-        pitch_feature_vectors.append(get_pitch_feature_vector(sample_next, frame_length, pitch_window, frame_rate))
+        pitch_feature_vectors.append(get_pitch_features(get_fundamental_freq_form_time_domain
+                                                        (sample_next, frame_length, pitch_window, frame_rate)))
         energy_feature_vectors.append(get_energy_feature_vector(sample_next, energy_window))
         sample = sample_next
 
     return pitch_feature_vectors, energy_feature_vectors
-
-
-def get_pitch_feature_vector(sample, frame_length, window, frame_rate):
-    """
-    Funkcja dla każdej rammki z sample, dłguośći frame_length przygotowuje fft i oblicza z tego częstotliwość bazową.
-    Następnie tworzy listę częstotliwości bazowych i oblicza wektor cech na podsawie tych danych.
-
-    :param sample: lista sampli, z ktorych ma być obliczony wetor cech częstotliwości
-    :param frame_length: Dłguosć ramki do fft
-    :param window: Funkcja okna
-    :param frame_rate: Czestotliwość samplowania
-    :return: Wektor cech częstliwośći dla podanego zbioru sampli
-    """
-    fundamental_freq_array = []
-    sample_len = len(sample)
-    sample_pointer = 0
-    while sample_pointer + frame_length < sample_len:
-        frame = sample[sample_pointer:(sample_pointer + frame_length)]
-        sample_pointer += frame_length
-        signal = window.plot(frame)
-        frequency_domain_vector = np.fft.rfft(signal)
-        fundamental_freq_array.append(
-            get_fundamental_freq(frequency_domain_vector, frame_rate, frame_length))
-
-    return get_pitch_features(fundamental_freq_array)
 
 
 def get_file_info(filename):
@@ -305,3 +280,69 @@ def get_energy_feature_vector(sample, window):
     standard_deviation = sqrt(standard_deviation/(time_domain_signal_len-1))
     relative_std_deviation = (standard_deviation/sound_vol_avg) * 100
     return [relative_std_deviation, zero_crossing_rate, rms_db, peak_db]
+
+
+def get_freq_history(file):
+    """ Funckja otwiera plik wav i dzieli go na kawałki o długości ~0,25s, biorąc sample co ~0,125s, czyli
+    kawałki nachodzą na siebie - w celu zwiększenia liczby obserwacji.
+    Dla każdego kawałka wypowiedzi oblicza na podstawie niego wektor cech częstotliwości i energii.
+
+    :param str file: ścieżka do pliku z którego mają być wygenerowane wektory cech
+    :return
+        * lista wektorów cech częstotliwości
+        * lista wektorów cech energii
+    """
+
+
+    try:
+        wav_file = wave.open(file, 'rb')
+    except IOError:
+        print("Can't open file " + file)
+        return []
+
+    # liczba sampli / sek
+    frame_rate = wav_file.getframerate()
+
+    frame_length = 512
+
+    # liczba ramek w 0,25 ms
+    frame_num = int(frame_rate / 4 / frame_length)
+
+    # ilosć sampli w 0,25 ms
+    sample_len = frame_num * frame_length
+
+    pitch_window = HanningWindow(frame_length)
+
+    frequency_feature_time_domain = []
+
+    while wav_file.tell() + sample_len < wav_file.getnframes():
+        sample = read_from_wav_file(wav_file, sample_len)
+        frequency_feature_time_domain.extend(get_fundamental_freq_form_time_domain(sample, frame_length,
+                                                                                   pitch_window, frame_rate))
+
+    return frequency_feature_time_domain
+
+
+def get_fundamental_freq_form_time_domain(sample, frame_length, window, frame_rate):
+    """
+    Funkcja dla każdej rammki z sample, dłguośći frame_length przygotowuje fft i oblicza z tego częstotliwość bazową.
+    Następnie tworzy listę częstotliwości bazowych.
+
+    :param sample: lista sampli, z ktorych ma być obliczony wetor cech częstotliwości
+    :param frame_length: Dłguosć ramki do fft
+    :param window: Funkcja okna
+    :param frame_rate: Czestotliwość samplowania
+    :return: Lista czestotliwości bazowych
+    """
+    fundamental_freq_array = []
+    sample_len = len(sample)
+    sample_pointer = 0
+    while sample_pointer + frame_length < sample_len:
+        frame = sample[sample_pointer:(sample_pointer + frame_length)]
+        sample_pointer += frame_length
+        signal = window.plot(frame)
+        frequency_domain_vector = np.fft.rfft(signal)
+        fundamental_freq_array.append(
+            get_fundamental_freq(frequency_domain_vector, frame_rate, frame_length))
+
+    return fundamental_freq_array

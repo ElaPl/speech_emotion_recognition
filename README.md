@@ -24,6 +24,12 @@ Aby rozpocząć testowanie używając modelu Markova należy wpisać jedną z po
 $ python main.py MM
 $ python main.py MM "name of database" "password to database" (Aby zapisać cześć informacji w bazie danych i przyspieszyć działanie programu)
 
+Aby zobaczyć jakie cechy są używanie do rozpoznawania emocjo, oraz porównać ich przydatność należy wpisać:
+$ python main.py FI
+
+Aby porównać zmiany częstotliwośći w różnych plikach należy wpisać
+$ python main.py FH ścieżki do plików
+
 ```
 
 Przykłądowy wynik:
