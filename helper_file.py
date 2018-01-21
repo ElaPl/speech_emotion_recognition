@@ -3,18 +3,17 @@ import glob
 import os
 import operator
 import pymysql
-from matplotlib import pyplot as plt
 
 
 # If True than debug print will be displayed
 debug = True
+
 
 def print_debug(text):
     if debug is True:
         print(text)
 
 
-# Oblicza odległosć euklidesową pomiedzy dwoma wektorami
 def euclidean_distance(vec1, vec2):
     """ Funckja oblicza dystans euklidesowy pomiędzy wektorami
     :param vec1: wektor cech

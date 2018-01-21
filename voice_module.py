@@ -76,17 +76,27 @@ def get_feature_vectors(file):
                                                 (sample, frame_length, pitch_window, frame_rate))]
     energy_feature_vectors = [get_energy_feature_vector(sample, energy_window)]
 
+    all_feature_vector = [pitch_feature_vectors[0] + energy_feature_vectors[0]]
+
     sample_len = int(sample_len / 2)
 
     while wav_file.tell() + sample_len < wav_file.getnframes():
         sample_next = sample[sample_len:]
         sample_next.extend(read_from_wav_file(wav_file, sample_len))
-        pitch_feature_vectors.append(get_pitch_features(get_fundamental_freq_form_time_domain
-                                                        (sample_next, frame_length, pitch_window, frame_rate)))
-        energy_feature_vectors.append(get_energy_feature_vector(sample_next, energy_window))
+
+        pitch_vector = get_pitch_features(get_fundamental_freq_form_time_domain
+                                          (sample_next, frame_length, pitch_window, frame_rate))
+        pitch_feature_vectors.append(pitch_vector)
+
+        energy_vector = get_energy_feature_vector(sample_next, energy_window)
+        energy_feature_vectors.append(energy_vector)
+
+        all_vector = pitch_vector + energy_vector
+        all_feature_vector.append(all_vector)
+
         sample = sample_next
 
-    return pitch_feature_vectors, energy_feature_vectors
+    return pitch_feature_vectors, energy_feature_vectors, all_feature_vector
 
 
 def get_file_info(filename):
@@ -184,7 +194,7 @@ def get_pitch_features(fundamental_freq_array):
     variance = 0
     for i in range(0, len(fundamental_freq_array)):
         variance += pow(fundamental_freq_array[i] - avg_frequency, 2)
-        if fundamental_freq_array[i] >= avg_frequency + 3000:
+        if fundamental_freq_array[i] >= avg_frequency + 700:
             dynamic_tones_percent += 1
 
     dynamic_tones_percent = (dynamic_tones_percent / len(fundamental_freq_array)) * 100
@@ -201,6 +211,8 @@ def get_summary_pitch_feature_vector(pitch_feature_vectors):
     :param pitch_feature_vectors: lista wektorów cech częstotliowśći bazowych
     :return: wektor cech
     """
+
+
 
     pitch_feature_vectors_size = len(pitch_feature_vectors)
     max_freq_range = pitch_feature_vectors[0][3]
@@ -224,13 +236,66 @@ def get_summary_pitch_feature_vector(pitch_feature_vectors):
     freq_range = max_freq_range - min_freq_range
 
     variance = 0
-    for i in range(1, pitch_feature_vectors_size):
+    for i in range(0, pitch_feature_vectors_size):
         variance += pow(pitch_feature_vectors[i][3] - avg_range, 2)
 
     std_deviation = sqrt(variance/(len(pitch_feature_vectors)-1))
     relative_std_deviation = (std_deviation / avg_range) * 100
 
     return [freq_range, max_freq_range, min_freq_range, avg_range, dynamic_tones_percent, relative_std_deviation]
+
+def get_summary_feature_vector(all_feature_vectors):
+    """
+    Funkcja na podstawie danych oblicza wektor cech częstotliwośći bazowych
+    :param pitch_feature_vectors: lista wektorów cech częstotliowśći bazowych
+    :return: wektor cech
+    """
+    summary_feature_vectors = []
+
+    for i in range(2):
+        feature_vectors = [all_feature_vectors[i] for i in range(0, len(all_feature_vectors), 2)]
+
+        feature_vectors_size = len(feature_vectors)
+        max_freq = feature_vectors[0][1]
+        min_freq = feature_vectors[0][2]
+        avg_freq = 0
+        dynamic_tones_percent = 0
+        zero_crossing_rate = 0
+        avg_energy = 0
+        peak_energy = 0
+
+        for i in range(0, feature_vectors_size):
+            avg_freq += feature_vectors[i][3]
+            avg_energy += feature_vectors[i][10]
+            peak_energy = max(peak_energy, feature_vectors[i][11])
+            max_freq = max(max_freq, feature_vectors[i][1])
+            min_freq = min(min_freq, feature_vectors[i][2])
+            dynamic_tones_percent += feature_vectors[i][4] / 100
+            zero_crossing_rate += feature_vectors[i][9] / 100
+
+        dynamic_tones_percent = (dynamic_tones_percent / feature_vectors_size) * 100
+        zero_crossing_rate = (zero_crossing_rate / feature_vectors_size) * 100
+        avg_freq /= feature_vectors_size
+        avg_energy /= feature_vectors_size
+        freq_range = max_freq - min_freq
+
+        pitch_variance = 0
+        energy_variance = 0
+        for i in range(1, feature_vectors_size):
+            pitch_variance += pow(feature_vectors[i][3] - avg_freq, 2)
+            energy_variance = +pow(feature_vectors[i][8] - avg_energy, 2)
+
+        std_deviation = sqrt(pitch_variance / (feature_vectors_size - 1))
+        relative_std_deviation_pitch = (std_deviation / avg_freq) * 100
+
+        std_deviation_energy = sqrt(energy_variance / (feature_vectors_size - 1))
+        relative_std_deviation_energy = (std_deviation_energy / avg_energy) * 100
+
+        summary_feature_vectors.append([freq_range, max_freq, avg_freq,
+                                        relative_std_deviation_pitch, zero_crossing_rate])
+
+    return summary_feature_vectors
+
 
 def get_energy_feature_vector(sample, window):
     """
@@ -280,6 +345,54 @@ def get_energy_feature_vector(sample, window):
     standard_deviation = sqrt(standard_deviation/(time_domain_signal_len-1))
     relative_std_deviation = (standard_deviation/sound_vol_avg) * 100
     return [relative_std_deviation, zero_crossing_rate, rms_db, peak_db]
+
+
+def get_energy_history(file):
+    """
+        Funkcja na podstawie podanej listy amplitude w domenie czasu oblicza wektor cech dla tych danych
+        :param vector sample: lista zmian energii w domenie czasu
+        :param window: funkcja okna
+        :return: lista cech na podstawie wprowadzonych danych
+    """
+
+    try:
+        wav_file = wave.open(file, 'rb')
+    except IOError:
+        print("Can't open file " + file)
+        return []
+
+    # liczba sampli / sek
+    frame_rate = wav_file.getframerate()
+
+    frame_length = 512
+
+    # liczba ramek w 0,25 ms
+    frame_num = int(frame_rate / 4 / frame_length)
+
+    # ilosć sampli w 0,25 ms
+    sample_len = frame_num * frame_length
+
+    energy_window = HanningWindow(frame_length)
+
+    energy_history = []
+
+    while wav_file.tell() + sample_len < wav_file.getnframes():
+        sample = read_from_wav_file(wav_file, frame_length)
+        energy_history.append(compute_rms_db(sample, energy_window))
+
+    return energy_history
+
+def compute_rms_db(time_domain_signal, window):
+    # print(len(time_domain_signal))
+    # print(len(window.hanning_window))
+    time_domain_signal = window.plot(time_domain_signal)
+    rms_db = 0
+    for mag in time_domain_signal:
+        rms_db += pow(mag, 2)
+
+    rms_db = sqrt(rms_db / len(time_domain_signal))
+    rms_db = 10 * log10(rms_db)
+    return rms_db
 
 
 def get_freq_history(file):

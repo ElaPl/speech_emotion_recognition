@@ -5,82 +5,42 @@ DB_NAME = 'speech_emotion_recognition'
 DB_FEMALE_NAME = 'female_speech_emo'
 DB_MALE_NAME = 'male_speech_emo'
 
-pitch_knn_train_db_table = 'knn_pitch_train_vectors'
-summary_pitch_knn_train_db_table = 'knn_summary_pitch_vectors'
-energy_knn_train_db_table = 'knn_energy_train_vectors'
+knn_train_db_table = 'knn_train_set'
 
 KNN_DB_TABLES = {}
-KNN_DB_TABLES[pitch_knn_train_db_table] = {}
-KNN_DB_TABLES[summary_pitch_knn_train_db_table] = {}
-KNN_DB_TABLES[energy_knn_train_db_table] = {}
+KNN_DB_TABLES[knn_train_db_table] = {}
 
-KNN_DB_TABLES[pitch_knn_train_db_table]['create'] = (
-    "CREATE TABLE knn_pitch_train_vectors ("
+KNN_DB_TABLES[knn_train_db_table]['create'] = (
+    "CREATE TABLE knn_train_set ("
     "vocal_range DOUBLE, "
     "max_freq DOUBLE, "
     "min_freq DOUBLE, "
     "avg_freq DOUBLE, "
-    "dynamic_tones_freq DOUBLE, "
     "percent_of_falling_tones DOUBLE, "
     "percent_of_rising_tones DOUBLE, "
-    "standard_deviation_freq DOUBLE, "
+    "relative_standard_deviation_freq DOUBLE, "
+    "relative_std_deviation_energy DOUBLE,"
+    "zero_crossing_rate DOUBLE,"
+    "rms_db DOUBLE, "
+    "peaK_db DOUBLE,"
     "emotion TEXT);"
 )
 
-KNN_DB_TABLES[pitch_knn_train_db_table]['insert'] = (
-    "INSERT INTO knn_pitch_train_vectors("
+KNN_DB_TABLES[knn_train_db_table]['insert'] = (
+    "INSERT INTO knn_train_set("
     "vocal_range,"
     "max_freq,"
     "min_freq,"
     "avg_freq,"
-    "dynamic_tones_freq,"
     "percent_of_falling_tones,"
     "percent_of_rising_tones,"
-    "standard_deviation_freq,"
+    "relative_standard_deviation_freq,"
+    "relative_std_deviation_energy,"
+    "zero_crossing_rate,"
+    "rms_db, "
+    "peaK_db,"
     "emotion)"
-    "VALUES (%lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %s)"
-)
-
-KNN_DB_TABLES[summary_pitch_knn_train_db_table]['create'] = (
-    "CREATE TABLE knn_summary_pitch_vectors ("
-    "freq_range DOUBLE,"
-    "max_freq DOUBLE,"
-    "min_freq DOUBLE,"
-    "avg_freq DOUBLE,"
-    "dynamic_tones_freq DOUBLE,"
-    "standard_deviation_freq DOUBLE,"
-    "emotion TEXT);"
-)
-
-KNN_DB_TABLES[summary_pitch_knn_train_db_table]['insert'] = (
-    "INSERT INTO knn_summary_pitch_vectors("
-    "freq_range,"
-    "max_freq,"
-    "min_freq,"
-    "avg_freq,"
-    "dynamic_tones_freq,"
-    "standard_deviation_freq,"
-    "emotion)"
-    "VALUES (%lf, %lf, %lf, %lf, %lf, %lf, %s);"
-)
-
-KNN_DB_TABLES[energy_knn_train_db_table]['create'] = (
-    "CREATE TABLE knn_energy_train_vectors ("
-    "standard_deviation_freq DOUBLE,"
-    "crossing_rate DOUBLE,"
-    "rms_db DOUBLE,"
-    "peak_db DOUBLE,"
-    "emotion TEXT);"
-)
-
-KNN_DB_TABLES[energy_knn_train_db_table]['insert'] = (
-    "INSERT INTO knn_energy_train_vectors("
-    "standard_deviation_freq,"
-    "crossing_rate,"
-    "rms_db,"
-    "peak_db,"
-    "emotion)"
-    "VALUES (%lf, %lf, %lf, %lf, %s);"
+    "VALUES (%lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %s)"
 )
 
 pitch_hmm_train_db_table = 'hmm_pitch_observation_vectors'
@@ -171,14 +131,10 @@ def select_all_from_db(cursor, table_name):
 def save_in_dbtable(db, cursor, vect, tbname):
     try:
 
-        if tbname == pitch_knn_train_db_table:
+        if tbname == knn_train_db_table:
             cursor.execute(KNN_DB_TABLES[tbname]['insert'] % (vect[0], vect[1], vect[2], vect[3], vect[4], vect[5],
-                                                              vect[6], vect[7], "'" + vect[8] + "'"))
-        elif tbname == summary_pitch_knn_train_db_table:
-            cursor.execute(KNN_DB_TABLES[tbname]['insert'] % (vect[0], vect[1], vect[2], vect[3], vect[4], vect[5],
-                                                              "'" + vect[6] + "'"))
-        elif tbname == energy_knn_train_db_table:
-            cursor.execute(KNN_DB_TABLES[tbname]['insert'] % (vect[0], vect[1], vect[2], vect[3], "'" + vect[4] + "'"))
+                                                              vect[6], vect[7], vect[8], vect[9], vect[10],
+                                                              "'" + vect[11] + "'"))
         elif tbname == energy_hmm_train_db_table:
             cursor.execute(HMM_DB_TABLES[tbname]['insert'] % (vect[0], vect[1], vect[2], vect[3]))
         else:

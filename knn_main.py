@@ -1,23 +1,13 @@
 from helper_file import create_summary_table, print_summary, connect_to_database, build_file_set, print_progress_bar, \
     get_most_frequently_occurring
-from voice_module import  get_feature_vectors, get_summary_pitch_feature_vector
+from voice_module import  get_feature_vectors, get_summary_pitch_feature_vector, get_summary_feature_vector
 from KNN import KNN
 import knn_database as knn_db
 
 knn_features = {
-    "pitch": {
-        "db_table_name": knn_db.pitch_knn_train_db_table,
+    "features": {
+        "db_table_name": knn_db.knn_train_db_table,
         "nearest_neighbour": 15
-    },
-
-    "energy": {
-        "db_table_name": knn_db.energy_knn_train_db_table,
-        "nearest_neighbour": 12
-    },
-
-    "pitch_summary": {
-        "db_table_name": knn_db.summary_pitch_knn_train_db_table,
-        "nearest_neighbour": 4
     }
 }
 
@@ -40,7 +30,7 @@ def knn_main(train_path_pattern, test_path_pattern, db_name, db_password, emotio
     :param emotions: zbiór emocji do rozpoznania
     :type emotions: list
     """
-    summary_table = create_summary_table(emotions)
+    # summary_table = create_summary_table(emotions)
 
     db, cursor = connect_to_database(db_name, db_password)
     if (cursor is not None) and knn_db.is_training_set_exists(cursor, knn_db.KNN_DB_TABLES):
@@ -55,21 +45,16 @@ def knn_main(train_path_pattern, test_path_pattern, db_name, db_password, emotio
                     vector_to_save.append(training_set[feature][i][1])
                     knn_db.save_in_dbtable(db, cursor, vector_to_save, knn_features[feature]["db_table_name"])
 
-    for emotion in emotions:
-        for vec in training_set["pitch"]:
-            if vec[1] == emotion:
-                summary_table[emotion]["trained"] += 1
-
     KNN_modules = {}
     for feature in knn_features:
         KNN_modules[feature] = KNN(training_set[feature])
 
-    knn_compute_emotions(test_path_pattern, KNN_modules, summary_table, emotions)
-
+    summary_table = create_summary_table(emotions)
+    knn_compute_emotions(test_path_pattern, KNN_modules, summary_table, 13)
     print_summary(summary_table, emotions)
 
 
-def knn_compute_emotions(path_pattern, KNN_modules, summary_table, emotions):
+def knn_compute_emotions(path_pattern, KNN_modules, summary_table, neighbour_number):
     """Funckja dla każdego pliku z path_pattern, pobiera wektory obserwacji, a nastepnie testuje nimi
     każdy z modelów KNN w celu odganięcia najbardziej prawdopodobnej emocji jaką reprezentuje plik
 
@@ -93,13 +78,13 @@ def knn_compute_emotions(path_pattern, KNN_modules, summary_table, emotions):
         emotion = file_set[i][1]
 
         feature_vectors = {}
-        feature_vectors["pitch"], feature_vectors["energy"] = get_feature_vectors(file)
-        feature_vectors["pitch_summary"] = get_summary_pitch_feature_vector(feature_vectors["pitch"])
+        feature_vectors["pitch"], feature_vectors["energy"], feature_vectors["features"] = get_feature_vectors(file)
 
         possible_emotions = []
-        for feature in knn_features.keys():
-            possible_emotions.extend(KNN_modules[feature].compute_emotion(feature_vectors[feature],
-                                     knn_features[feature]["nearest_neighbour"]))
+        for feature in knn_features:
+            possible_emotions.extend(KNN_modules[feature].compute_emotion(feature_vectors[feature], neighbour_number))
+
+                                                                          # knn_features[feature]["nearest_neighbour"]))
 
         computed_emotion = get_most_frequently_occurring(possible_emotions)
 
@@ -150,15 +135,11 @@ def knn_get_training_feature_set_from_dir(path_pattern):
         file = test_set[i][0]
         emotion = test_set[i][1]
 
-        pitch_feature_vectors, energy_feature_vectors = get_feature_vectors(file)
-        summary_pitch_feature_vector = get_summary_pitch_feature_vector(pitch_feature_vectors)
+        pitch_feature_vectors, energy_feature_vectors, feature_vectors = get_feature_vectors(file)
 
-        for vec in pitch_feature_vectors:
-            features_set["pitch"].append([vec, emotion])
-
-        for vec in energy_feature_vectors:
-            features_set["energy"].append([vec, emotion])
-
-        features_set["pitch_summary"].append([summary_pitch_feature_vector, emotion])
+        for vec in feature_vectors:
+            features_set["features"].append([vec, emotion])
 
     return features_set
+
+
