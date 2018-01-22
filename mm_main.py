@@ -39,7 +39,7 @@ def mm_main(train_path_pattern, test_path_pattern, db_name, db_password, emotion
     """
     summary_table = create_summary_table(emotions);
     all_possible_observations, min_max_features = hmm_get_all_possible_observations(train_path_pattern, db_name,
-                                                                                db_password)
+                                                                                db_password, emotions)
 
     MM_modules = {}
     for f in hmm_features.keys():
@@ -68,25 +68,26 @@ def mm_main(train_path_pattern, test_path_pattern, db_name, db_password, emotion
         print_progress_bar(i + 1, num_files, prefix='Testing progress:', suffix='Complete', length=50)
         file = file_set[i][0]
         tested_emotion = file_set[i][1]
-        possible_emotions = []
+        if tested_emotion in emotions:
+            possible_emotions = []
 
-        obs_vec = hmm_get_observations_vectors(file, min_max_features, all_possible_observations)
-        for feature in hmm_features.keys():
-            for obs in obs_vec[feature]:
-                max_ppb = 0
-                for emotion, mm_module in MM_modules[feature].items():
-                    ppb = mm_module.evaluate(obs)
-                    if ppb > max_ppb:
-                        max_ppb = ppb
-                        most_ppb_emotion = emotion
+            obs_vec = hmm_get_observations_vectors(file, min_max_features, all_possible_observations)
+            for feature in hmm_features.keys():
+                for obs in obs_vec[feature]:
+                    max_ppb = 0
+                    for emotion, mm_module in MM_modules[feature].items():
+                        ppb = mm_module.evaluate(obs)
+                        if ppb > max_ppb:
+                            max_ppb = ppb
+                            most_ppb_emotion = emotion
 
-                    possible_emotions.append(most_ppb_emotion)
+                        possible_emotions.append(most_ppb_emotion)
 
-        computed_emotion = get_most_frequently_occurring(possible_emotions)
-        summary_table[tested_emotion]["tested"] += 1
-        summary_table[tested_emotion][computed_emotion] += 1
+            computed_emotion = get_most_frequently_occurring(possible_emotions)
+            summary_table[tested_emotion]["tested"] += 1
+            summary_table[tested_emotion][computed_emotion] += 1
 
-        if computed_emotion == tested_emotion:
-            summary_table[tested_emotion]["guessed"] += 1
+            if computed_emotion == tested_emotion:
+                summary_table[tested_emotion]["guessed"] += 1
 
     print_summary(summary_table, emotions)

@@ -5,7 +5,7 @@ import glob
 debug = 0
 
 class HMM:
-    """Klasa implementująca algorytm Ukryte Modle Markova dla problemu rozpoznawania emocji z głosu.
+    """Klasa implementująca algorytm Ukryte Modele Markowa dla problemu rozpoznawania emocji z głosu.
 
         Dany jest zbiór uczący zawieracjący obserwację (wektory cech), z któżych każda ma przypisaną emocję jaką dany wektor
 
@@ -348,7 +348,7 @@ class HMM:
         else:
             training_set_str = training_set
 
-        for estimation_iteration in range(0, 7):
+        for estimation_iteration in range(0, 20):
             old_likehood = sum(log(self.evaluate(obs)) for obs in training_set)
             old_likehood /= observations_num
 

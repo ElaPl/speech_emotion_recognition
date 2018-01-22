@@ -201,7 +201,7 @@ def get_pitch_features(fundamental_freq_array):
     standard_deviation_frequency = sqrt(variance/(len(fundamental_freq_array)-1))
     relative_std_deviation = (standard_deviation_frequency/avg_frequency) * 100
 
-    return [vocal_range, max_freq, min_freq, avg_frequency, dynamic_tones_percent, percent_of_falling_tones,
+    return [vocal_range, max_freq, min_freq, avg_frequency, percent_of_falling_tones,
             percent_of_rising_tones, relative_std_deviation]
 
 

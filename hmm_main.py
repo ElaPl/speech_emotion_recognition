@@ -7,17 +7,11 @@ from voice_module import get_feature_vectors
 from sklearn.cluster import KMeans
 from helper_file import normalize_vector
 
-
 hmm_features = {
-    "pitch": {
-        "db_table_name": knn_db.pitch_hmm_train_db_table,
+    "features": {
+        "db_table_name": knn_db.hmm_observation_db_table,
     },
-
-    "energy": {
-        "db_table_name": knn_db.energy_hmm_train_db_table,
-    }
 }
-
 
 def hmm_main(train_path_pattern, test_path_pattern, db_name, db_password, emotions):
     """Główna funkcja hmm. Dla każdego zestawu cech i kazdej emocji tworzy model HMM i trenuje go wektorami obserwacji
@@ -52,14 +46,14 @@ def hmm_main(train_path_pattern, test_path_pattern, db_name, db_password, emotio
     summary_table = create_summary_table(emotions)
 
     possible_observations, min_max_features = hmm_get_all_possible_observations(train_path_pattern, db_name,
-                                                                                db_password)
+                                                                                db_password, emotions)
     num_of_states = 6
     trasition_ppb = [[0.2, 0.8],
                      [0.2, 0.8],
                      [0.2, 0.8],
                      [0.2, 0.8],
                      [0.2, 0.8],
-                     [0.2, 0]]
+                     [0.2, 0.0]]
 
     HMM_modules = {}
     for f in hmm_features.keys():
@@ -86,26 +80,27 @@ def hmm_main(train_path_pattern, test_path_pattern, db_name, db_password, emotio
         print_progress_bar(i + 1, num_files, prefix='Testing progress:', suffix='Complete', length=50)
         file = file_set[i][0]
         tested_emotion = file_set[i][1]
-        possible_emotions = []
+        if tested_emotion in emotions:
+            possible_emotions = []
 
-        obs_vec = hmm_get_observations_vectors(file, min_max_features, possible_observations)
-        for feature in hmm_features.keys():
-            for obs in obs_vec[feature]:
-                max_ppb = 0
-                for emotion, hmm_module in HMM_modules[feature].items():
-                    ppb = hmm_module.evaluate(obs)
-                    if ppb > max_ppb:
-                        max_ppb = ppb
-                        most_ppb_emotion = emotion
+            obs_vec = hmm_get_observations_vectors(file, min_max_features, possible_observations)
+            for feature in hmm_features.keys():
+                for obs in obs_vec[feature]:
+                    max_ppb = 0
+                    for emotion, hmm_module in HMM_modules[feature].items():
+                        ppb = hmm_module.evaluate(obs)
+                        if ppb > max_ppb:
+                            max_ppb = ppb
+                            most_ppb_emotion = emotion
 
-                possible_emotions.append(most_ppb_emotion)
+                    possible_emotions.append(most_ppb_emotion)
 
-        computed_emotion = get_most_frequently_occurring(possible_emotions)
-        summary_table[tested_emotion]["tested"] += 1
-        summary_table[tested_emotion][computed_emotion] += 1
+            computed_emotion = get_most_frequently_occurring(possible_emotions)
+            summary_table[tested_emotion]["tested"] += 1
+            summary_table[tested_emotion][computed_emotion] += 1
 
-        if computed_emotion == tested_emotion:
-            summary_table[tested_emotion]["guessed"] += 1
+            if computed_emotion == tested_emotion:
+                summary_table[tested_emotion]["guessed"] += 1
 
     print_summary(summary_table, emotions)
 
@@ -138,11 +133,12 @@ def hmm_get_train_set(path_pattern, min_max_features, all_possible_observations,
         print_progress_bar(i + 1, num_files, prefix='Preparing training set:', suffix='Complete', length=50)
         file = file_set[i][0]
         trained_emotion = file_set[i][1]
-        summary_table[trained_emotion]["trained"] += 1
-        obs_vec = hmm_get_observations_vectors(file, min_max_features, all_possible_observations)
-        for feature in hmm_features.keys():
-            for obs in obs_vec[feature]:
-                train_set[feature][trained_emotion].append(obs)
+        if trained_emotion in emotions:
+            summary_table[trained_emotion]["trained"] += 1
+            obs_vec = hmm_get_observations_vectors(file, min_max_features, all_possible_observations)
+            for feature in hmm_features.keys():
+                for obs in obs_vec[feature]:
+                    train_set[feature][trained_emotion].append(obs)
 
     return train_set
 
@@ -165,7 +161,7 @@ def hmm_get_observations_vectors(file, min_max_features_vec, all_possible_observ
     """
 
     feature_vectors = {}
-    feature_vectors["pitch"], feature_vectors["energy"] = get_feature_vectors(file)
+    feature_vectors["pitch"], feature_vectors["energy"], feature_vectors["features"] = get_feature_vectors(file)
 
     normalized_observations = {}
     for feature in hmm_features.keys():
@@ -221,7 +217,7 @@ def hmm_claster(feature_vector_set):
 
     min_feature_vec, max_feature_vec = hmm_normalize(feature_vector_set)
 
-    kmeans = KMeans(n_clusters=1000).fit(feature_vector_set)
+    kmeans = KMeans(n_clusters=500).fit(feature_vector_set)
 
     observations = (kmeans.cluster_centers_).tolist()
 
@@ -257,7 +253,7 @@ def hmm_normalize(feature_vector_set):
     return min_features_vector, max_features_vector
 
 
-def hmm_get_all_possible_observations(train_path_pattern, db_name, db_password):
+def hmm_get_all_possible_observations(train_path_pattern, db_name, db_password, emotions):
     """Funkcja dla każdego zestawu cech tworzy zbiór wszystkich możliwych wektorów cech, wyliczony z plików w katalogu
     train_path_pattern, oraz klasteryzuje je w celu uzyskania ograniczonego zbioru obserwacji
 
@@ -278,13 +274,14 @@ def hmm_get_all_possible_observations(train_path_pattern, db_name, db_password):
     if (cursor is not None) and knn_db.is_training_set_exists(cursor, knn_db.HMM_DB_TABLES):
         feature_set = hmm_get_features_vectors_from_db(cursor)
     else:
-        feature_set = hmm_get_features_vector_from_dir(train_path_pattern)
+        feature_set = hmm_get_features_vector_from_dir(train_path_pattern, emotions)
         if db is not None:
             knn_db.prepare_db_table(db, cursor, knn_db.HMM_DB_TABLES)
             for feature in hmm_features:
                 for i in range(len(feature_set[feature])):
                     knn_db.save_in_dbtable(db, cursor, feature_set[feature][i], hmm_features[feature]["db_table_name"])
 
+    min_max_features = {}
     min_max_features = {}
     possible_observations = {}
 
@@ -317,7 +314,7 @@ def hmm_get_features_vectors_from_db(cursor):
     return feature_set
 
 
-def hmm_get_features_vector_from_dir(path_pattern):
+def hmm_get_features_vector_from_dir(path_pattern, emotions):
     """Funkcja dla każdego z dla każdego zbioru cech tworzy wektor cech z plików w katalogu "path_pattern"
 
     :param path_pattern: ściażka do katalogu z plikami z których należy wygenerować wektory cech
@@ -336,11 +333,13 @@ def hmm_get_features_vector_from_dir(path_pattern):
     for i in range(num_files):
         print_progress_bar(i + 1, num_files, prefix='Preparing observations:', suffix='Complete', length=50)
         file = test_set[i][0]
+        emotion = test_set[i][1]
 
-        feature_vectors = {}
-        feature_vectors["pitch"], feature_vectors["energy"] = get_feature_vectors(file)
+        if emotion in emotions:
+            feature_vectors = {}
+            feature_vectors["pitch"], feature_vectors["energy"], feature_vectors["features"] = get_feature_vectors(file)
 
-        for feature in hmm_features.keys():
-            features_set[feature].extend(feature_vectors[feature])
+            for feature in hmm_features.keys():
+                features_set[feature].extend(feature_vectors[feature])
 
     return features_set
