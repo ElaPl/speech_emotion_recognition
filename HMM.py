@@ -1,6 +1,5 @@
 import numpy
 from math import log
-import glob
 
 debug = 0
 

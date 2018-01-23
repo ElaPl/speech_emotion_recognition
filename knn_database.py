@@ -1,4 +1,5 @@
-import pymysql, sys
+import sys
+import sqlite3 as lite
 
 DB_NAME = 'speech_emotion_recognition'
 
@@ -77,6 +78,25 @@ HMM_DB_TABLES[hmm_observation_db_table]['insert'] = (
 )
 
 
+def connect_to_database(db_name):
+    """Funckja łączy się z bazą danych jako root
+    :param db_name nazwa bazy danych
+    :type str
+    :param db_password hasło do bazy danych
+    :type str
+    :return
+        * db, cursor - jeżeli połączenie zostało nawiązane
+        * None, None - w przeciwnym przypadku
+    """
+    try:
+        con = lite.connect(db_name)
+        cur = con.cursor()
+        return con, cur
+
+    except lite.Errora as e:
+        return None, None
+
+
 def prepare_db_table(db, cursor, table):
     for name, ddl in table.items():
         try:
@@ -84,7 +104,7 @@ def prepare_db_table(db, cursor, table):
             db.commit()
             cursor.execute(ddl['create'])
             db.commit()
-        except pymysql.Error as e:
+        except lite.Error as e:
             db.rollback()
             sys.exit('[ERROR] %d: %s\n' % (e.args[0], e.args[1]))
 
@@ -93,7 +113,7 @@ def is_training_set_exists(cursor, table):
     for name in table.keys():
         try:
             cursor.execute("SELECT * FROM %s;" % name)
-        except pymysql.Error as e:
+        except lite.Error as e:
             return False
 
         result = cursor.fetchall()
@@ -106,7 +126,7 @@ def is_training_set_exists(cursor, table):
 def select_all_from_db(cursor, table_name):
     try:
         cursor.execute("SELECT * FROM %s;" % table_name)
-    except pymysql.Error as e:
+    except lite.Error as e:
         sys.exit('[ERROR] % d: % s\n' % (e.args[0], e.args[1]))
 
     result = cursor.fetchall()
@@ -126,5 +146,5 @@ def save_in_dbtable(db, cursor, vect, tbname):
         else:
             print("Unknown table name")
         db.commit()
-    except pymysql.Error as e:
+    except lite.Error as e:
         sys.exit('[ERROR] % d: % s\n' % (e.args[0], e.args[1]))

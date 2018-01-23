@@ -1,5 +1,5 @@
 import numpy
-from math import log
+
 
 class Markov_model:
     """Klasa implementująca algorytm Ukryte Modle Markova dla problemu rozpoznawania emocji z głosu.

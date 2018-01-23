@@ -3,6 +3,7 @@
 Wymagania:
 * python 3.5
 * pip3
+* sqlite3
 
 Polecane:
 * virtualenv
@@ -13,22 +14,22 @@ W celu pobrania wszystkich zależności należy włączyć i wpisać komendę (n
 Aby rozpocząć testowanie używając algorytmu KNN należy wpisać jedną z poniższych komand:
 ```
 $ python main.py KNN
-$ python main.py KNN "name of database" "password to database" (Aby zapisać cześć informacji w bazie danych i przyspieszyć działanie programu)
+$ python main.py KNN "name of database" (Aby zapisać cześć informacji w bazie danych i przyspieszyć działanie programu)
 
 Aby rozpocząć testowanie używając algorytmu HMM należy wpisać jedną z poniższych komand:
 
 $ python main.py HMM
-$ python main.py HMM "name of database" "password to database" (Aby zapisać cześć informacji w bazie danych i przyspieszyć działanie programu)
+$ python main.py HMM "name of database" (Aby zapisać cześć informacji w bazie danych i przyspieszyć działanie programu)
 
 Aby rozpocząć testowanie używając modelu Markova należy wpisać jedną z poniższych komand:
 $ python main.py MM
-$ python main.py MM "name of database" "password to database" (Aby zapisać cześć informacji w bazie danych i przyspieszyć działanie programu)
+$ python main.py MM "name of database" (Aby zapisać cześć informacji w bazie danych i przyspieszyć działanie programu)
 
-Aby zobaczyć jakie cechy są używanie do rozpoznawania emocjo, oraz porównać ich przydatność należy wpisać:
+Aby zobaczyć jakie cechy są używanie do rozpoznawania emocji oraz porównać ich przydatność należy wpisać:
 $ python main.py FI
 
-Aby porównać zmiany częstotliwośći w różnych plikach należy wpisać
-$ python main.py FH ścieżki do plików
+Aby porównać zmiany częstotliwośći i energii w różnych plikach należy wpisać
+$ python main.py AS ścieżki do plików
 
 ```
 

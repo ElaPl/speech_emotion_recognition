@@ -1,8 +1,9 @@
-from helper_file import create_summary_table, connect_to_database, build_file_set, print_progress_bar, \
-    get_most_frequently_occurring, euclidean_distance, print_summary, print_debug
+from helper_file import create_summary_table, build_file_set, print_progress_bar, \
+    get_most_frequently_occurring, euclidean_distance, print_summary
 
 from HMM import HMM
 import knn_database as knn_db
+from knn_database import connect_to_database
 from voice_module import get_feature_vectors
 from sklearn.cluster import KMeans
 from helper_file import normalize_vector
@@ -13,7 +14,7 @@ hmm_features = {
     },
 }
 
-def hmm_main(train_path_pattern, test_path_pattern, db_name, db_password, emotions):
+def hmm_main(train_path_pattern, test_path_pattern, db_name, emotions):
     """Główna funkcja hmm. Dla każdego zestawu cech i kazdej emocji tworzy model HMM i trenuje go wektorami obserwacji
     pobranymi z bazie danych db_name jeżeli istnieją, lub w przeciwnym wypadku obliczonymi z plików znajdujacych sie w katalogu
     train_path_pattern.
@@ -46,7 +47,7 @@ def hmm_main(train_path_pattern, test_path_pattern, db_name, db_password, emotio
     summary_table = create_summary_table(emotions)
 
     possible_observations, min_max_features = hmm_get_all_possible_observations(train_path_pattern, db_name,
-                                                                                db_password, emotions)
+                                                                                emotions)
     num_of_states = 6
     trasition_ppb = [[0.2, 0.8],
                      [0.2, 0.8],
@@ -253,7 +254,7 @@ def hmm_normalize(feature_vector_set):
     return min_features_vector, max_features_vector
 
 
-def hmm_get_all_possible_observations(train_path_pattern, db_name, db_password, emotions):
+def hmm_get_all_possible_observations(train_path_pattern, db_name, emotions):
     """Funkcja dla każdego zestawu cech tworzy zbiór wszystkich możliwych wektorów cech, wyliczony z plików w katalogu
     train_path_pattern, oraz klasteryzuje je w celu uzyskania ograniczonego zbioru obserwacji
 
@@ -270,18 +271,20 @@ def hmm_get_all_possible_observations(train_path_pattern, db_name, db_password, 
         * dla każdego zestawu cech wektor najmniejszych i największych wartości każdej z cech
     """
 
-    db, cursor = connect_to_database(db_name, db_password)
+    con, cursor = connect_to_database(db_name)
     if (cursor is not None) and knn_db.is_training_set_exists(cursor, knn_db.HMM_DB_TABLES):
         feature_set = hmm_get_features_vectors_from_db(cursor)
     else:
         feature_set = hmm_get_features_vector_from_dir(train_path_pattern, emotions)
-        if db is not None:
-            knn_db.prepare_db_table(db, cursor, knn_db.HMM_DB_TABLES)
+        if con is not None:
+            knn_db.prepare_db_table(con, cursor, knn_db.HMM_DB_TABLES)
             for feature in hmm_features:
                 for i in range(len(feature_set[feature])):
-                    knn_db.save_in_dbtable(db, cursor, feature_set[feature][i], hmm_features[feature]["db_table_name"])
+                    knn_db.save_in_dbtable(con, cursor, feature_set[feature][i], hmm_features[feature]["db_table_name"])
 
-    min_max_features = {}
+    if con:
+        con.close()
+
     min_max_features = {}
     possible_observations = {}
 

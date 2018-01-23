@@ -2,16 +2,6 @@ from math import sqrt, pow
 import glob
 import os
 import operator
-import pymysql
-
-
-# If True than debug print will be displayed
-debug = True
-
-
-def print_debug(text):
-    if debug is True:
-        print(text)
 
 
 def euclidean_distance(vec1, vec2):
@@ -115,25 +105,6 @@ def create_summary_table(emotions_list):
         summary_table[emotion]["trained"] = 0
 
     return summary_table
-
-
-def connect_to_database(db_name, db_password):
-    """Funckja łączy się z bazą danych jako root
-    :param db_name nazwa bazy danych
-    :type str
-    :param db_password hasło do bazy danych
-    :type str
-    :return
-        * db, cursor - jeżeli połączenie zostało nawiązane
-        * None, None - w przeciwnym przypadku
-    """
-    try:
-        db = pymysql.connect(host="localhost", user="root", passwd=db_password, db=db_name)
-        cursor = db.cursor()
-        return db, cursor
-    except pymysql.Error as e:
-        print_debug("Can't connect to db")
-        return None, None
 
 
 def normalize(feature_vector_set):

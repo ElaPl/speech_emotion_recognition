@@ -1,13 +1,8 @@
-from helper_file import create_summary_table, connect_to_database, build_file_set, print_progress_bar, \
-    get_most_frequently_occurring, euclidean_distance, print_summary, print_debug
-
 from Markov_model import Markov_model
-# from Markov_model_helper_file import get_all_possible_observations, hmm_features, get_nearest_neighbour
-from voice_module import get_feature_vectors
-from helper_file import normalize_vector
 from hmm_main import *
 
-def mm_main(train_path_pattern, test_path_pattern, db_name, db_password, emotions):
+
+def mm_main(train_path_pattern, test_path_pattern, db_name, emotions):
     """
     Główna funkcja algorytmu rozpoznawania emocji z głosu z urzyciem Modeli Markova. Dla każdego zestawu cech i
     kazdej emocji tworzy model HMM i trenuje go wektorami obserwacji pobranymi z bazie danych db_name jeżeli istnieją,
@@ -39,7 +34,7 @@ def mm_main(train_path_pattern, test_path_pattern, db_name, db_password, emotion
     """
     summary_table = create_summary_table(emotions);
     all_possible_observations, min_max_features = hmm_get_all_possible_observations(train_path_pattern, db_name,
-                                                                                db_password, emotions)
+                                                                                    emotions)
 
     MM_modules = {}
     for f in hmm_features.keys():

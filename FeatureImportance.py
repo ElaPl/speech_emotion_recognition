@@ -3,15 +3,14 @@ from helper_file import  normalize
 from knn_main import knn_get_training_feature_set_from_dir
 
 
-def feature_importance(path_pattern, db_name, db_password):
-    training_set = knn_get_training_feature_set_from_dir(path_pattern)
+def feature_importance(path_pattern, emotions):
+    training_set = knn_get_training_feature_set_from_dir(path_pattern, emotions)
     for feature in ["features"]:
         min_f, max_f = normalize(training_set[feature])
 
         x, y = [training_set[feature][i][0] for i in range(len(training_set[feature]))], \
                [training_set[feature][i][1] for i in range(len(training_set[feature]))]
 
-        # fit an Extra Trees model to the data
         model = ExtraTreesClassifier()
         model.fit(x, y)
         result = model.feature_importances_

@@ -1,8 +1,10 @@
-from helper_file import create_summary_table, print_summary, connect_to_database, build_file_set, print_progress_bar, \
+from helper_file import create_summary_table, print_summary, build_file_set, print_progress_bar, \
     get_most_frequently_occurring
-from voice_module import  get_feature_vectors, get_summary_pitch_feature_vector, get_summary_feature_vector
+from voice_module import  get_feature_vectors
 from KNN import KNN
 import knn_database as knn_db
+from knn_database import connect_to_database
+
 
 knn_features = {
     "features": {
@@ -11,7 +13,7 @@ knn_features = {
     }
 }
 
-def knn_main(train_path_pattern, test_path_pattern, db_name, db_password, emotions):
+def knn_main(train_path_pattern, test_path_pattern, db_name, emotions):
     """Główna funckja knn. Dla każdej emocji tworzy model KNN i trenuje go wektorami obserwacji
     pobranymi z bazie danych db_name jeżeli istnieją, lub w przeciwnym wypadku obliczonymi z plików znajdujacych sie w katalogu
     train_path_pattern.
@@ -31,18 +33,22 @@ def knn_main(train_path_pattern, test_path_pattern, db_name, db_password, emotio
     :type emotions: list
     """
 
-    db, cursor = connect_to_database(db_name, db_password)
+
+    con, cursor = connect_to_database(db_name)
     if (cursor is not None) and knn_db.is_training_set_exists(cursor, knn_db.KNN_DB_TABLES):
         training_set = knn_get_training_feature_set_from_db(cursor)
     else:
         training_set = knn_get_training_feature_set_from_dir(train_path_pattern, emotions)
-        if db is not None:
-            knn_db.prepare_db_table(db, cursor, knn_db.KNN_DB_TABLES)
+        if con is not None:
+            knn_db.prepare_db_table(con, cursor, knn_db.KNN_DB_TABLES)
             for feature in knn_features:
                 for i in range(len(training_set[feature])):
                     vector_to_save = list(training_set[feature][i][0])
                     vector_to_save.append(training_set[feature][i][1])
-                    knn_db.save_in_dbtable(db, cursor, vector_to_save, knn_features[feature]["db_table_name"])
+                    knn_db.save_in_dbtable(con, cursor, vector_to_save, knn_features[feature]["db_table_name"])
+
+    if con:
+        con.close()
 
     KNN_modules = {}
     for feature in knn_features:

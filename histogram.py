@@ -1,7 +1,6 @@
 from voice_module import get_freq_history, get_energy_history
 import matplotlib.pyplot as plt
 import os
-import numpy as np
 
 def show_freq_histogram(file_set):
     if file_set:
@@ -43,10 +42,6 @@ def show_subplot_histogram(file_set):
 
             freq_array = get_freq_history(file_set[i])
             x = [i for i in range(0, len(freq_array))]
-            print(x)
-            print(len(x))
-            print(len(freq_array))
-            print(freq_array)
 
             axarr[0, i].plot(x, freq_array, label=emotion)
             axarr[0, i].set_title(emotion)
