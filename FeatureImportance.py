@@ -4,9 +4,15 @@ from knn_main import knn_get_training_feature_set_from_dir
 
 
 def feature_importance(path_pattern, emotions):
+    """
+    Funkcja tworzy wektor cech z plików podanych w path_pattern i wypisuje ważność każdej z cechy
+    :param path_pattern: Ścieżka do plików, z których mają być obliczone wektory cech
+    :param emotions: Lista emocji które mają być uwzględnione
+    :return: None
+    """
     training_set = knn_get_training_feature_set_from_dir(path_pattern, emotions)
     for feature in ["features"]:
-        min_f, max_f = normalize(training_set[feature])
+        normalize(training_set[feature])
 
         x, y = [training_set[feature][i][0] for i in range(len(training_set[feature]))], \
                [training_set[feature][i][1] for i in range(len(training_set[feature]))]

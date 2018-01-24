@@ -5,22 +5,22 @@ from hanning_window import HanningWindow
 import struct
 
 
-# Odczytaj określoną ilość próbek z jednego channelu z pliku wav
 def read_from_wav_file(wav_file, length):
-    """Funkcja odczytuje określoną ilość próbek pochodzących z jednego chanellu z pliku wav.
+    """Funkcja odczytuje z pliku wav określoną ilość próbek pochodzących z jednego kanału.
 
     :param wav_file wskaźnik na plik wav
     :param int length: liczba sampli jaką chcemy odczytać
 
-    :return [list] - lista sampli długości length, pochądzących z jednego channella.
+    :return list - lista sampli długości length, pochodzących z jednego kanału.
 
-    Ponieważ rozmary sampli w pliku .wav mają różną długość należy odczytywać 1 próbkę należy odczytać określoną
-    ilość bitów.Do tego służy tablica ftm_size
+    Opis:
 
-    Sample w pliku wav są umieszczone następująco: s1_c1, s1_c2, s2_c1, s2_c2, gdzie s1 oznacza sample_1, a c1 channel_1.
+    Sample w plikach wav z więcej niż jednym kanałem są ustawione naprzemiennie. Najpierw jest pierszy sampel kanału 1,
+     następnie pierwszy sampel kanału 2 itd. dopiero później są sample dla kanału 2.
 
-    Aby więc odczytać informację o długości n należy odczytać (fmt_size * length * wav_file.getnchannels()) bitów, a
-    następnie wziąć co x-ty element x-ty element, gdzie x to liczba channeli.
+    Aby więc odczytać informację o długości n należy odczytać długość sampla * liczbę kanałów * rządana długość, a
+    następnie z odczytanych danych wziąć elemnty z określonego kanału. Na przykład dla trzek kanałów należy
+    wziać co trzeci element.
     """
     sizes = {1: 'B', 2: 'h', 4: 'i'}
     fmt_size = sizes[wav_file.getsampwidth()]
@@ -36,14 +36,14 @@ def read_from_wav_file(wav_file, length):
 
 
 def get_feature_vectors(file):
-    """ Funckja otwiera plik wav i dzieli go na kawałki o długości ~0,25s, biorąc sample co ~0,125s, czyli
-    kawałki nachodzą na siebie - w celu zwiększenia liczby obserwacji.
-    Dla każdego kawałka wypowiedzi oblicza na podstawie niego wektor cech częstotliwości i energii.
+    """ Funckja otwiera plik .wav a nastepnie co 0,125ms z pliku odczytuje próbkę dźwięku od długości ok 0,25 ms.
+    Z każdej próbki oblicza wektor cech częstotliwości i energii, tworząc wektory cech.
 
     :param str file: ścieżka do pliku z którego mają być wygenerowane wektory cech
     :return
         * lista wektorów cech częstotliwości
         * lista wektorów cech energii
+        * lista wektorów cech częstotliwości i energii
     """
 
 
@@ -53,15 +53,12 @@ def get_feature_vectors(file):
         print("Can't open file " + file)
         return []
 
-    # liczba sampli / sek
     frame_rate = wav_file.getframerate()
 
     frame_length = 512
 
-    # liczba ramek w 0,25 ms
     frame_num = int(frame_rate / 4 / frame_length)
 
-    # ilosć sampli w 0,25 ms
     sample_len = frame_num * frame_length
 
     try:
@@ -101,7 +98,7 @@ def get_feature_vectors(file):
 
 def get_file_info(filename):
     """
-    :param str filename: Ścieżka do pliku
+    :param str filename: Ścieżka do pliku z rozszerzeniem wav
     :return: parametry pliku
     """
     try:
@@ -119,7 +116,7 @@ def get_file_info(filename):
 def get_sample_rate(filename):
     """
 
-    :param str filename: ścieżka do pliku
+    :param str filename: Ścieżka do pliku z rozszerzeniem wav
     :return: częstotliwość samplowania
     """
     try:
@@ -136,12 +133,12 @@ def get_sample_rate(filename):
 
 def get_fundamental_freq(freq_domain_vect, sample_rate, sample_length):
     """
-    Funkcja oblicza częśtotliwość bazową dla danego funkcji w domenie częsttliwości
+    Funkcja dla podanej jako argument funkcji w domenie częstotliwości, oblicza wartość tonu podstawowego
 
     :param vector freq_domain_vect: wektor reprezentujacy funkcję w domenie częstotliowści
     :param int sample_rate: częstotliwość próbkowania dźwięku z którego pochodzi funkcja
     :param int sample_length: długosć ramki z której została wygenerowana funkcja
-    :return float: częstotliwość bazowa dla podanej funkcji
+    :return float: wartość tonu podstawowego obliczonego z podanej funkcji
     """
     max_magnitude = sqrt(np.power(np.real(freq_domain_vect[1]), 2) + np.power(np.imag(freq_domain_vect[1]), 2))
     max_magnitude_ind = 1
@@ -157,9 +154,9 @@ def get_fundamental_freq(freq_domain_vect, sample_rate, sample_length):
 
 def get_pitch_features(fundamental_freq_array):
     """
-    Funkcja na podstawie podanej listy częstotliwość bazowych oblicza wektor cech dla tych danych
+    Funkcja na podstawie podanej listy wartości tonów podstawowych oblicza wektor cech dla tych danych
     :param vector fundamental_freq_array: wektor częstotliowści bazowych
-    :return: lista cech wektora
+    :return: lista cech obliczonych na podstawie podanej jako argument funckji
     """
 
     if len(fundamental_freq_array) == 0:
@@ -212,8 +209,6 @@ def get_summary_pitch_feature_vector(pitch_feature_vectors):
     :return: wektor cech
     """
 
-
-
     pitch_feature_vectors_size = len(pitch_feature_vectors)
     max_freq_range = pitch_feature_vectors[0][3]
     min_freq_range = pitch_feature_vectors[0][3]
@@ -243,58 +238,6 @@ def get_summary_pitch_feature_vector(pitch_feature_vectors):
     relative_std_deviation = (std_deviation / avg_range) * 100
 
     return [freq_range, max_freq_range, min_freq_range, avg_range, dynamic_tones_percent, relative_std_deviation]
-
-def get_summary_feature_vector(all_feature_vectors):
-    """
-    Funkcja na podstawie danych oblicza wektor cech częstotliwośći bazowych
-    :param pitch_feature_vectors: lista wektorów cech częstotliowśći bazowych
-    :return: wektor cech
-    """
-    summary_feature_vectors = []
-
-    for i in range(2):
-        feature_vectors = [all_feature_vectors[i] for i in range(0, len(all_feature_vectors), 2)]
-
-        feature_vectors_size = len(feature_vectors)
-        max_freq = feature_vectors[0][1]
-        min_freq = feature_vectors[0][2]
-        avg_freq = 0
-        dynamic_tones_percent = 0
-        zero_crossing_rate = 0
-        avg_energy = 0
-        peak_energy = 0
-
-        for i in range(0, feature_vectors_size):
-            avg_freq += feature_vectors[i][3]
-            avg_energy += feature_vectors[i][10]
-            peak_energy = max(peak_energy, feature_vectors[i][11])
-            max_freq = max(max_freq, feature_vectors[i][1])
-            min_freq = min(min_freq, feature_vectors[i][2])
-            dynamic_tones_percent += feature_vectors[i][4] / 100
-            zero_crossing_rate += feature_vectors[i][9] / 100
-
-        dynamic_tones_percent = (dynamic_tones_percent / feature_vectors_size) * 100
-        zero_crossing_rate = (zero_crossing_rate / feature_vectors_size) * 100
-        avg_freq /= feature_vectors_size
-        avg_energy /= feature_vectors_size
-        freq_range = max_freq - min_freq
-
-        pitch_variance = 0
-        energy_variance = 0
-        for i in range(1, feature_vectors_size):
-            pitch_variance += pow(feature_vectors[i][3] - avg_freq, 2)
-            energy_variance = +pow(feature_vectors[i][8] - avg_energy, 2)
-
-        std_deviation = sqrt(pitch_variance / (feature_vectors_size - 1))
-        relative_std_deviation_pitch = (std_deviation / avg_freq) * 100
-
-        std_deviation_energy = sqrt(energy_variance / (feature_vectors_size - 1))
-        relative_std_deviation_energy = (std_deviation_energy / avg_energy) * 100
-
-        summary_feature_vectors.append([freq_range, max_freq, avg_freq,
-                                        relative_std_deviation_pitch, zero_crossing_rate])
-
-    return summary_feature_vectors
 
 
 def get_energy_feature_vector(sample, window):
@@ -349,10 +292,9 @@ def get_energy_feature_vector(sample, window):
 
 def get_energy_history(file):
     """
-        Funkcja na podstawie podanej listy amplitude w domenie czasu oblicza wektor cech dla tych danych
-        :param vector sample: lista zmian energii w domenie czasu
-        :param window: funkcja okna
-        :return: lista cech na podstawie wprowadzonych danych
+        Funkcja otwiera plik podany w ścieżce, oraz oblicza rozkłąd wartości nateżęnia w czasie w tym pliku.
+        :param str file: Ścieżka do pliku
+        :return: lista zawierająca wartości natężenia w czasie w podanym pliku
     """
 
     try:
@@ -383,8 +325,6 @@ def get_energy_history(file):
     return energy_history
 
 def compute_rms_db(time_domain_signal, window):
-    # print(len(time_domain_signal))
-    # print(len(window.hanning_window))
     time_domain_signal = window.plot(time_domain_signal)
     rms_db = 0
     for mag in time_domain_signal:
@@ -396,14 +336,12 @@ def compute_rms_db(time_domain_signal, window):
 
 
 def get_freq_history(file):
-    """ Funckja otwiera plik wav i dzieli go na kawałki o długości ~0,25s, biorąc sample co ~0,125s, czyli
-    kawałki nachodzą na siebie - w celu zwiększenia liczby obserwacji.
-    Dla każdego kawałka wypowiedzi oblicza na podstawie niego wektor cech częstotliwości i energii.
+    """ Funckja otwiera plik wav i dzieli go na kawałki o długości ~0,25s i z każdego fragmentu oblicza wartość tonu
+    podstawowego
 
     :param str file: ścieżka do pliku z którego mają być wygenerowane wektory cech
     :return
-        * lista wektorów cech częstotliwości
-        * lista wektorów cech energii
+        * lista zawierająca wartości tonu podstawego w czasie w podanym pliku
     """
 
 
@@ -413,15 +351,12 @@ def get_freq_history(file):
         print("Can't open file " + file)
         return []
 
-    # liczba sampli / sek
     frame_rate = wav_file.getframerate()
 
     frame_length = 512
 
-    # liczba ramek w 0,25 ms
     frame_num = int(frame_rate / 4 / frame_length)
 
-    # ilosć sampli w 0,25 ms
     sample_len = frame_num * frame_length
 
     pitch_window = HanningWindow(frame_length)

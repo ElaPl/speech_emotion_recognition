@@ -9,7 +9,9 @@
 \usepackage{flexisym}
 \graphicspath{ {images/} }
 \usepackage{float}
-
+\usepackage[skip=5pt]{caption} % example skip set to 2pt
+\setlength{\belowcaptionskip}{4pt}
+\captionsetup{font=small}
 %%%%% DANE DO STRONY TYTUŁOWEJ
 % Niezaleznie od jezyka pracy wybranego w opcjach klasy, tytul i streszczenie
 % pracy nalezy podac zarowno w jezyku polskim, jak i angielskim.
@@ -28,7 +30,6 @@
 %\transcriptnum {273005}                     % Numer indeksu
 %\advisorgen    {dr. Jana Kowalskiego} % Nazwisko promotora w dopelniaczu
 %%%%%
-
 %%%%% WLASNE DODATKOWE PAKIETY
 %
 %\usepackage{graphicx,listings,amsmath,amssymb,amsthm,amsfonts,tikz}
@@ -44,14 +45,14 @@
 %%%%%
 
 \polishabstract {
-W ramach projektu został stworzony i opisany program, którego celem jest wydobywanie konkretnych cech z fragmentów wypowiedzi znajdujących się w plikach .wav i na ich podstawie rozpoznawanie czterech emocji: smutek, radość, złość i znudzenie. Jako cechy dźwięku, które wydobyto i użyto do rozpoznawania stanu emocjonalnego, wybrano: ton podstawowy i natężenie dźwięku. W celu klasyfikacji i przewidywania emocji program korzysta z jednego z dwuch zaimplementowanych algorytmów: K najbliższych sąsiadów oraz Ukryte Modele Markowa, których schemat działania został opisany w pracy. Użytkownik ma możliwość uruchomienia programu z każdym z tych algorytmów. W celu przyspieszenia działania systemu część danych jest zapisywanych jest w bazie danych SQLite. Program został przetestowny oraz wyniki poprawności rozpoznawania emocji na każdym z tych algorytmów zostały zaprezentowane w pracy.
+W ramach projektu został stworzony i opisany program, którego celem jest wydobywanie konkretnych cech z fragmentów wypowiedzi znajdujących się w plikach .wav i na ich podstawie rozpoznawanie czterech emocji: smutek, radość, złość i znudzenie. Jako cechy dźwięku, które wydobyto i użyto do rozpoznawania stanu emocjonalnego, wybrano: ton podstawowy i natężenie dźwięku. W celu klasyfikacji i przewidywania emocji program korzysta z jednego z dwóch zaimplementowanych algorytmów: k najbliższych sąsiadów oraz ukryte modele Markowa, których schemat działania został opisany w pracy. Użytkownik ma możliwość uruchomienia programu z każdym z tych algorytmów. W celu przyspieszenia działania systemu część danych jest zapisywanych jest w bazie danych SQLite. Program został przetestowany oraz wyniki poprawności rozpoznawania emocji na każdym z tych algorytmów zostały zaprezentowane w pracy.
 
-We wprowadzeniu opisana jest geneza projektu oraz cel i zakres pracy inżynierskiej. Następny rodział prezentuje już istniejące rozwiązania i stan wiedzy na temat problemu rozważanego w pracy oraz porównuje projekt z już istniejącymi rozwiązaniami. W kolejnej części opisany jest ogólny proces działania systemu do rozpoznawani emocji z głosu. Znajdują się tam również odpowiednie definicje, opis operacji oraz uzasadnienie wyboru cech dźwięku użytych do rozpoznawania stanu emocjonalnego. Kolejne 2 rozdziały opisują algorytmy: K najbliższych sąsiadów i Ukryte Modele Markowa oraz sposób ich implementacji dla problemu rozpoznawania emocji z głosu. Następna część prezentuje wyniki testów obydwóch algorytmów na niemieckiej bazie danych mowy emocjonalnej. Wnioski z testów oraz przykłady możliwości rozszerzenia projektu znajdują się w ostatnim rozdziale pracy, wraz z jej podsumowaniem.}
+We wprowadzeniu opisana jest geneza projektu oraz cel i zakres pracy inżynierskiej. Następny rodział prezentuje już istniejące rozwiązania i stan wiedzy na temat problemu rozważanego w pracy oraz porównuje projekt z już istniejącymi rozwiązaniami. W kolejnej części opisany jest ogólny proces działania systemu do rozpoznawani emocji z głosu. Znajdują się tam również odpowiednie definicje, opis operacji oraz uzasadnienie wyboru cech dźwięku użytych do rozpoznawania stanu emocjonalnego. Kolejne 2 rozdziały opisują algorytmy: k najbliższych sąsiadów i ukryte modele Markowa oraz sposób ich implementacji dla problemu rozpoznawania emocji z głosu. Następna część prezentuje wyniki testów obydwóch algorytmów na niemieckiej bazie danych mowy emocjonalnej. Wnioski z testów oraz przykłady możliwości rozszerzenia projektu znajdują się w ostatnim rozdziale pracy, wraz z jej podsumowaniem.}
 
 \englishabstract {
-This document describes program which was create as part of enginering project and result of testing it. The aim of program is to extract specific features from fragments of statements contained in .wav file and based on these data, recognition four emotions: sadness, anger, happiness and boredom. As sound features that were extracted and used to recognize the emotional state, the basic tone and sound intensity were selected. In order to classify and predict emotions, the program uses one of the two implemented algorithms: K nearest neighbors and Hidden Markov models, the flowchart of which is described in the paper. The user can run the program with each of these algorithms. In order to speed up the system, some data are saved in the SQLite database. The program was tested and the results of the correctness of emotion recognition on each of these algorithms were presented in the work.
+This document describes a program which was created as part of an engineering project and the result of testing it. The aim of the program is to extract specific features from fragments of statements contained in .wav files and based on these data, recognition four emotions: sadness, anger, happiness and boredom. The basic tone and sound intensity were selected, as sound features that were extracted and used to recognize the emotional state. In order to classify and predict emotions, the program uses one of the two implemented algorithms: k nearest neighbors and hidden Markov models, the flowchart of which is described in the paper. The user can run the program with each of these algorithms. In order to speed up the system, some data are saved in the SQLite database. The program was tested and the results of the correctness of emotion recognition on each of these algorithms were presented in the work.
 
-The introduction describes the genesis of the project and the purpose and scope of the engineering work. The next chapter presents already existing solutions and the state of knowledge about the problem considered at work and compares the project with existing solutions. The next part describes the general process of operating the system to recognize emotions from the voice. There are also relevant definitions, a description of the operation and justification for choosing the sound characteristics used to recognize the emotional state. The next two chapters describe the algorithms: K nearest neighbors and Hidden Markov models and describe how they were implemented for the problem of recognizing emotions from the voice. The next part presents the results of tests of both algorithms on the German emotional speech database. The conclusions of the tests and examples of possibilities to extend the project can be found in the last chapter of the work, together with its summary.}
+The introduction describes the genesis of the project and the purpose and scope of the engineering thesis. The next chapter presents already existing solutions and the state of knowledge how the problem considered in the thesis and compares the project with existing solutions. The next part describes the general process of operating the system to recognize emotions from the voice. There are also relevant definitions, a description of the operation and justification for choosing the sound characteristics used to recognize the emotional state. The next two chapters describe the algorithms: k nearest neighbors and hidden Markov models and describe how they were implemented for the problem of recognizing emotions from the voice. The next part presents the results of tests of both algorithms on the German emotional speech database. The conclusions of the tests and examples of possibilities to extend the project can be found in the last chapter of the work, together with its summary.}
 
 \begin{document}
 %%%%% POCZĄTEK ZASADNICZEGO TEKSTU PRACY
@@ -62,37 +63,37 @@ Rozmowa jest najbardziej naturalnym sposobem wymiany informacji. Dzięki niej mo
 
 Rozwój technologii umożliwił komunikację online. Coraz częściej ludzie do wymiany informacji używają telefonów lub komputerów. Jest to wygodny oraz szybki sposób wymiany informacji. Jednak komunikacja internetowa znacznie różni się od tej tradycyjnej. Pomimo że cel jest ten sam, to podczas komunikacji tradycyjnej oprócz słów korzystamy z gestów i mimiki. Widzimy reakcję osoby, z którą rozmawiamy. Niestety, nie zawsze jest to możliwe podczas komunikacji internetowej. A więc rozpoznawanie emocji w tym przypadku ogranicza się do interpretacji głosu, jego tonu, energii czy barwy. Złe zinterpretowanie tych sygnałów, często prowadzi do konfliktów. System, który umożliwiłby rozpoznawanie stanu emocjonalnego mówcy, ułatwiłby i poprawiłby jakość komunikacji we współczesnym życiu. 
 
-Elektronika jest coraz powszechniej wykorzystywana przez ludzi. Roboty pomagają znaleźć drogę, służą jako rozrywka oraz pomoc w codziennych czynnościach. Coraz więcej czasu spędzamy przed ekranem urządzeń elektronicznych. Jednak maszyny nie wiedzą co czujemy. Umiejętność rozpoznawania przez urządzenia emocji na podstawie tylko głosu, znacznie zwiększyłaby jakość komunikacji człowiek-komputer. Maszyny na podstawie danych o stanie emocjonalnym człowieka, mogłyby dostosowywać swoje zachowanie do stanu odbiorcy i tym samym wpływać na jego reakcje. Obecnie coraz powszechniejsze jest wykrywanie emocji z mimiki twarzy. Powstają programy, które śledzą ruchy mięśni twarzy, na tej podstawie są w stanie określić stan emocjonalny człowieka. Jednak dokładnie przetwarzanie obrazu wymaga dużej złożoności obliczeniowej oraz profesjonalnego sprzętu. Natomiast przetwarzanie dźwięku jest prostsze i szybsze, dlatego nawet nie bardzo zaawansowany sprzęt mógłby spełniać takie funkcje.
+Elektronika jest coraz powszechniej wykorzystywana przez ludzi. Roboty pomagają znaleźć drogę, służą jako rozrywka oraz pomoc w codziennych czynnościach. Coraz więcej czasu spędzamy przed ekranem urządzeń elektronicznych. Jednak maszyny nie wiedzą co czujemy. Umiejętność rozpoznawania przez urządzenia emocji na podstawie tylko głosu, znacznie zwiększyłaby jakość komunikacji człowiek-komputer. Maszyny na podstawie danych o stanie emocjonalnym człowieka, mogłyby dostosowywać swoje zachowanie do stanu odbiorcy i tym samym wpływać na jego reakcje. Obecnie coraz powszechniejsze jest wykrywanie emocji z mimiki twarzy. Powstają programy, które śledzą ruchy mięśni twarzy, na tej podstawie są w stanie określić stan emocjonalny człowieka. Jednak dokładnie przetwarzanie obrazu wymaga dużej złożoności obliczeniowej oraz profesjonalnego sprzętu. Natomiast przetwarzanie dźwięku jest prostsze i szybsze, dlatego nawet prosty sprzęt mógłby spełniać takie funkcje.
 
-Urządzenie do wykrywania emocji z głosu dałoby również możliwość nauki lepszej kontroli nad swoim głosem. Umiejętność ta poprawiłaby jakość rozmów, zwiększyła pewność siebiez a także ułatwiłaby kontakt między ludźmi. Często, podczas rozmowy, gdy jeden z jej uczestników podnosi głos i tym samym wyraża złość, reszta reaguje tym samym. Dlatego, coraz powszechniejsze stają się szkolenia z kontroli nad swoimi emocjami, podczas których dużą uwagę zwraca się na głos. Taka aplikacja umożliwiłaby trenowania głosu każdemu. 
+Urządzenie do wykrywania emocji z głosu dałoby również możliwość nauki lepszej kontroli nad swoim głosem. Umiejętność ta poprawiłaby jakość rozmów, zwiększyła pewność siebiez a także ułatwiłaby kontakt między ludźmi. Często, podczas rozmowy, gdy jeden z jej uczestników podnosi głos i tym samym wyraża złość, reszta reaguje tym samym. Dlatego coraz powszechniejsze stają się szkolenia z kontroli nad swoimi emocjami, podczas których dużą uwagę zwraca się na głos. Taka aplikacja umożliwiłaby trenowanie głosu każdemu. 
 
 \section{Cel projektu}
-Celem pracy jest zaimplementowanie i porównanie działania algorytmu K najbliższych sąsiadów i algorytmu bazujacego na Ukrytych Modelacj Markowa oraz zaimplementowanie systemu, który korzystając z nich, umożliwiłby rozpoznawanie emocji na podstawie nagranych fragmentów wypowiedzi.
-Za cechy odpowiadające emocją zdecydowano wybrać cechy związane z tonem podstawowym oraz natężeniem dźwięku. Emocje, jakie program powinien przewidywać to: szczęście, smutek, znudzenie i złość.
+Celem pracy jest zaimplementowanie i porównanie działania algorytmu k najbliższych sąsiadów i algorytmu bazujacego na ukrytych modelach Markowa oraz zaimplementowanie systemu, który korzystając z nich, umożliwiłby rozpoznawanie emocji na podstawie nagranych fragmentów wypowiedzi.
+Za cechy odpowiadające emocjom zdecydowano wybrać cechy związane z tonem podstawowym oraz natężeniem dźwięku. Emocje, jakie program powinien przewidywać to: szczęście, smutek, znudzenie i złość.
 
 \section{Zakres pracy}
 \begin{enumerate}
 \item Analiza plików dźwiękowych w formacie .wav
 \item Wydobycie z fragmentów wypowiedzi i obliczenie cech związanych z tonem podstawowym oraz natężeniem dźwięku
-\item Zaimplementowanie algorytmu "K najbliższych sąsiadów" dla problemu rozpoznawania emocji z głosu.
-\item Zaimplementowanie algorytmu bazującego na Ukrytych Modelach Markowa dla problemu rozpoznawania emocji z głosu.
+\item Zaimplementowanie algorytmu ,,k najbliższych sąsiadów" dla problemu rozpoznawania emocji z głosu.
+\item Zaimplementowanie algorytmu bazującego na ukrytych modelach Markowa dla problemu rozpoznawania emocji z głosu.
 \item Zaimplementowanie aplikacji, która korzystając z tych algorytmów i opierając się na bazie danych mowy emocjonalnej, potrafiłaby rozpoznawać emocje z głosu.
 \item Porównanie działania i wyników dwóch powyższych algorytmów w kontekście rozważanego problemu.
 \end{enumerate}.
 
 \chapter{Stan wiedzy w zakresie tematyki pracy}
 \section{Istniejące rozwiązania}
-Badania nad wykrywaniem zmian stanu emocjonalnego człowieka na podstawie cech głosu, są coraz powszechniejsze. Przez ostatnich parę lat pojawiło się kilka prac na ten temat. 
+Badania nad wykrywaniem zmian stanu emocjonalnego człowieka na podstawie cech głosu są coraz powszechniejsze. Przez ostatnich parę lat pojawiło się kilka prac na ten temat. 
 
-Przykładem jest praca ~\cite{sernn} opublikowana w 2016 roku, w której autorzy opisują swoje badania na ten temat. Autorzy, używając konwolucyjnych sieci neuronowych oraz algorytmu piramid, stworzyli aplikację, która z powodzeniem odczytuje emocje na podstawie fragmentów wypowiedzi. Do klasyfikacji emocji wykorzystują różne cechy dźwięku, takie jak: MFCC, czy cechy prozodyczne. Poprawność programu była zależna od bazy danych, na której przeprowadzili testy. Wynosiła ona od ok. 44\% dla jednej z wykorzystanych baz danych do nawet ok. 87\% dla innej.
+Przykładem jest praca~\cite{sernn} opublikowana w 2016 roku, w której autorzy opisują swoje badania na ten temat. Autorzy, używając konwolucyjnych sieci neuronowych oraz algorytmu piramid, stworzyli aplikację, która z powodzeniem odczytuje emocje na podstawie fragmentów wypowiedzi. Do klasyfikacji emocji wykorzystują różne cechy dźwięku, takie jak MFCC czy cechy prozodyczne. Poprawność programu była zależna od bazy danych, na której przeprowadzili testy. Wynosiła ona od ok. 44\% dla jednej z wykorzystanych baz danych do nawet ok. 87\% dla innej.
 
-Kolejnym algorytmem, jaki jest często wykorzystywany w tym problemie jest SVM (Support Vector Machine). Autorzy opublikowanej w 2013 roku na KST ("International Conference on Knowledge and Smart Technology") pracy ~\cite{svn} pod tytułem: “Speech emotion recognition using support vector Machines” wykorzystują ten algorytm do problemu rozpoznawania emocji z głosu. Używają cech głosu związanych z tonem podstawowym, energią i MFCC. Następnie testują wyniki na trzech różnych bazach danych. Poprawność wyników wynosi od 89,80\% dla Niemieckiej bazy danych do nawet 98\% dla tajskiej bazy danych.
+Kolejnym algorytmem, jaki jest często wykorzystywany w tym problemie jest SVM (Support Vector Machine). Autorzy opublikowanej w 2013 roku na konferencji KST (,,International Conference on Knowledge and Smart Technology") pracy~\cite{svn} pod tytułem: ,,Speech Emotion Recognition Using Support Vector Machines” wykorzystują ten algorytm do problemu rozpoznawania emocji z głosu. Używają cech głosu związanych z tonem podstawowym, energią i MFCC. Następnie testują wyniki na trzech różnych bazach danych. Poprawność wyników wynosi od 89,80\% dla niemieckiej bazy danych do nawet 98\% dla tajskiej bazy danych.
 
 Warto również wspomnieć o dużym sukcesie, jakim okazał się stworzony w 2009 roku program Affectiva, który odczytując mimikę twarzy, głos oraz tętno potrafi nie tylko odgadywać ludzkie emocje, ale też mierzyć poziom zaskoczenia, zadowolenia, czy zmieszania osoby przed kamerą.
 
 \section{Porównianie projektu z istniejącymi rozwiązaniami}
 Istniejące rozwiązania bazują na dużej ilości cech dźwięku użytych w celu rozpoznawania dużej ilości emocji.
-Celem tego projektu wykorzystanie podstawowych i szybkich do obliczenia cech głosu, czyli ton podstawowy i natężenie dźwięku i na ich podstawie, próba predykcji emocji. Dałoby to również obraz tego, jak charakterystyczne sa te cechy dla wybranych emocji.
+Celem tego projektu wykorzystanie podstawowych i szybkich do obliczenia cech głosu, czyli ton podstawowy i natężenie dźwięku i próba predykcji emocji na ich podstawie. Dałoby to również obraz tego, jak charakterystyczne sa te cechy dla wybranych emocji.
 
 \let\cleardoublepage\clearpage
 \chapter{System rozpoznawania emocji z głosu}
@@ -110,7 +111,7 @@ W dalszej części rozdziału opisana jest każda z tych faz.
 \cleardoublepage
 
 \begin{figure}[!ht]
-\hspace*{-5cm}  
+\hspace*{-6cm}  
 	\caption{Process testowania systemu do rozpoznawania emocji z głosu}
 	\includegraphics[scale=0.35]{testowanie.png}
 \end{figure}
@@ -118,16 +119,16 @@ W dalszej części rozdziału opisana jest każda z tych faz.
 \section{Dźwięk, podstawowe definicje}
 Formalnie fala dźwiękowa to rozchodzące się w ośrodku zaburzenie, któremu towarzyszą drgania cząsteczek ośrodka i która powoduje wrażenie słuchowe.  Fale mają pewne fundamentalne cechy jak:
 \begin{enumerate}
-\item Długość fali - odległość pomiędzy początkiem a końcem jednego pełnego cyklu.
-\item Amplituda - poziom wychylenia z położenia równowagi. Amplituda fali akustyczne mierzona jest na 2 sposoby:
+\item Długość fali -- odległość pomiędzy początkiem a końcem jednego pełnego cyklu.
+\item Amplituda -- poziom wychylenia z położenia równowagi. Amplituda fali akustyczne mierzona jest na 2 sposoby:
 	\begin{itemize}
-	\item maksymalne wychylenie - maksymalny pozytywny lub negatywny poziom sygnału,
-	\item średnia kwadratowa (RMS) - która mierzy bardziej znaczący średni poziom sygnału,
+	\item maksymalne wychylenie -- maksymalny pozytywny lub negatywny poziom sygnału,
+	\item średnia kwadratowa (RMS) -- która mierzy bardziej znaczący średni poziom sygnału,
 	\end{itemize}
-\item Częstotliwość - czyli liczba pełnych drgań (cykli), jakie wykona fala w ciągu jednej jednostki czasu (np.: sekundy). Jej jednostką jest Herc(Hz).
+\item Częstotliwość -- czyli liczba pełnych drgań (cykli), jakie wykona fala w ciągu jednej jednostki czasu (np. sekundy). Jej jednostką jest Herc(Hz).
 \end{enumerate}
 
-Drganie fałd głosowych podczas wydechu powodują wibracje, tworząc fale dźwiękowe. Następnie na skutek różnych procesów, takich jak ruchy języka, podniebienia, szczęk nabierają one specyficznych właściwości, tworząc wrażenie słuchowe nazywane głosem. Podstawowe cechy głosu to: barwa głosu, jego wysokość, oraz natężenie.
+Drganie fałd głosowych podczas wydechu powoduje wibracje, tworząc fale dźwiękowe. Następnie na skutek różnych procesów, takich jak ruchy języka, podniebienia, szczęk nabierają one specyficznych właściwości, tworząc wrażenie słuchowe nazywane głosem. Podstawowe cechy głosu to: barwa głosu, jego wysokość, oraz natężenie.
 
 Barwa głosu zależy od ilości oraz zachowania tonów w dźwięku. To właśnie dzięki niej jesteśmy w stanie odróżniać głosy poszczególnych osób. Właściwość ta jest mocno uzależniona od budowy gardła, krtani, fałd głosowych. 
 
@@ -137,29 +138,33 @@ Natężenie dźwięku jest miarą energii fali dźwiękowej i zależy od jej amp
 
 \section{Dobór cech dźwięku}
 Jak już zostało wspomniane, w projekcie w celu rozpoznawania emocji z głosu, zdecydowano się użyć cech związanych z wysokością głosu oraz natężeniem. Poniżej znajdują się wykresy 4 szukanych emocji.
-\hspace*{-10cm}  
-	\includegraphics[width=\paperwidth]{b01.png}
+
+\begin{figure}[!ht]
+\hspace*{-2cm}  
+	\caption{Przykładowy rozkład zmian wartości tonu podstawowego oraz natężenia w czasie}
+	\includegraphics[scale=0.3]{b01.png}
+\end{figure}
 	
 W pierwszym wierszu dla każdej emocji widzimy rozkład tonu podstawowego w czasie, natomiast w drugim wierszu rozkład natężenia. Możemy z niego wywnioskować podstawowe zależności pomiędzy poszczególnymi emocjami. Na przykład: wysoki ton głosu i wysoka energia są charakterystyczne  przy okazywaniu złości, natomiast również wysoki ton i troszkę niższa energia są charakterystyczne dla szczęścia. Smutek cechuje się bardzo niskim tonem głosu i dużą dynamiką energii, natomiast znudzenie trochę wyższym tonem głosu niż smutek, ale niższym niż dwie pozostałe emocje oraz trochę stabilniejszym poziomem energii. 
 
 Na podstawie tych danych zostało wybrane dwanaście cech, które mogłyby reprezentować stany emocjonalne.
 Są to: 
 \begin{enumerate}
-\item Różnica między maksymalna a minimalną wartością tonu podstawowego.
-\item Maksymalna wartość tonu podstawowego.
-\item Minimalna wartość tonu podstawowego.
-\item Średnia wartość tonu podstawowego.
-\item Dynamika tonu podstawowego.
-\item Procent tonów opadających.
-\item Procent tonów wzrastających.
-\item Relatywne standardowe odchylenie wartości tonu podstawowego.
-\item Relatywne standardowe odchylenie wartości średniej kwadratowej natężenia.
-\item Gęstość przejść przez zero.
-\item Średnia kwadratowa natężenia.
-\item Największa wartość natężenia.
+\item różnica między maksymalna a minimalną wartością tonu podstawowego,
+\item maksymalna wartość tonu podstawowego,
+\item minimalna wartość tonu podstawowego,
+\item średnia wartość tonu podstawowego,
+\item dynamika tonu podstawowego,
+\item procent tonów opadających,
+\item procent tonów wzrastających,
+\item relatywne standardowe odchylenie wartości tonu podstawowego,
+\item relatywne standardowe odchylenie wartości średniej kwadratowej natężenia,
+\item gęstość przejść przez zero,
+\item średnia kwadratowa natężenia,
+\item największa wartość natężenia.
 \end{enumerate}
 
-W celu dokładniejszego doboru parametrów dźwięku skorzystano z algorytmu ExtraTreeClassifier z jednej z bibliotek python'a: sklearn. Algorytm oblicza relatywną ważność cech. Wynik algorytmu przedstawia tabelka poniżej.
+W celu dokładniejszego doboru parametrów dźwięku skorzystano z algorytmu ExtraTreeClassifier z jednej z bibliotek języka Python: sklearn. Algorytm oblicza relatywną ważność cech. Wynik algorytmu przedstawia tabelka poniżej.
 
 \begin{tabular}{ l | r }
 
@@ -177,11 +182,11 @@ Gęstość przejść przez zero & 0.099278 \\
 Największa wartość natężenia & 0.094414 \\
 \end{tabular}
 
-Na podstawie powyższych danych zdecydowano się zrezygnować z cechy: Dynamika tonu podstawowego i do rozpoznawania emocji użyć pozostałych jedenastu cech.
+Na podstawie powyższych danych zdecydowano się zrezygnować z cechy: ,,dynamika tonu podstawowego" i do rozpoznawania emocji użyć pozostałych jedenastu cech.
 
 \section{Ekstrakcja cech}
 
-Ekstrakcja cech polega na analizie sygnału dźwiękowego i wydobyciu z niego potrzebnych wartości. W projekcie, aby wydobyć odpowiednie cechy, z sygnału dźwiękowego, co 0.125 sekundy brana jest próbka dźwięku o długości 0.25 sekundy. Z próbek o tej długości wyliczane są odpowiednie cechy. Sygnał odczytywany z pliku jest sygnałem w domenie czasu. Z takiego sygnału możemy odczytać wszystkie wartośći związane z energią, czyli:
+Ekstrakcja cech polega na analizie sygnału dźwiękowego i wydobyciu z niego potrzebnych wartości. W projekcie, aby wydobyć odpowiednie cechy z sygnału dźwiękowego, co 0.125 sekundy brana jest próbka dźwięku o długości 0.25 sekundy. Z próbek o tej długości wyliczane są odpowiednie cechy. Sygnał odczytywany z pliku jest sygnałem w domenie czasu. Z takiego sygnału możemy odczytać wszystkie wartości związane z energią, czyli:
 \begin{itemize}
 \item relatywne standardowe odchylenie wartości średniej kwadratowej natężenia,
 \item gęstość przejść przez zero,
@@ -189,11 +194,11 @@ Ekstrakcja cech polega na analizie sygnału dźwiękowego i wydobyciu z niego po
 \item największa wartość natężenia,
 \end{itemize}
 
-Aby wydobyć cechy związane z częstotliwością, należy sygnał w domenie czasu przekształcić na sygnał w domenie częstotliwości. Operacją, która na to pozwala, jest transformacja Fouriera. W projekcie wykorzystano algorytm szybkiej transformaty Fouriera dla rzeczywistych danych wejściowych: rfft, znajdujący się w bibliotece python'a: numpy.fft. Z sygnału w domenie częstotliwości wydobyto częstotliwość podstawową i na jej podstawie wyliczono pozostałe cechy.
+Aby wydobyć cechy związane z częstotliwością, należy sygnał w domenie czasu przekształcić na sygnał w domenie częstotliwości. Operacją, która na to pozwala, jest transformacja Fouriera. W projekcie wykorzystano algorytm szybkiej transformaty Fouriera dla rzeczywistych danych wejściowych: rfft, znajdujący się w bibliotece języka Python: numpy.fft. Z sygnału w domenie częstotliwości wydobyto częstotliwość podstawową i na jej podstawie wyliczono pozostałe cechy.
 
 \section{Normalizacja}
 
-Obliczone cechy mają różną wartość. Maksymalna wartość cech obliczanych w procenach to sto, podczas gdy maksymalna wartość częstotliwości jest dużo wyższa. Z tego względu, podczas liczenia podobieństwa wektorów cechy z większą rangą będą uważane jako bardziej istotne. Aby temu zapobiec, przeprowadza się normalizację wektorową. W wyniku tej operacji, wartości cech są z przedziału \textless 0,1\textgreater. Dzięki temu wpływ wszystkich cech na wynik jest taki sam. Normalizacja przebiega według następującego wzoru:
+Obliczone cechy mają różną wartość. Maksymalna wartość cech obliczanych w procentach to sto, podczas gdy maksymalna wartość częstotliwości jest dużo wyższa. Z tego względu, podczas liczenia podobieństwa wektorów cechy z większą rangą będą uważane jako bardziej istotne. Aby temu zapobiec, przeprowadza się normalizację wektorową. W wyniku tej operacji, wartości cech są z przedziału \textless 0,1\textgreater. Dzięki temu wpływ wszystkich cech na wynik jest taki sam. Normalizacja przebiega według następującego wzoru:
 
 $a_i$\textprime = $\frac{a_i - min(a_i)}{min(a_i) - max(a_i)}$
 
@@ -208,9 +213,9 @@ Algorytm w trakcie trenowania nie przeprowadza żadnych obliczeń. Jedynie zapam
 
 Podczas testowania podana jest obserwacja O. Celem algorytmu jest prognoza przewidywanej wartości tej obserwacji. W tym celu algorytm:
 \begin{enumerate}
-\item Oblicza odległość pomiędzy O a każdą z obserwacji ze zbioru trenującego. 
-\item Tworzy zbiór O\textprime, w którego skład wchodzi k najbliżej położonych od niego obserwacji ze zbioru trenującego.
-\item Przeprowadza głosowanie wśród elementów ze zbioru O’ i obserwacji O przypisuje element, który wystąpił największą ilość razy.
+\item oblicza odległość pomiędzy O a każdą z obserwacji ze zbioru trenującego;
+\item tworzy zbiór O\textprime, w którego skład wchodzi k najbliżej położonych od niego obserwacji ze zbioru trenującego;
+\item przeprowadza głosowanie wśród elementów ze zbioru O’ i obserwacji O przypisuje element, który wystąpił największą ilość razy.
 \end{enumerate}
 
 \section{Implementacja}
@@ -218,10 +223,10 @@ W części trenującej program tworzy moduł KNN i podaje mu zbiór wektorów w 
 
 W części testującej program podaje modułowi KNN zbiór wektorów cech z wypowiedzi. Algorytm KNN dla każdego wektora V z podanego zbioru:
 \begin{enumerate}
-\item Normalizuje V wartościami użytymi podczas normalizacji zbioru trenującego.
-\item Oblicza odległość euklidesową pomiędzy V a każdym wektorem ze zbioru trenującego.
-\item Tworzy zbiór O\textprime, w którego skład wchodzi k najbliżej położonych od niego obserwacji ze zbioru trenującego.
-\item Zwraca emocje, które w zbiorze O\textprime wystąpiły najczęściej, jako najbardziej prawdopodobne emocje dla tego wektora.
+\item normalizuje V wartościami użytymi podczas normalizacji zbioru trenującego;
+\item oblicza odległość euklidesową pomiędzy V a każdym wektorem ze zbioru trenującego;
+\item tworzy zbiór O\textprime, w którego skład wchodzi k najbliżej położonych od niego obserwacji ze zbioru trenującego;
+\item zwraca emocje, które w zbiorze O\textprime wystąpiły najczęściej, jako najbardziej prawdopodobne emocje dla tego wektora.
 \end{enumerate}
 Jako emocję reprezentującą dany zbiór, algorytm zwraca emocję, która wystąpiła najczęściej w zbiorze testującym. Jeżeli więcej niż jedna emocja wystąpiła najczęściej, zwracana jest losowa z nich. 
 
@@ -230,7 +235,7 @@ Jako emocję reprezentującą dany zbiór, algorytm zwraca emocję, która wyst�
 Ukryte modele Markowa(HMM) to narzędzie służące do statystycznej analizy sekwencji zdarzeń. Aby zrozumieć ten model, należy zacząć od 
 definicji łańcucha Markowa.
 
-Łańcuch Markowa jest modelem składającym się ze zbioru stanów S oraz macierzy M, zawierająca prawdopodobieństwa przejść pomiędzy stanami. Opisuje układ, który w danym momencie czasu może znajdować się tylko w jednym ze swoich stanów, a w następnym przejść do innego lub pozostać w swoim z prawdopodobieństwem zapisanym w macierzy M. Cechą charakterystyczną dla łańcucha Markowa jest to, że zachowuje on własność Markowa, która mówi, że w czasie t+1 prawdopodobieństwo bycia w stanie j zależy jedynie od stanu w jakim układ znajdował się w czasie t.
+Łańcuch Markowa jest modelem składającym się ze zbioru stanów S oraz macierzy M, zawierającej prawdopodobieństwa przejść pomiędzy stanami. Opisuje układ, który w danym momencie czasu może znajdować się tylko w jednym ze swoich stanów, a w następnym przejść do innego lub pozostać w swoim z prawdopodobieństwem zapisanym w macierzy M. Cechą charakterystyczną dla łańcucha Markowa jest to, że zachowuje on własność Markowa, która mówi, że w czasie t+1 prawdopodobieństwo bycia w stanie j zależy jedynie od stanu w jakim układ znajdował się w czasie t.
 
 Ukryty model Markowa jest modelem zawierającym:
 \begin{itemize}
@@ -242,7 +247,7 @@ Ukryty model Markowa jest modelem zawierającym:
 
 Ukryte Modele Markowa zakładają, że stany tworzące łańcuch Markowa są ukryte. Widoczna jest tylko obserwacja jaką stan zwróci. Na tej podstawie i mając dane z tablicy emisji oraz przejść, HMM jest w stanie obliczyć prawdopodobną sekwencję stanów, która wyrzuciła dany wektor obserwacji oraz prawdopodobieństwo wygenerowania obserwacji w modelu.
 
-W projekcie wykorzystano liniowy model HMM. Charakteryzuje on się tym, że w czasie t, ze stanu $s_{i}$ możemy przejść do stanu $s_{i+1}$ lub pozostać w stanie $s_{i}$, z pewnym prawdopodobieństwem. Prawdopodobieństwo przejścia do pozostałych stanów jest zerowe. Do trenowania ukrytych modeli Markowa wykorzystano algorytm Bauma-Welcha, natomiast w celu obliczenia prawdopodobieństwa wygenerowania obserwacji przez model wykorzystano algorytmu prefiksowego.
+W projekcie wykorzystano liniowy model HMM. Charakteryzuje on się tym, że w czasie t, ze stanu $s_{i}$ możemy przejść do stanu $s_{i+1}$ lub pozostać w stanie $s_{i}$, z pewnym prawdopodobieństwem. Prawdopodobieństwo przejścia do pozostałych stanów jest zerowe. Do trenowania ukrytych modeli Markowa wykorzystano algorytm Bauma-Welcha, natomiast w celu obliczenia prawdopodobieństwa wygenerowania obserwacji przez model wykorzystano algorytm prefiksowy.
 
 \section{Implementacja}
 W pierwszej fazie program tworzy zbiór wszystkich możliwych obserwacji. W tym celu, z każdego pliku w zbiorze trenującym pobiera wektory cech. Kolejnym etapem jest normalizacja stworzonego zbioru wektorów. W celu zmniejszenia liczby obserwacji i uśrednienia ich program używa algorytmu k-średnich, o nazwie KMeans z biblioteki sklearn.cluster. Algorytm tworzy podaną ilość możliwych obserwacji.
@@ -255,9 +260,9 @@ W części trenującej program dla każdej emocji i każdego pliku trenującego 
 	\includegraphics[scale=0.35]{hmm_train.png}
 \end{figure}
 
-Podczas testowania z pliku będącego wypowiedzią, algorytm oblicza zbiór obserwacji O. Każdy z elementów obserwacji reprezentuje zbiór 6 wektorów cech będących sekwencją 1,5-sekundowej wypowiedzi. Kolejnym krokiem jest normalizacja każdej obserwacji, wartościami, którymi był normalizowany zbiór wszystkich możliwych wartości. Każdy ze znormalizowanych wektorów cech zostaje zamieniony na najbliższy mu wektor ze zbioru obserwacji, tworząc zbiór S. Dzięki temu model HMM będzie je rozpoznawał. Następnie, program dla każdej obserwacji ze zbioru S i każdego modelu HMM, wylicza prawdopodobieństwo wygenerowania tej obserwacji w tym modelu. Jako emocję, która odpowiada tej obserwacji wybiera tą, która reprezenutje model HMM, który wyliczył największe prawdopodobieństwo jej wygenerowania. Jako emocję reprezentujacą wypowiedź algoryt zwraca emocję, która po przejściu wszystkich obserwacji ze zbioru O wystąpiła najcześciej. Jeżeli więcej niż jedna emocja wystąpiła najczęściej, zwracana jest losowa z nich.
+Podczas testowania z pliku będącego wypowiedzią, algorytm oblicza zbiór obserwacji O. Każdy z elementów obserwacji reprezentuje zbiór 6 wektorów cech będących sekwencją 1,5-sekundowej wypowiedzi. Kolejnym krokiem jest normalizacja każdej obserwacji, wartościami, którymi był normalizowany zbiór wszystkich możliwych wartości. Każdy ze znormalizowanych wektorów cech zostaje zamieniony na najbliższy mu wektor ze zbioru obserwacji, tworząc zbiór S. Dzięki temu model HMM będzie je rozpoznawał. Następnie, program dla każdej obserwacji ze zbioru S i każdego modelu HMM, wylicza prawdopodobieństwo wygenerowania tej obserwacji w tym modelu. Jako emocję, która odpowiada tej obserwacji wybiera tą, która reprezenutje model HMM, który wyliczył największe prawdopodobieństwo jej wygenerowania. Jako emocję reprezentujacą wypowiedź algorytm zwraca emocję, która po przejściu wszystkich obserwacji ze zbioru O wystąpiła najcześciej. Jeżeli więcej niż jedna emocja wystąpiła najczęściej, zwracana jest losowa z nich.
 
-\chapter{Testowania}
+\chapter{Wyniki}
 \section{Baza danych mowy emocjonalnej}
 W celu przetestowania algorytmów użyto niemieckiej bazy mowy emocjonalnej ~\cite{BDemo}. Wybrano właśnie tę bazę danych, ponieważ jest ona publicznie dostępna oraz w istniejących rozwiązaniach, testy na tej bazie danych charakteryzowały się dużą poprawnością. Ponadto baza zawiera wszystkie 4 emocje, na których skupia się ten projekt.
 
@@ -276,9 +281,9 @@ W algorytmie KNN, najlepszy wynik został wygenerowany przy liczbie stanów rów
   \end{tabular}
 \end{center}
 
-Widać z niej, że algorytm k najbliższych sąsiadów wykrył poprawnie 68.45\% emocji. Najlepiej radzi sobie z emocjami, które cechują się wyrazistymi właściwościami jak złość, którą cechuje wysoki ton i wysoka energia oraz smutek, który cechuje niski ton i niska energia. Natomiast gorzej radzi sobie z emocjami, dla których właściwości nie są tak wyraziste. Szczęście w 39,13\% myli ze złością, która cechuje się podobnymi parametrami, natomiast znudzenie myli w 38,46\% ze smutkiem. A więc na podstawie wyników algorytmu można również stwierdzić podobieństwo poszczególnych emocji.
+Widać z niej, że algorytm k najbliższych sąsiadów wykrył poprawnie 68.45\% emocji. Najlepiej radzi sobie z emocjami, które cechują się wyrazistymi właściwościami jak złość, którą cechuje wysoki ton i wysoka energia oraz smutek, który cechuje niski ton i niska energia. Natomiast gorzej radzi sobie z emocjami, których właściwości nie są tak wyraziste. Szczęście w 39,13\% myli ze złością, która cechuje się podobnymi parametrami, natomiast znudzenie myli w 38,46\% ze smutkiem. A więc na podstawie wyników algorytmu można również stwierdzić podobieństwo sposobu wyrażania poszczególnych emocji.
 
-System rozpoznający emocje z głosu bazujący na Ukrytych Modelach Markowa został przetestowany na stanach od 200, do 700. Najlepsze wyniki pod kątem poprawności i szybkości działania uzyskał dla 500 stanów. Tabela poniżej prezentuje wyniki algorytmu: 
+System rozpoznający emocje z głosu bazujący na ukrytych modelach Markowa został przetestowany na stanach od 200, do 700. Najlepsze wyniki pod kątem poprawności i szybkości działania uzyskał dla 500 stanów. Tabela poniżej prezentuje wyniki algorytmu: 
 
 \begin{center}
   \begin{tabular}{| c | c | c | c | c |}
@@ -292,22 +297,22 @@ System rozpoznający emocje z głosu bazujący na Ukrytych Modelach Markowa zost
   \end{tabular}
 \end{center}
 
-Widać z niej, że algorytm bazujący na Ukrytych Modelach Markowa wykrył poprawnie 62,41\% emocji. Podobnie jak KNN bardzo dobrze rozpoznaje emocje takie smutek czy złość. Natomiast nie gorzej radzi sobie z emocjami takimi jak szczęście i znudzenie, myląc je odpowiednio z złością i smutkiem.
+Widać z niej, że algorytm bazujący na Ukrytych Modelach Markowa wykrył poprawnie 62,41\% emocji. Podobnie jak KNN bardzo dobrze rozpoznaje emocje takie smutek czy złość. Natomiast gorzej radzi sobie z emocjami takimi jak szczęście i znudzenie, myląc je odpowiednio z złością i smutkiem.
 
 
 \chapter{Wnioski i podsumowanie}
 
-Widać więc, że algorytm K najbliższych sąsiadów poradził sobie lepiej w tym problemie. Jednakże różnica jest niewielka. Poprawność wyników, jakie zwróciły oba algorytmy, wynosi ponad 60\%. Jednak algorytm KNN jest prostszy do napisania oraz czas działania tego algorytmu jest szybszy. Także biorąc pod uwagę również te cechy, spisuje się o wiele lepiej.
+Algorytm k najbliższych sąsiadów poradził sobie lepiej z tym problemem. Jednakże różnica jest niewielka. Poprawność wyników, jakie zwróciły oba algorytmy, wynosi ponad 60\%. Jednak algorytm KNN jest prostszy do zaimplementowania oraz czas działania tego algorytmu jest szybszy. Także biorąc pod uwagę również te cechy, spisuje się o wiele lepiej.
 
-Warto jednak zwrócić uwagę, że istnieje dużo różnych możliwości implementacji Ukrytych modeli Markowa, oraz sposobów trenowania go. W projekcie zdecydowano się użyć modelu liniowego oraz do trenowania, algorytmu Bauma-Welcha. Inny model może zwrócić zupełnie inne wyniki.
+Warto jednak zwrócić uwagę, że istnieje dużo różnych możliwości implementacji ukrytych modeli Markowa, oraz sposobów trenowania go. W projekcie zdecydowano się użyć modelu liniowego oraz do trenowania, algorytmu Bauma-Welcha. Inny model może zwrócić zupełnie inne wyniki.
 
-Projekt inżynierski opracowany w tej pracy ma za zadanie rozpoznawać 4 podstawowej emocje: szczęście, złość, smutek oraz znudzenie. Do swojego działania wykorzystuje jednen z dwuch algorytmów: K najbliższych sąsiadów lub algorytmu bazującego na Ukrytych Modelach Markowa, w zależności od wyboru użytkownika. Ponadto do projektu dodano dodatkową opcję, która pozwala śledzić przebieg częstotliwości i natężenia w czasie w plikach .wav. Praca została wykonana w pełnym zakresie i zgodnie z założonym celem. Wyniki pracy zostały zaprezentowane i opisane w pracy. Do projektu jest załączona dokumentacja w postaci html i pdf, która zawiera opis funkcji programu.
+Projekt inżynierski opracowany w tej pracy ma za zadanie rozpoznawać 4 podstawowej emocje: szczęście, złość, smutek oraz znudzenie. Do swojego działania wykorzystuje jeden z dwóch algorytmów: k najbliższych sąsiadów lub algorytmu bazującego na ukrytych modelach Markowa, w zależności od wyboru użytkownika. Ponadto do projektu dodano dodatkową opcję, która pozwala śledzić przebieg częstotliwości i natężenia w czasie w plikach .wav. Praca została wykonana w pełnym zakresie i zgodnie z założonym celem. Wyniki pracy zostały zaprezentowane i opisane w pracy. Do projektu jest załączona dokumentacja w postaci html i pdf, która zawiera opis funkcji programu.
 
-Projekt można rozwinąć. Przykładowa lista usprawnień:
+Projekt można rozwinąć. Możliwe usprawnienia:
 \begin{itemize}
-\item Dodanie kolejnych cech dźwięku w celu przetestowania wpływu tych właściwości na poprawne rozpoznawanie emocji
-\item Dodanie większej liczby emocji
-\item Implementacja innych algorytmów w celu przetestowania ich działania w tym problemie
+\item dodanie kolejnych cech dźwięku w celu przetestowania wpływu tych właściwości na poprawne rozpoznawanie emocji
+\item dodanie większej liczby emocji
+\item implementacja innych algorytmów w celu przetestowania ich działania w tym problemie
 \end{itemize}
 
 %%%%% BIBLIOGRAFIA
@@ -326,6 +331,7 @@ Speech emotion recognition using Support Vector Machines
 Niemiecka baza mowy emocjonalnej
 \\\texttt{http://emodb.bilderbar.info/start.html}
 
+\bibitem
 Robert J. Elliot, Lakhdar Aggoun, John B. Moore 
 \textit{Hidden Markov Model Estimation and Control}
 Springer Science+Business Media, LLC, 1995

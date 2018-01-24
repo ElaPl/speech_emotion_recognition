@@ -364,7 +364,6 @@ class HMM:
     # Oblicza prawdopodobieństwo, żę dana sekwencja obserwacji została wyprodukowana przez ten model
     def evaluate(self, obs_sequence):
         """Funckcja oblicza prawdopodobieństwo, że dana sekwencja obserwacji została wyprodukowana przez ten model.
-
         :param: list obs_sequence: lista obserwacji"""
         if not isinstance(obs_sequence, str):
             obs_sequence_str = list(map(str, obs_sequence))
