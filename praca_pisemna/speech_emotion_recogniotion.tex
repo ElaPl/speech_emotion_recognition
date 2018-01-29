@@ -12,6 +12,7 @@
 \usepackage[skip=5pt]{caption} % example skip set to 2pt
 \setlength{\belowcaptionskip}{4pt}
 \captionsetup{font=small}
+
 %%%%% DANE DO STRONY TYTUŁOWEJ
 % Niezaleznie od jezyka pracy wybranego w opcjach klasy, tytul i streszczenie
 % pracy nalezy podac zarowno w jezyku polskim, jak i angielskim.
@@ -164,10 +165,12 @@ Są to:
 \item największa wartość natężenia.
 \end{enumerate}
 
-W celu dokładniejszego doboru parametrów dźwięku skorzystano z algorytmu ExtraTreeClassifier z jednej z bibliotek języka Python: sklearn. Algorytm oblicza relatywną ważność cech. Wynik algorytmu przedstawia tabelka poniżej.
+W celu dokładniejszego doboru parametrów dźwięku skorzystano z algorytmu ExtraTreeClassifier z jednej z bibliotek języka Python: sklearn. Algorytm oblicza stopień ważności każdej z cech. Wynik algorytmu przedstawia tabela poniżej.
 
+\begin{table}[t]
+\caption{Tabela reprezentująca stopień ważności wybranych cech głosu}
+\label{nazwa}
 \begin{tabular}{ l | r }
-
 Różnica między maksymalną a minimalną wartością tonu podstawowego & 0.080200 \\
 Maksymalna wartość tonu podstawowego & 0.103055 \\
 Minimalna wartość tonu podstawowego & 0.098071 \\
@@ -181,6 +184,7 @@ Gęstość przejść przez zero & 0.099278 \\
 Średnia kwadratowa natężenia & 0.102582 \\
 Największa wartość natężenia & 0.094414 \\
 \end{tabular}
+\end{table}
 
 Na podstawie powyższych danych zdecydowano się zrezygnować z cechy: ,,dynamika tonu podstawowego" i do rozpoznawania emocji użyć pozostałych jedenastu cech.
 
@@ -256,7 +260,7 @@ W części trenującej program dla każdej emocji i każdego pliku trenującego 
 
 \begin{figure}[!ht]
 \hspace*{-5cm}  
-	\caption{Process trenowania modelu HMM}
+	\caption{Process trenowania modelu HMM do rozpoznawania emocji z głosu}
 	\includegraphics[scale=0.35]{hmm_train.png}
 \end{figure}
 
@@ -281,7 +285,7 @@ W algorytmie KNN, najlepszy wynik został wygenerowany przy liczbie stanów rów
   \end{tabular}
 \end{center}
 
-Widać z niej, że algorytm k najbliższych sąsiadów wykrył poprawnie 68.45\% emocji. Najlepiej radzi sobie z emocjami, które cechują się wyrazistymi właściwościami jak złość, którą cechuje wysoki ton i wysoka energia oraz smutek, który cechuje niski ton i niska energia. Natomiast gorzej radzi sobie z emocjami, których właściwości nie są tak wyraziste. Szczęście w 39,13\% myli ze złością, która cechuje się podobnymi parametrami, natomiast znudzenie myli w 38,46\% ze smutkiem. A więc na podstawie wyników algorytmu można również stwierdzić podobieństwo sposobu wyrażania poszczególnych emocji.
+Widać z niej, że algorytm k najbliższych sąsiadów wykrył poprawnie 68.45\% emocji. Najlepiej radzi sobie z emocjami, które cechują się wyrazistymi różnicami jak złość, którą cechuje wysoki ton i wysoka energia oraz smutek, który cechuje niski ton i niska energia. Natomiast gorzej radzi sobie z emocjami, których właściwości nie są tak wyraziste. Szczęście w 39,13\% myli ze złością, która cechuje się podobnymi parametrami, natomiast znudzenie myli w 38,46\% ze smutkiem. A więc na podstawie wyników algorytmu można również stwierdzić podobieństwo sposobu wyrażania poszczególnych emocji.
 
 System rozpoznający emocje z głosu bazujący na ukrytych modelach Markowa został przetestowany na stanach od 200, do 700. Najlepsze wyniki pod kątem poprawności i szybkości działania uzyskał dla 500 stanów. Tabela poniżej prezentuje wyniki algorytmu: 
 
@@ -299,7 +303,6 @@ System rozpoznający emocje z głosu bazujący na ukrytych modelach Markowa zost
 
 Widać z niej, że algorytm bazujący na Ukrytych Modelach Markowa wykrył poprawnie 62,41\% emocji. Podobnie jak KNN bardzo dobrze rozpoznaje emocje takie smutek czy złość. Natomiast gorzej radzi sobie z emocjami takimi jak szczęście i znudzenie, myląc je odpowiednio z złością i smutkiem.
 
-
 \chapter{Wnioski i podsumowanie}
 
 Algorytm k najbliższych sąsiadów poradził sobie lepiej z tym problemem. Jednakże różnica jest niewielka. Poprawność wyników, jakie zwróciły oba algorytmy, wynosi ponad 60\%. Jednak algorytm KNN jest prostszy do zaimplementowania oraz czas działania tego algorytmu jest szybszy. Także biorąc pod uwagę również te cechy, spisuje się o wiele lepiej.
@@ -316,7 +319,6 @@ Projekt można rozwinąć. Możliwe usprawnienia:
 \end{itemize}
 
 %%%%% BIBLIOGRAFIA
-
 \begin{thebibliography}{99}
 
 \bibitem{sernn} 
@@ -331,34 +333,34 @@ Speech emotion recognition using Support Vector Machines
 Niemiecka baza mowy emocjonalnej
 \\\texttt{http://emodb.bilderbar.info/start.html}
 
-\bibitem
+\bibitem{}
 Robert J. Elliot, Lakhdar Aggoun, John B. Moore 
 \textit{Hidden Markov Model Estimation and Control}
 Springer Science+Business Media, LLC, 1995
 
-\bibitem
+\bibitem{}
 Fink Gernot A.
 \textit{Markov Models for Pattern Recognition}
 Springer London Ltd, 2014
 
-\bibitem
+\bibitem{}
 Stuart J. Russell and Peter Norvig
 \textit{Artificial Intelligence A Modern Approach Third Edition}
 Pearson, 2009, s:566-584
 
-\bibitem
+\bibitem{}
 Wstęp do ukrytych modeli Markowa i metody Bauma–Welcha.
 \\\texttt{https://www.mimuw.edu.pl/\~pzwiernik/docs/hmm.pdf}
 
-\bibitem 
+\bibitem{}
 Statistical approach to normalization of feature vectors and clustering of mixed datasets
 \\\texttt{http://rspa.royalsocietypublishing.org/content/early/2012/04/17/rspa.2011.0704?utm\_source=TrendMD\&utm\_medium=cpc\&utm\_campaign=TrendMD\_MEX\_BRA}
 
-\bibitem
+\bibitem{}
 K najbliższych sąsiadów
 \\\texttt{https://www.statsoft.pl/textbook/stathome\_stat.html?https\%3A\%2F\%2Fwww.statsoft.pl\%2Ftextbook\%2Fstknn.html}
 
-\bibitem
+\bibitem{}
 The Scientist and Engineer's Guide to Digital Signal Processing
 \\\texttt{http://www.dspguide.com/pdfbook.htm}
 rozdziały 8-12: Applications of the DFT, Fourier Transform Properties, The Fast Fourier Transform, Continuous Signal Processing

@@ -189,8 +189,8 @@ class HMM:
 
         * beta[i][n] = 1
         * beta[i][t] = [\sum_{j=1}^{k} (emission_ppb[j][y_t+1] * beta[j][t+1] * transition_ppb[i][j]]
-
         """
+
         observation_len = len(ob_sequence)
 
         beta = numpy.zeros(shape=(self.hidden_states_num, observation_len))
@@ -203,6 +203,7 @@ class HMM:
                 state_to = state_from
                 beta[state_from][t] = beta[state_to][t + 1] * self.transition_ppb[state_from][state_to] \
                                       * self.emission_ppb[state_to][ob_sequence[t + 1]]
+
                 if debug and t == 1 and state_from == 2:
                     print(beta[state_from][t])
 
