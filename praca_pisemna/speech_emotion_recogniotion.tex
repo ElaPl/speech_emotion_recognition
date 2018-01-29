@@ -51,7 +51,7 @@ W ramach projektu został stworzony i opisany program, którego celem jest wydob
 We wprowadzeniu opisana jest geneza projektu oraz cel i zakres pracy inżynierskiej. Następny rodział prezentuje już istniejące rozwiązania i stan wiedzy na temat problemu rozważanego w pracy oraz porównuje projekt z już istniejącymi rozwiązaniami. W kolejnej części opisany jest ogólny proces działania systemu do rozpoznawani emocji z głosu. Znajdują się tam również odpowiednie definicje, opis operacji oraz uzasadnienie wyboru cech dźwięku użytych do rozpoznawania stanu emocjonalnego. Kolejne 2 rozdziały opisują algorytmy: k najbliższych sąsiadów i ukryte modele Markowa oraz sposób ich implementacji dla problemu rozpoznawania emocji z głosu. Następna część prezentuje wyniki testów obydwóch algorytmów na niemieckiej bazie danych mowy emocjonalnej. Wnioski z testów oraz przykłady możliwości rozszerzenia projektu znajdują się w ostatnim rozdziale pracy, wraz z jej podsumowaniem.}
 
 \englishabstract {
-This document describes a program which was created as part of an engineering project and the result of testing it. The aim of the program is to extract specific features from fragments of statements contained in .wav files and based on these data, recognition four emotions: sadness, anger, happiness and boredom. The basic tone and sound intensity were selected, as sound features that were extracted and used to recognize the emotional state. In order to classify and predict emotions, the program uses one of the two implemented algorithms: k nearest neighbors and hidden Markov models, the flowchart of which is described in the paper. The user can run the program with each of these algorithms. In order to speed up the system, some data are saved in the SQLite database. The program was tested and the results of the correctness of emotion recognition on each of these algorithms were presented in the work.
+This document describes a program which was created as part of an engineering project and the result of testing it. The aim of the program is to extract specific features from fragments of statements contained in .wav files and based on these data, recognition of four emotions: sadness, anger, happiness and boredom. The basic tone and sound intensity were selected, as sound features that were extracted and used to recognize the emotional state. In order to classify and predict emotions, the program uses one of the two implemented algorithms: k nearest neighbors and hidden Markov models, the flowchart of which is described in the paper. The user can run the program with each of these algorithms. In order to speed up the system, some data are saved in the SQLite database. The program was tested and the results of the correctness of emotion recognition on each of these algorithms were presented in the work.
 
 The introduction describes the genesis of the project and the purpose and scope of the engineering thesis. The next chapter presents already existing solutions and the state of knowledge how the problem considered in the thesis and compares the project with existing solutions. The next part describes the general process of operating the system to recognize emotions from the voice. There are also relevant definitions, a description of the operation and justification for choosing the sound characteristics used to recognize the emotional state. The next two chapters describe the algorithms: k nearest neighbors and hidden Markov models and describe how they were implemented for the problem of recognizing emotions from the voice. The next part presents the results of tests of both algorithms on the German emotional speech database. The conclusions of the tests and examples of possibilities to extend the project can be found in the last chapter of the work, together with its summary.}
 
@@ -141,9 +141,10 @@ Natężenie dźwięku jest miarą energii fali dźwiękowej i zależy od jej amp
 Jak już zostało wspomniane, w projekcie w celu rozpoznawania emocji z głosu, zdecydowano się użyć cech związanych z wysokością głosu oraz natężeniem. Poniżej znajdują się wykresy 4 szukanych emocji.
 
 \begin{figure}[!ht]
+\caption{Przykładowy rozkład zmian wartości tonu podstawowego oraz natężenia w czasie}
 \hspace*{-2cm}  
-	\caption{Przykładowy rozkład zmian wartości tonu podstawowego oraz natężenia w czasie}
 	\includegraphics[scale=0.3]{b01.png}
+\label{wyk_emo}
 \end{figure}
 	
 W pierwszym wierszu dla każdej emocji widzimy rozkład tonu podstawowego w czasie, natomiast w drugim wierszu rozkład natężenia. Możemy z niego wywnioskować podstawowe zależności pomiędzy poszczególnymi emocjami. Na przykład: wysoki ton głosu i wysoka energia są charakterystyczne  przy okazywaniu złości, natomiast również wysoki ton i troszkę niższa energia są charakterystyczne dla szczęścia. Smutek cechuje się bardzo niskim tonem głosu i dużą dynamiką energii, natomiast znudzenie trochę wyższym tonem głosu niż smutek, ale niższym niż dwie pozostałe emocje oraz trochę stabilniejszym poziomem energii. 
@@ -308,8 +309,32 @@ System rozpoznający emocje z głosu bazujący na ukrytych modelach Markowa zost
 
 Widać z niej, że algorytm bazujący na Ukrytych Modelach Markowa wykrył poprawnie 62,41\% emocji. Podobnie jak KNN bardzo dobrze rozpoznaje emocje takie smutek czy złość. Natomiast gorzej radzi sobie z emocjami takimi jak szczęście i znudzenie, myląc je odpowiednio z złością i smutkiem.
 
-\chapter{Wnioski i podsumowanie}
+Oba wyniki mają podobne cechy. Mylą szczęście ze złością oraz znudzenie ze smutkiem. Jak przyjrzymy się jeszcze raz wykresom z rysunku \ref{wyk_emo}, możemy zauważyć podobieństwo wysokości i natężenia głosu w tych emocjach. Jak widzimy na przykładzie szczęścia i złości, szczęście ma niewiele mniejsze parametry co złość. Podobnie z pozostałymi dwoma emocjami. W celu dokładniejszego porównania podobieństwa cech tych emocji obliczono średnią wartość tych cech z wszystkich wypowiedzi ze zbioru trenującego. Poniższa tabela prezentuje uzyskane wyniki:
 
+\begin{table}[!htbp]
+\caption{Tabela przedstawiająca średnią wartość cech dla każdej z emocji}
+  \begin{tabular}{|l|c|c|c|c|}
+    \hline
+    cecha/emocja & złość & szczęście & smutek & znudzenie \\ \hline
+    Ranga tonu głosu & 1984.25 & 1869.97 & 1172.018 & 1169.39 \\ \hline
+    Maksymalny ton & 2180.92 & 2052.31 & 1238.78 & 1274.70\\ \hline
+    Minimalny ton & 196.67 & 182.34 & 66.77 & 105.31 \\ \hline
+    Średnia wartość tonu & 879.42 & 801.53 & 439.23 & 487.50\\ \hline
+	Procent tonów opadających & 46.54 & 45.24 & 32.95 & 36.35 \\ \hline
+	Procent tonów wzrastających & 44.13 & 42.20 & 31.98 & 35.16 \\ \hline
+	Std odchylenie tonu podstawowego & 80.16 & 80.56 & 80.09 & 74.31 \\ \hline
+	Std odchylenie natężenia & 40.84 & 36.51 & 29.27 & 29.35 \\ \hline
+	Gęstość przejść przez zero & 2.04 & 1.48 & 0.76 & 0.76 \\ \hline
+	Średnia kwadratowa natężenia & 29.43 & 29.69 & 30.04 & 31.29 \\ \hline
+	Największa wartość natężenia & 15.08 & 14.22 & 12.25 & 12.71 \\ \hline
+  \end{tabular}
+\end{table}
+
+Jak widać z powyższej tabeli średnie wartości cech w emocjach, które algorytmy mylą są bardzo podobne. Przez to szczęście często mylone jest ze złością, która cechuje się niewiele większymi parametrami i nachodzi na tę emocję. Podobnie jest w przypadku znudzenia i smutku. 
+
+Jednak widzimy, że algorytmy całkiem dobrze poradziły sobie z zadaniem. Cechy, które w projekcie użyto nie wystarczą do dokładnego rozpoznawania emocji z głosu, ale nadają sie do rozpoznawania podstawowych emocji, zmian stanu z pobudzonego na spokojny i wiele innych. Wynik działania algorytmu można poprawić dodajac dodatkowe cechy na przykład na związane z: jakością głosu (prędkość mówienia, płynność) lub cechy spektralne MFCC, LFPC. 
+
+\chapter{Wnioski i podsumowanie}
 Algorytm k najbliższych sąsiadów poradził sobie lepiej z tym problemem. Jednakże różnica jest niewielka. Poprawność wyników, jakie zwróciły oba algorytmy, wynosi ponad 60\%. Jednak algorytm KNN jest prostszy do zaimplementowania oraz czas działania tego algorytmu jest szybszy. Także biorąc pod uwagę również te cechy, spisuje się o wiele lepiej.
 
 Warto jednak zwrócić uwagę, że istnieje dużo różnych możliwości implementacji ukrytych modeli Markowa, oraz sposobów trenowania go. W projekcie zdecydowano się użyć modelu liniowego oraz do trenowania, algorytmu Bauma-Welcha. Inny model może zwrócić zupełnie inne wyniki.

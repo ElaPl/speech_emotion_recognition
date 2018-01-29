@@ -4,7 +4,7 @@ import sys
 from hmm_main import hmm_main
 from knn_main import knn_main
 import knn_database as knn_db
-from FeatureImportance import feature_importance
+from FeatureImportance import feature_importance, avg_features_val
 from histogram import show_subplot_histogram
 
 emotions = ["anger", "boredom", "happiness", "sadness"]
@@ -14,6 +14,11 @@ if __name__ == "__main__":
 
     if len(sys.argv) == 3:
         db_name = sys.argv[2]
+
+    if len(sys.argv) < 2:
+        print("Podaj komendę. Dozwolone komendy:\n KNN - k nearest neighbour, HMM - hidden markov model, "
+              "AS - frequency and energy historgra, FI - feature importance")
+        exit(0)
 
     if sys.argv[1] == 'KNN':
         knn_main('Berlin_EmoDatabase/train/*/*/*.wav', 'Berlin_EmoDatabase/test/*/*/*.wav', db_name,
@@ -25,6 +30,9 @@ if __name__ == "__main__":
         feature_importance('Berlin_EmoDatabase/train/*/*/*.wav', emotions)
     elif sys.argv[1] == 'AS':
         show_subplot_histogram(sys.argv[2:])
+    elif sys.argv[1] == 'tmp':
+        avg_features_val('Berlin_EmoDatabase/train/*/*/*.wav', emotions)
+
     else:
         print("Nieznana komenda. Dozwolone komendy:\n KNN - k nearest neighbour, HMM - hidden markov model, "
               "AS - frequency and energy historgra, FI - feature importance")
