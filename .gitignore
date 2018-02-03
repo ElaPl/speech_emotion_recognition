@@ -16,3 +16,7 @@ praca_pisemna/speech_emotion_recogniotion.out
 praca_pisemna/speech_emotion_recogniotion.toc
 praca_pisemna/speech_emotion_recogniotion.lot
 praca_pisemna/speech_emotion_recogniotion.lof
+praca_pisemna/*.bbl
+praca_pisemna/*.bcf
+praca_pisemna/*.blg
+praca_pisemna/*.run.xml
