@@ -5,7 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="pl">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>knn_database module &#8212; Rozpoznawanie emocji z głosu  - dokumentacja</title>
+    <title>database_module module &#8212; Rozpoznawanie emocji z głosu  - dokumentacja</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -24,8 +24,8 @@
     <script type="text/javascript" src="_static/translations.js"></script>
     <link rel="index" title="Indeks" href="genindex.html" />
     <link rel="search" title="Szukaj" href="search.html" />
-    <link rel="next" title="knn_main module" href="knn_main.html" />
-    <link rel="prev" title="hmm_main module" href="hmm_main.html" />
+    <link rel="next" title="hanning_window module" href="hanning_window.html" />
+    <link rel="prev" title="KNN module" href="KNN.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -41,11 +41,11 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-knn_database">
-<span id="knn-database-module"></span><h1>knn_database module<a class="headerlink" href="#module-knn_database" title="Stały odnośnik do tego nagłówka">¶</a></h1>
+  <div class="section" id="module-database_module">
+<span id="database-module-module"></span><h1>database_module module<a class="headerlink" href="#module-database_module" title="Stały odnośnik do tego nagłówka">¶</a></h1>
 <dl class="function">
-<dt id="knn_database.connect_to_database">
-<code class="descclassname">knn_database.</code><code class="descname">connect_to_database</code><span class="sig-paren">(</span><em>db_name</em><span class="sig-paren">)</span><a class="headerlink" href="#knn_database.connect_to_database" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dt id="database_module.connect_to_database">
+<code class="descclassname">database_module.</code><code class="descname">connect_to_database</code><span class="sig-paren">(</span><em>db_name</em><span class="sig-paren">)</span><a class="headerlink" href="#database_module.connect_to_database" title="Stały odnośnik do tej definicji">¶</a></dt>
 <dd><p>Funckja łączy się z bazą danych jako root</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -73,8 +73,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="knn_database.is_training_set_exists">
-<code class="descclassname">knn_database.</code><code class="descname">is_training_set_exists</code><span class="sig-paren">(</span><em>cursor</em>, <em>table</em><span class="sig-paren">)</span><a class="headerlink" href="#knn_database.is_training_set_exists" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dt id="database_module.is_training_set_exists">
+<code class="descclassname">database_module.</code><code class="descname">is_training_set_exists</code><span class="sig-paren">(</span><em>cursor</em>, <em>table</em><span class="sig-paren">)</span><a class="headerlink" href="#database_module.is_training_set_exists" title="Stały odnośnik do tej definicji">¶</a></dt>
 <dd><p>Funkcja sprawdza, czy wszystkie tablice podane w table istnieją.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -95,8 +95,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="knn_database.prepare_db_table">
-<code class="descclassname">knn_database.</code><code class="descname">prepare_db_table</code><span class="sig-paren">(</span><em>db</em>, <em>cursor</em>, <em>table_names</em><span class="sig-paren">)</span><a class="headerlink" href="#knn_database.prepare_db_table" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dt id="database_module.prepare_db_table">
+<code class="descclassname">database_module.</code><code class="descname">prepare_db_table</code><span class="sig-paren">(</span><em>db</em>, <em>cursor</em>, <em>table_names</em><span class="sig-paren">)</span><a class="headerlink" href="#database_module.prepare_db_table" title="Stały odnośnik do tej definicji">¶</a></dt>
 <dd><p>Tworzy w bazie danych tablice o podanych nazwach</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -114,8 +114,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="knn_database.save_in_dbtable">
-<code class="descclassname">knn_database.</code><code class="descname">save_in_dbtable</code><span class="sig-paren">(</span><em>db</em>, <em>cursor</em>, <em>vect</em>, <em>tbname</em><span class="sig-paren">)</span><a class="headerlink" href="#knn_database.save_in_dbtable" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dt id="database_module.save_in_dbtable">
+<code class="descclassname">database_module.</code><code class="descname">save_in_dbtable</code><span class="sig-paren">(</span><em>db</em>, <em>cursor</em>, <em>vect</em>, <em>tbname</em><span class="sig-paren">)</span><a class="headerlink" href="#database_module.save_in_dbtable" title="Stały odnośnik do tej definicji">¶</a></dt>
 <dd><p>Funkcja zapisuje w bazie danych w tablicy tbname, wartości z wektora vect</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -134,8 +134,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="knn_database.select_all_from_db">
-<code class="descclassname">knn_database.</code><code class="descname">select_all_from_db</code><span class="sig-paren">(</span><em>cursor</em>, <em>table_name</em><span class="sig-paren">)</span><a class="headerlink" href="#knn_database.select_all_from_db" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dt id="database_module.select_all_from_db">
+<code class="descclassname">database_module.</code><code class="descname">select_all_from_db</code><span class="sig-paren">(</span><em>cursor</em>, <em>table_name</em><span class="sig-paren">)</span><a class="headerlink" href="#database_module.select_all_from_db" title="Stały odnośnik do tej definicji">¶</a></dt>
 <dd><p>Funckja pobiera z bazy danych z tablicy table_name wszystkie wartości i zwraca w postaci listy wektorów.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -163,8 +163,8 @@
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
   <li><a href="modules.html">speech_emotion_recognition</a><ul>
-      <li>Previous: <a href="hmm_main.html" title="poprzedni rozdział">hmm_main module</a></li>
-      <li>Next: <a href="knn_main.html" title="następny rozdział">knn_main module</a></li>
+      <li>Previous: <a href="KNN.html" title="poprzedni rozdział">KNN module</a></li>
+      <li>Next: <a href="hanning_window.html" title="następny rozdział">hanning_window module</a></li>
   </ul></li>
   </ul></li>
 </ul>
@@ -191,7 +191,7 @@
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
-      <a href="_sources/knn_database.rst.txt"
+      <a href="_sources/database_module.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

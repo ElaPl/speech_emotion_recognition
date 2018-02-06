@@ -3,7 +3,7 @@
 import sys
 from hmm_main import hmm_main
 from knn_main import knn_main
-import knn_database as knn_db
+import database_module as knn_db
 from FeatureImportance import feature_importance
 from histogram import show_subplot_histogram
 

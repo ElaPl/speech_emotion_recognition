@@ -2,8 +2,8 @@ from helper_file import create_summary_table, build_file_set, print_progress_bar
     get_most_frequently_occurring, euclidean_distance, print_summary
 
 from HMM import HMM
-import knn_database as knn_db
-from knn_database import connect_to_database
+import database_module as knn_db
+from database_module import connect_to_database
 from voice_module import get_feature_vectors
 from sklearn.cluster import KMeans
 from helper_file import normalize_vector

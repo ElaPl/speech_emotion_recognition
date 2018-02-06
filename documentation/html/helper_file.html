@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="pl">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>helper_file module &#8212; Speech emotion recognition 1.0 - dokumentacja</title>
+    <title>helper_file module &#8212; Rozpoznawanie emocji z głosu  - dokumentacja</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/translations.js"></script>
     <link rel="index" title="Indeks" href="genindex.html" />
     <link rel="search" title="Szukaj" href="search.html" />
-    <link rel="next" title="hmm_main module" href="hmm_main.html" />
+    <link rel="next" title="histogram module" href="histogram.html" />
     <link rel="prev" title="hanning_window module" href="hanning_window.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -63,77 +63,134 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="helper_file.connect_to_database">
-<code class="descclassname">helper_file.</code><code class="descname">connect_to_database</code><span class="sig-paren">(</span><em>db_name</em>, <em>db_password</em><span class="sig-paren">)</span><a class="headerlink" href="#helper_file.connect_to_database" title="Stały odnośnik do tej definicji">¶</a></dt>
-<dd><p>Funckja łączy się z bazą danych jako root
-:param db_name nazwa bazy danych
-:type str
-:param db_password hasło do bazy danych
-:type str
-:return</p>
-<blockquote>
-<div><ul class="simple">
-<li>db, cursor - jeżeli połączenie zostało nawiązane</li>
-<li>None, None - w przeciwnym przypadku</li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-<dl class="function">
 <dt id="helper_file.create_summary_table">
-<code class="descclassname">helper_file.</code><code class="descname">create_summary_table</code><span class="sig-paren">(</span><em>emotions_list</em><span class="sig-paren">)</span><a class="headerlink" href="#helper_file.create_summary_table" title="Stały odnośnik do tej definicji">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">helper_file.</code><code class="descname">create_summary_table</code><span class="sig-paren">(</span><em>emotions</em><span class="sig-paren">)</span><a class="headerlink" href="#helper_file.create_summary_table" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dd><p>Funkcja tworzy tablicę podsumowującą i zeruje jej elementy</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><strong>emotions</strong> (<em>list</em>) – lista emocji, w summary table</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body">dictionary</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="helper_file.euclidean_distance">
 <code class="descclassname">helper_file.</code><code class="descname">euclidean_distance</code><span class="sig-paren">(</span><em>vec1</em>, <em>vec2</em><span class="sig-paren">)</span><a class="headerlink" href="#helper_file.euclidean_distance" title="Stały odnośnik do tej definicji">¶</a></dt>
-<dd><p>Funckja oblicza dystans euklidesowy pomiędzy wektorami
-:param vec1: wektor cech
-:param vec2: wektor cech
-:return: Dystans pomiedzy dwoma wektorami</p>
+<dd><p>Funckja oblicza dystans euklidesowy pomiędzy wektorami</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><ul class="first simple">
+<li><strong>vec1</strong> – wektor cech</li>
+<li><strong>vec2</strong> – wektor cech</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body"><p class="first last">Dystans pomiedzy dwoma wektorami</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="helper_file.get_most_frequently_occurring">
 <code class="descclassname">helper_file.</code><code class="descname">get_most_frequently_occurring</code><span class="sig-paren">(</span><em>emotions_set</em><span class="sig-paren">)</span><a class="headerlink" href="#helper_file.get_most_frequently_occurring" title="Stały odnośnik do tej definicji">¶</a></dt>
-<dd><p>Zwraca najczęściej występujacy element w liście
-:param emotions_set: lista elementów
-:type emotions_set: list
-:return element który występuje najczęściej</p>
+<dd><p>Zwraca najczęściej występujacy element w liście</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><strong>emotions_set</strong> (<em>list</em>) – lista elementów</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body">element który występuje najczęściej</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="helper_file.normalize">
+<code class="descclassname">helper_file.</code><code class="descname">normalize</code><span class="sig-paren">(</span><em>feature_vector_set</em><span class="sig-paren">)</span><a class="headerlink" href="#helper_file.normalize" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dd><p>Normalizuje listę wektórów postaci [data, target],
+nie naruszając ich kolejności</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Param:</th><td class="field-body">feature_vector_set: Zbiór wektorów cech do znormalizowania</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body"><ul class="simple">
+<li>wektor najmniejszych wartości z każdej cechy</li>
+<li>wektor największych wartości z każdej cechy</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="helper_file.normalize_vector">
 <code class="descclassname">helper_file.</code><code class="descname">normalize_vector</code><span class="sig-paren">(</span><em>feature_vector</em>, <em>min_features</em>, <em>max_features</em><span class="sig-paren">)</span><a class="headerlink" href="#helper_file.normalize_vector" title="Stały odnośnik do tej definicji">¶</a></dt>
-<dd><p>Normalizuje wektor testowy wartościami podanymi jako argumenty
-:param feature_vector: wektor cech do znormalizowania
-:param min_features: wektor najmniejszych wartości z każdej cechy, którymi należy znormalizować podany wektor
-:param max_features: wektor największych wartości z każdej cechy, którymi należy znormalizować podany wektor</p>
+<dd><p>Normalizuje wektor testowy wartościami podanymi jako argumenty</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><ul class="first last simple">
+<li><strong>feature_vector</strong> – wektor cech do znormalizowania</li>
+<li><strong>min_features</strong> – wektor najmniejszych wartości z każdej cechy, którymi należy znormalizować podany wektor</li>
+<li><strong>max_features</strong> – wektor największych wartości z każdej cechy, którymi należy znormalizować podany wektor</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
-
-<dl class="function">
-<dt id="helper_file.print_debug">
-<code class="descclassname">helper_file.</code><code class="descname">print_debug</code><span class="sig-paren">(</span><em>text</em><span class="sig-paren">)</span><a class="headerlink" href="#helper_file.print_debug" title="Stały odnośnik do tej definicji">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="function">
 <dt id="helper_file.print_progress_bar">
 <code class="descclassname">helper_file.</code><code class="descname">print_progress_bar</code><span class="sig-paren">(</span><em>iteration</em>, <em>total</em>, <em>prefix=''</em>, <em>suffix=''</em>, <em>decimals=1</em>, <em>length=100</em>, <em>fill='█'</em><span class="sig-paren">)</span><a class="headerlink" href="#helper_file.print_progress_bar" title="Stały odnośnik do tej definicji">¶</a></dt>
-<dd><p>FUnckja rysuje pasek postępu
-:param iteration: Obecna iteracja
-:type iteration: int
-:param total: Liczba wszystkich operacji
-:type total: int
-:param prefix: Tekst na początku paska postępu
-:type prefix: str
-:param suffix: Tekst na końcu paska postępu
-:type suffix: str</p>
+<dd><p>Funckja rysuje pasek postępu</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><ul class="first last simple">
+<li><strong>iteration</strong> (<em>int</em>) – Obecna iteracja</li>
+<li><strong>total</strong> (<em>int</em>) – Liczba wszystkich operacji</li>
+<li><strong>prefix</strong> (<em>str</em>) – Tekst na początku paska postępu</li>
+<li><strong>suffix</strong> (<em>str</em>) – Tekst na końcu paska postępu</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="helper_file.print_summary">
-<code class="descclassname">helper_file.</code><code class="descname">print_summary</code><span class="sig-paren">(</span><em>summary_table</em>, <em>emotions_list</em><span class="sig-paren">)</span><a class="headerlink" href="#helper_file.print_summary" title="Stały odnośnik do tej definicji">¶</a></dt>
-<dd><p>function illustrating how to document python source code</p>
+<code class="descclassname">helper_file.</code><code class="descname">print_summary</code><span class="sig-paren">(</span><em>summary_table</em>, <em>emotions</em><span class="sig-paren">)</span><a class="headerlink" href="#helper_file.print_summary" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dd><p>Funkacja wypisuje summary table dla emocji z listy</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><ul class="first last simple">
+<li><strong>summary_table</strong> (<em>dictionary</em>) – Tablica podsumowujaca wyniki</li>
+<li><strong>emotion</strong> (<em>list</em>) – tablica emocji, z summary table, które mają byc wypisane</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -149,7 +206,7 @@
   <li><a href="index.html">Documentation overview</a><ul>
   <li><a href="modules.html">speech_emotion_recognition</a><ul>
       <li>Previous: <a href="hanning_window.html" title="poprzedni rozdział">hanning_window module</a></li>
-      <li>Next: <a href="hmm_main.html" title="następny rozdział">hmm_main module</a></li>
+      <li>Next: <a href="histogram.html" title="następny rozdział">histogram module</a></li>
   </ul></li>
   </ul></li>
 </ul>

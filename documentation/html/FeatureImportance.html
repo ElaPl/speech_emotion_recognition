@@ -5,7 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="pl">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>hanning_window module &#8212; Rozpoznawanie emocji z głosu  - dokumentacja</title>
+    <title>FeatureImportance module &#8212; Rozpoznawanie emocji z głosu  - dokumentacja</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -24,8 +24,8 @@
     <script type="text/javascript" src="_static/translations.js"></script>
     <link rel="index" title="Indeks" href="genindex.html" />
     <link rel="search" title="Szukaj" href="search.html" />
-    <link rel="next" title="helper_file module" href="helper_file.html" />
-    <link rel="prev" title="KNN module" href="KNN.html" />
+    <link rel="next" title="HMM module" href="HMM.html" />
+    <link rel="prev" title="speech_emotion_recognition" href="modules.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -41,29 +41,27 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-hanning_window">
-<span id="hanning-window-module"></span><h1>hanning_window module<a class="headerlink" href="#module-hanning_window" title="Stały odnośnik do tego nagłówka">¶</a></h1>
-<dl class="class">
-<dt id="hanning_window.HanningWindow">
-<em class="property">class </em><code class="descclassname">hanning_window.</code><code class="descname">HanningWindow</code><span class="sig-paren">(</span><em>size</em><span class="sig-paren">)</span><a class="headerlink" href="#hanning_window.HanningWindow" title="Stały odnośnik do tej definicji">¶</a></dt>
-<dd><p>Klasy bazowe: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>Klasa reprezentuje funckję Hanninga o konkrentej wartości</p>
-<dl class="method">
-<dt id="hanning_window.HanningWindow.plot">
-<code class="descname">plot</code><span class="sig-paren">(</span><em>signal</em><span class="sig-paren">)</span><a class="headerlink" href="#hanning_window.HanningWindow.plot" title="Stały odnośnik do tej definicji">¶</a></dt>
-<dd><p>Funkcja przemnaża podany jako argument sygnał przez okno Hanninga</p>
+  <div class="section" id="module-FeatureImportance">
+<span id="featureimportance-module"></span><h1>FeatureImportance module<a class="headerlink" href="#module-FeatureImportance" title="Stały odnośnik do tego nagłówka">¶</a></h1>
+<dl class="function">
+<dt id="FeatureImportance.feature_importance">
+<code class="descclassname">FeatureImportance.</code><code class="descname">feature_importance</code><span class="sig-paren">(</span><em>path_pattern</em>, <em>emotions</em><span class="sig-paren">)</span><a class="headerlink" href="#FeatureImportance.feature_importance" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dd><p>Funkcja tworzy wektor cech z plików podanych w path_pattern i wypisuje ważność każdej z cechy</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><strong>signal</strong> – Fragment sygnału dźwiękowego</td>
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><ul class="first simple">
+<li><strong>path_pattern</strong> – Ścieżka do plików, z których mają być obliczone wektory cech</li>
+<li><strong>emotions</strong> – Lista emocji które mają być uwzględnione</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body">sygnał będący wynikiem przemnożenia podanego sygnału przez okno Hanninga</td>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body"><p class="first last">None</p>
+</td>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
 </dd></dl>
 
 </div>
@@ -78,8 +76,8 @@
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
   <li><a href="modules.html">speech_emotion_recognition</a><ul>
-      <li>Previous: <a href="KNN.html" title="poprzedni rozdział">KNN module</a></li>
-      <li>Next: <a href="helper_file.html" title="następny rozdział">helper_file module</a></li>
+      <li>Previous: <a href="modules.html" title="poprzedni rozdział">speech_emotion_recognition</a></li>
+      <li>Next: <a href="HMM.html" title="następny rozdział">HMM module</a></li>
   </ul></li>
   </ul></li>
 </ul>
@@ -106,7 +104,7 @@
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
-      <a href="_sources/hanning_window.rst.txt"
+      <a href="_sources/FeatureImportance.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

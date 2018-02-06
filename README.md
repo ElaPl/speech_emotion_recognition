@@ -8,28 +8,24 @@ Wymagania:
 Polecane:
 * virtualenv
 
-W celu pobrania wszystkich zależności należy włączyć i wpisać komendę (najlepiej w środowisku wirtualnym)
+W celu pobrania wszystkich zależności należy wpisać komendę:
 * pip3 install -r requirements.txt
 
 Aby rozpocząć testowanie używając algorytmu KNN należy wpisać jedną z poniższych komand:
 ```
 $ python main.py KNN
-$ python main.py KNN "name of database" (Aby zapisać cześć informacji w bazie danych i przyspieszyć działanie programu)
+$ python main.py KNN "name of database"
 
 Aby rozpocząć testowanie używając algorytmu HMM należy wpisać jedną z poniższych komand:
 
 $ python main.py HMM
-$ python main.py HMM "name of database" (Aby zapisać cześć informacji w bazie danych i przyspieszyć działanie programu)
-
-Aby rozpocząć testowanie używając modelu Markova należy wpisać jedną z poniższych komand:
-$ python main.py MM
-$ python main.py MM "name of database" (Aby zapisać cześć informacji w bazie danych i przyspieszyć działanie programu)
+$ python main.py HMM "name of database"
 
 Aby zobaczyć jakie cechy są używanie do rozpoznawania emocji oraz porównać ich przydatność należy wpisać:
 $ python main.py FI
 
 Aby porównać zmiany częstotliwośći i energii w różnych plikach należy wpisać
-$ python main.py AS ścieżki do plików
+$ python main.py AS "ścieżki do plików"
 
 ```
 
@@ -45,7 +41,7 @@ tested emotion: sadness	 , anger: 0	 , boredom: 1	,  happiness: 0	, sadness: 0	,
 ```
 
 * tested emotion - testowana emocja
-* trained - liczba plików które zostały użyte do wytrenowania tested emotion
+* trained - liczba plików które zostały użyte do wytrenowania danej emocji
 * tested - liczba testów tej emocji
 * guessed - ile testów przeszło poprawnie (algorytm poprawnie obliczył jaką emocję ten plik reprezentuje)
 * kolumny z emocjami - jakie emocje wyliczył algorytm dla każdego z testowanych plików (na przykład:
@@ -54,5 +50,5 @@ w wierszu 1, "happiness: 4" oznacza, że algorytm dla 4 plików reprezentującyc
 Dokumentacja:
 
 Do projektu została stworzona dokumentacje w postacji html i pdf.
-Aby otworzyć dokumentację w postaci html, należy w dowolnej przeglądarce otworzyć plik documentation/index.html
-Dokumentacja w postaci pdf znajduje się w katalogu documentation/pdf/Speechemotionrecognition.pdf
+Aby otworzyć dokumentację w postaci html, należy w dowolnej przeglądarce otworzyć plik documentation/html/index.html
+Dokumentacja w postaci pdf znajduje się w katalogu documentation/pdf/Rozpoznawanieemocjizgosu.pdf

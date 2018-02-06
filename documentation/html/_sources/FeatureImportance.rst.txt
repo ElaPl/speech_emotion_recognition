@@ -1,0 +1,7 @@
+FeatureImportance module
+========================
+
+.. automodule:: FeatureImportance
+    :members:
+    :undoc-members:
+    :show-inheritance:

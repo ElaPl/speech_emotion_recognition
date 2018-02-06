@@ -4,12 +4,14 @@ speech_emotion_recognition
 .. toctree::
    :maxdepth: 4
 
+   FeatureImportance
    HMM
    KNN
+   database_module
    hanning_window
    helper_file
+   histogram
    hmm_main
-   knn_database
    knn_main
    main
    voice_module

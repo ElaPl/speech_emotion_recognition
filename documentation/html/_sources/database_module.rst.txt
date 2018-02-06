@@ -1,0 +1,7 @@
+database\_module module
+=======================
+
+.. automodule:: database_module
+    :members:
+    :undoc-members:
+    :show-inheritance:

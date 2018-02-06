@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="pl">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>HMM module &#8212; Speech emotion recognition 1.0 - dokumentacja</title>
+    <title>HMM module &#8212; Rozpoznawanie emocji z głosu  - dokumentacja</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -25,7 +25,7 @@
     <link rel="index" title="Indeks" href="genindex.html" />
     <link rel="search" title="Szukaj" href="search.html" />
     <link rel="next" title="KNN module" href="KNN.html" />
-    <link rel="prev" title="speech_emotion_recognition" href="modules.html" />
+    <link rel="prev" title="FeatureImportance module" href="FeatureImportance.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -47,7 +47,7 @@
 <dt id="HMM.HMM">
 <em class="property">class </em><code class="descclassname">HMM.</code><code class="descname">HMM</code><span class="sig-paren">(</span><em>transition_ppb</em>, <em>states_num</em>, <em>observations</em><span class="sig-paren">)</span><a class="headerlink" href="#HMM.HMM" title="Stały odnośnik do tej definicji">¶</a></dt>
 <dd><p>Klasy bazowe: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>Klasa implementująca algorytm Ukryte Modle Markova dla problemu rozpoznawania emocji z głosu.</p>
+<p>Klasa implementująca algorytm Ukryte Modele Markowa dla problemu rozpoznawania emocji z głosu.</p>
 <p>Dany jest zbiór uczący zawieracjący obserwację (wektory cech), z któżych każda ma przypisaną emocję jaką dany wektor</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -69,43 +69,6 @@ z ukrytych stanów.</li>
 </tbody>
 </table>
 <dl class="method">
-<dt id="HMM.HMM.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>transition_ppb</em>, <em>states_num</em>, <em>observations</em><span class="sig-paren">)</span><a class="headerlink" href="#HMM.HMM.__init__" title="Stały odnośnik do tej definicji">¶</a></dt>
-<dd><p>Konstruktor klasy HMM.</p>
-<p>Tworzy tablicę przejść pomiędzy stanami, transition_ppb.
-Dla dowolnych 2 stanów s_i i s_j, prawdopodobnieństwo przejścia z stanu s_i do stanu s_j: p(s_i, s_j) jest równe:</p>
-<blockquote>
-<div><ul class="simple">
-<li>transition_ppb[i][0] jeżeli i == j</li>
-<li>transition_ppb[i][1] jeżeli i == j-1</li>
-<li>0 w przeciwnym przypadku</li>
-</ul>
-</div></blockquote>
-<p>Tworzy tablicę emisji: emission_ppb. Na początku dla każdego stanu S i każdej obserwacji O prawdopodobieństwo
-przejścia emisji O w stanie S jest równe.</p>
-<p>Tworzy tablicę: initial_ppb. Na początku dla każdego stanu S prawdopodobieństwo przejścia ze stanu początkowego
-do stanu S jest równe.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><ul class="first last simple">
-<li><strong>transition_ppb</strong> (<em>matrix</em><em>[</em><em>states_num</em><em>]</em><em>[</em><em>2</em><em>]</em>) – <p>macierz prawdopodobieństw przejść pomiędzy stanami.</p>
-<ul>
-<li>matrix[i][0] - zawiera pradopodobieńśwo przejśćia z stanu i do stanu i,</li>
-<li>matrix[i][1] - zawiera pradopodobieńśwo przejśćia z stanu i do stanu (i+1)</li>
-</ul>
-</li>
-<li><strong>states_num</strong> (<em>int</em>) – liczba ukrytych stanow</li>
-<li><strong>observations</strong> (<em>list</em>) – lista wszystkich możliwych obserwacji</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="HMM.HMM.backward_algorithm">
 <code class="descname">backward_algorithm</code><span class="sig-paren">(</span><em>ob_sequence</em><span class="sig-paren">)</span><a class="headerlink" href="#HMM.HMM.backward_algorithm" title="Stały odnośnik do tej definicji">¶</a></dt>
 <dd><p>Implementacja algorytmu sufiksowego (backward algorithm)</p>
@@ -115,11 +78,11 @@ do stanu S jest równe.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><strong>ob_sequence</strong> (<em>list</em>) – sekwencja obserwacji</td>
 </tr>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body">matrix[hidden_states_num][len(observation_seq)], matrix[i][t]<p>Opis algorytmu:</p>
+</td>
+</tr>
 </tbody>
 </table>
-<p>:return matrix[hidden_states_num][len(observation_seq)], matrix[i][t]</p>
-<blockquote>
-<div>Opis algorytmu:</div></blockquote>
 <p>Dane:
 Y = [y_0, y_1, … , y_n] - observation_seq
 X = [x_1, x_1, … , x_k] - ukryte stany markowa</p>
@@ -166,8 +129,7 @@ danym stanie</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name" colspan="2">Return matrix[state_num][observation_num]:</th></tr>
-<tr class="field-odd field"><td>&#160;</td><td class="field-body">macierz emisji prawdopodobieństw obserwacji</td>
+<tr class="field-odd field"><th class="field-name">Zwraca:</th><td class="field-body">matrix[state_num][observation_num] - macierz emisji prawdopodobieństw obserwacji</td>
 </tr>
 </tbody>
 </table>
@@ -177,7 +139,16 @@ danym stanie</p>
 <dt id="HMM.HMM.create_initial_ppb">
 <code class="descname">create_initial_ppb</code><span class="sig-paren">(</span><em>states_num</em><span class="sig-paren">)</span><a class="headerlink" href="#HMM.HMM.create_initial_ppb" title="Stały odnośnik do tej definicji">¶</a></dt>
 <dd><p>Funkcja tworzy wektor prawdopodobieństw przejść ze stanu początkowe do każdego z ukrytych stanów</p>
-<p>:return list[states_num]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><strong>states_num</strong> (<em>int</em>) – liczba stanów modelu</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body">list[states_num]</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -191,9 +162,10 @@ numer z przedziału [0, len(observations)-1].</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><strong>observations</strong> (<em>list</em>) – lista obserwacji (wektorów cech)</td>
 </tr>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body">słownik obserwacji</td>
+</tr>
 </tbody>
 </table>
-<p>:return słownik obserwacji</p>
 </dd></dl>
 
 <dl class="method">
@@ -225,7 +197,9 @@ numer z przedziału [0, len(observations)-1].</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Param:</th><td class="field-body">list obs_sequence: lista obserwacji</td>
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><strong>obs_sequence</strong> (<em>list</em>) – lista obserwacji</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body">prawdopodobieństwo wygenerowania podanej sekwencji przez ten model</td>
 </tr>
 </tbody>
 </table>
@@ -241,9 +215,10 @@ numer z przedziału [0, len(observations)-1].</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><strong>observation_seq</strong> (<em>list</em>) – sekwencja obserwacji</td>
 </tr>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body">matrix[hidden_states_num][len(observation_seq)], matrix[i][t]</td>
+</tr>
 </tbody>
 </table>
-<p>:return matrix[hidden_states_num][len(observation_seq)], matrix[i][t]</p>
 <p>Opis algorytmu:
 Dane:
 Y = [y_0, y_1, … , y_n] - observation_seq
@@ -269,16 +244,20 @@ macierz alfa[[hidden_states_num][n]) taka, że:</p>
 <dt id="HMM.HMM.get_parameters">
 <code class="descname">get_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#HMM.HMM.get_parameters" title="Stały odnośnik do tej definicji">¶</a></dt>
 <dd><p>Funkcja zwraca parametry obiektu</p>
-<dl class="docutils">
-<dt>:return</dt>
-<dd><ul class="first last simple">
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Zwraca:</th><td class="field-body"><ul class="simple">
 <li>transiton_ppb</li>
 <li>emission_ppb</li>
 <li>initial_ppb</li>
 <li>observation_dict</li>
 </ul>
-</dd>
-</dl>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -322,7 +301,7 @@ prawdopodobieństw wygenerowania zbioru uczącego w starym modelu i nowym będzi
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
   <li><a href="modules.html">speech_emotion_recognition</a><ul>
-      <li>Previous: <a href="modules.html" title="poprzedni rozdział">speech_emotion_recognition</a></li>
+      <li>Previous: <a href="FeatureImportance.html" title="poprzedni rozdział">FeatureImportance module</a></li>
       <li>Next: <a href="KNN.html" title="następny rozdział">KNN module</a></li>
   </ul></li>
   </ul></li>

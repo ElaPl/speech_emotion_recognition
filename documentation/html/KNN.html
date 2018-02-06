@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="pl">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>KNN module &#8212; Speech emotion recognition 1.0 - dokumentacja</title>
+    <title>KNN module &#8212; Rozpoznawanie emocji z głosu  - dokumentacja</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -68,22 +68,6 @@ Dla każdej obserwacji c_i :</p>
 </div></blockquote>
 <p>Stany które wystąpiły najczęściej w S są zwracane jako możliwe stany reprezentujace dany zbiór obserwacji</p>
 <dl class="method">
-<dt id="KNN.KNN.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>train_set</em><span class="sig-paren">)</span><a class="headerlink" href="#KNN.KNN.__init__" title="Stały odnośnik do tej definicji">¶</a></dt>
-<dd><p>Konstruktor klasy.
-Normalizuje i zapisuje zbiór uczący</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><strong>train_set</strong> (<em>list</em>) – zbiór uczący dany model KNN -&gt; lista wektorów postaci
-[wektor_cech, emocja jaką reprezentuje]</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="KNN.KNN.compute_emotion">
 <code class="descname">compute_emotion</code><span class="sig-paren">(</span><em>obs_sequence</em>, <em>num_of_nearest_neighbour</em><span class="sig-paren">)</span><a class="headerlink" href="#KNN.KNN.compute_emotion" title="Stały odnośnik do tej definicji">¶</a></dt>
 <dd><p>Funkcja dla każdego wektora z zbioru obserwacji, zlicza prawdopodobne stany jakie reprezentują.</p>
@@ -91,16 +75,18 @@ Normalizuje i zapisuje zbiór uczący</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><ul class="first simple">
 <li><strong>obs_sequence</strong> (<em>list</em>) – lista obserwacji (wektorów) reprezentujących wypowiedź, której stan emocjonalny trzeba
 rozpoznać</li>
 <li><strong>num_num_of_nearest_neighbour</strong> (<em>int</em>) – liczba najbliższych sąsiadów.</li>
 </ul>
 </td>
 </tr>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body"><p class="first last">stany najczęściej występujące w podanej sekwencji obserwacji.</p>
+</td>
+</tr>
 </tbody>
 </table>
-<p>:return stany najczęściej występujące w podanej sekwencji obserwacji.</p>
 </dd></dl>
 
 <dl class="method">
@@ -111,31 +97,13 @@ rozpoznać</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><ul class="first simple">
 <li><strong>test_vector</strong> (<em>vector</em>) – wektor, którego stan należy odgadnąć</li>
 <li><strong>num_num_of_nearest_neighbour</strong> (<em>int</em>) – liczba najbliższych sąsiadów, z których należy wziąć stan do porównania.</li>
 </ul>
 </td>
 </tr>
-</tbody>
-</table>
-<p>:return lista stanów których wektory pojawiły sie najczęściej w grupie k najbliższych wektorów.</p>
-</dd></dl>
-
-<dl class="staticmethod">
-<dt id="KNN.KNN.normalize">
-<em class="property">static </em><code class="descname">normalize</code><span class="sig-paren">(</span><em>feature_vector_set</em><span class="sig-paren">)</span><a class="headerlink" href="#KNN.KNN.normalize" title="Stały odnośnik do tej definicji">¶</a></dt>
-<dd><p>Normalizuje zbiór listę wektórów postaci [wektor_cecg, emocja]</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Param:</th><td class="field-body">feature_vector_set: Zbiór wektorów cech do znormalizowania</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body"><ul class="simple">
-<li>wektor najmniejszych wartości z każdej cechy</li>
-<li>wektor największych wartości z każdej cechy</li>
-</ul>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body"><p class="first last">lista stanów których wektory pojawiły sie najczęściej w grupie k najbliższych wektorów.</p>
 </td>
 </tr>
 </tbody>

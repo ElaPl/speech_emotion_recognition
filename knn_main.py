@@ -2,8 +2,8 @@ from helper_file import create_summary_table, print_summary, build_file_set, pri
     get_most_frequently_occurring
 from voice_module import  get_feature_vectors
 from KNN import KNN
-import knn_database as knn_db
-from knn_database import connect_to_database
+import database_module as knn_db
+from database_module import connect_to_database
 
 
 knn_features = {

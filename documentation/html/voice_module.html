@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="pl">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>voice_module module &#8212; Speech emotion recognition 1.0 - dokumentacja</title>
+    <title>voice_module module &#8212; Rozpoznawanie emocji z głosu  - dokumentacja</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -43,48 +43,131 @@
   <div class="section" id="module-voice_module">
 <span id="voice-module-module"></span><h1>voice_module module<a class="headerlink" href="#module-voice_module" title="Stały odnośnik do tego nagłówka">¶</a></h1>
 <dl class="function">
+<dt id="voice_module.compute_rms_db">
+<code class="descclassname">voice_module.</code><code class="descname">compute_rms_db</code><span class="sig-paren">(</span><em>time_domain_signal</em>, <em>window</em><span class="sig-paren">)</span><a class="headerlink" href="#voice_module.compute_rms_db" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dd><p>Funkcja mnoży podany sygnał przez podene okno i oblicza średnią
+wadratową wartości natężenia tego sygnału</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><ul class="first simple">
+<li><strong>time_domain_singal</strong> (<em>list</em>) – sygnał w domenie czasu</li>
+<li><strong>window</strong> – objekt reprezentujący funkcję okna.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body"><p class="first">średnia kwadratowa wartości natężenia</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Typ zwracany:</th><td class="field-body"><p class="first last">double</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="voice_module.get_energy_feature_vector">
 <code class="descclassname">voice_module.</code><code class="descname">get_energy_feature_vector</code><span class="sig-paren">(</span><em>sample</em>, <em>window</em><span class="sig-paren">)</span><a class="headerlink" href="#voice_module.get_energy_feature_vector" title="Stały odnośnik do tej definicji">¶</a></dt>
-<dd><p>Funkcja na podstawie podanej listy amplitude w domenie czasu oblicza wektor cech dla tych danych
-:param vector sample: lista zmian energii w domenie czasu
-:param window: funkcja okna
-:return: lista cech na podstawie wprowadzonych danych</p>
+<dd><p>Funkcja na podstawie podanej listy amplitude w domenie czasu oblicza wektor cech dla tych danych</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><ul class="first simple">
+<li><strong>sample</strong> (<em>vector</em>) – lista zmian energii w domenie czasu</li>
+<li><strong>window</strong> – funkcja okna</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body"><p class="first">lista cech na podstawie wprowadzonych danych</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Typ zwracany:</th><td class="field-body"><p class="first last">list</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="voice_module.get_energy_history">
+<code class="descclassname">voice_module.</code><code class="descname">get_energy_history</code><span class="sig-paren">(</span><em>file</em><span class="sig-paren">)</span><a class="headerlink" href="#voice_module.get_energy_history" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dd><p>Funkcja otwiera plik podany w ścieżce, oraz oblicza rozkłąd wartości nateżęnia w czasie w tym pliku.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><strong>file</strong> (<em>str</em>) – Ścieżka do pliku</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body">lista zawierająca wartości natężenia w czasie w podanym pliku</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Typ zwracany:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="voice_module.get_feature_vectors">
 <code class="descclassname">voice_module.</code><code class="descname">get_feature_vectors</code><span class="sig-paren">(</span><em>file</em><span class="sig-paren">)</span><a class="headerlink" href="#voice_module.get_feature_vectors" title="Stały odnośnik do tej definicji">¶</a></dt>
-<dd><p>Funckja otwiera plik wav i dzieli go na kawałki o długości ~0,25s, biorąc sample co ~0,125s, czyli
-kawałki nachodzą na siebie - w celu zwiększenia liczby obserwacji.
-Dla każdego kawałka wypowiedzi oblicza na podstawie niego wektor cech częstotliwości i energii.</p>
+<dd><p>Funckja otwiera plik .wav a nastepnie co 0,125ms z pliku odczytuje próbkę dźwięku od długości ok 0,25 ms.
+Z każdej próbki oblicza wektor cech częstotliwości i energii, tworząc wektory cech.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><strong>file</strong> (<em>str</em>) – ścieżka do pliku z którego mają być wygenerowane wektory cech</td>
 </tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>:return</dt>
-<dd><ul class="first last simple">
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body"><ul class="simple">
 <li>lista wektorów cech częstotliwości</li>
 <li>lista wektorów cech energii</li>
+<li>lista wektorów cech częstotliwości i energii</li>
 </ul>
-</dd>
-</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Typ zwracany:</th><td class="field-body">dictionary</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="voice_module.get_file_info">
 <code class="descclassname">voice_module.</code><code class="descname">get_file_info</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#voice_module.get_file_info" title="Stały odnośnik do tej definicji">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
+<dd><p>Zwraca informacje o podanym pliku</p>
+<table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) – Ścieżka do pliku</td>
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) – Ścieżka do pliku z rozszerzeniem wav</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body">parametry pliku</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Typ zwracany:</th><td class="field-body">dictionary</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="voice_module.get_freq_history">
+<code class="descclassname">voice_module.</code><code class="descname">get_freq_history</code><span class="sig-paren">(</span><em>file</em><span class="sig-paren">)</span><a class="headerlink" href="#voice_module.get_freq_history" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dd><p>Funckja otwiera plik wav i dzieli go na kawałki o długości ~0,25s i z każdego fragmentu oblicza wartość tonu
+podstawowego</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><strong>file</strong> (<em>str</em>) – ścieżka do pliku z którego mają być wygenerowane wektory cech</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body"><ul class="simple">
+<li>lista zawierająca wartości tonu podstawego w czasie w podanym pliku</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Typ zwracany:</th><td class="field-body">list</td>
 </tr>
 </tbody>
 </table>
@@ -93,7 +176,7 @@ Dla każdego kawałka wypowiedzi oblicza na podstawie niego wektor cech częstot
 <dl class="function">
 <dt id="voice_module.get_fundamental_freq">
 <code class="descclassname">voice_module.</code><code class="descname">get_fundamental_freq</code><span class="sig-paren">(</span><em>freq_domain_vect</em>, <em>sample_rate</em>, <em>sample_length</em><span class="sig-paren">)</span><a class="headerlink" href="#voice_module.get_fundamental_freq" title="Stały odnośnik do tej definicji">¶</a></dt>
-<dd><p>Funkcja oblicza częśtotliwość bazową dla danego funkcji w domenie częsttliwości</p>
+<dd><p>Funkcja dla podanej jako argument funkcji w domenie częstotliwości, oblicza wartość tonu podstawowego</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -105,7 +188,10 @@ Dla każdego kawałka wypowiedzi oblicza na podstawie niego wektor cech częstot
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return float:</th><td class="field-body"><p class="first last">częstotliwość bazowa dla podanej funkcji</p>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body"><p class="first">wartość tonu podstawowego obliczonego z podanej funkcji</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Typ zwracany:</th><td class="field-body"><p class="first last">float</p>
 </td>
 </tr>
 </tbody>
@@ -113,10 +199,10 @@ Dla każdego kawałka wypowiedzi oblicza na podstawie niego wektor cech częstot
 </dd></dl>
 
 <dl class="function">
-<dt id="voice_module.get_pitch_feature_vector">
-<code class="descclassname">voice_module.</code><code class="descname">get_pitch_feature_vector</code><span class="sig-paren">(</span><em>sample</em>, <em>frame_length</em>, <em>window</em>, <em>frame_rate</em><span class="sig-paren">)</span><a class="headerlink" href="#voice_module.get_pitch_feature_vector" title="Stały odnośnik do tej definicji">¶</a></dt>
+<dt id="voice_module.get_fundamental_freq_form_time_domain">
+<code class="descclassname">voice_module.</code><code class="descname">get_fundamental_freq_form_time_domain</code><span class="sig-paren">(</span><em>sample</em>, <em>frame_length</em>, <em>window</em>, <em>frame_rate</em><span class="sig-paren">)</span><a class="headerlink" href="#voice_module.get_fundamental_freq_form_time_domain" title="Stały odnośnik do tej definicji">¶</a></dt>
 <dd><p>Funkcja dla każdej rammki z sample, dłguośći frame_length przygotowuje fft i oblicza z tego częstotliwość bazową.
-Następnie tworzy listę częstotliwości bazowych i oblicza wektor cech na podsawie tych danych.</p>
+Następnie tworzy listę częstotliwości bazowych.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -129,7 +215,10 @@ Następnie tworzy listę częstotliwości bazowych i oblicza wektor cech na pods
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body"><p class="first last">Wektor cech częstliwośći dla podanego zbioru sampli</p>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body"><p class="first">Lista czestotliwości bazowych</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Typ zwracany:</th><td class="field-body"><p class="first last">list</p>
 </td>
 </tr>
 </tbody>
@@ -139,9 +228,19 @@ Następnie tworzy listę częstotliwości bazowych i oblicza wektor cech na pods
 <dl class="function">
 <dt id="voice_module.get_pitch_features">
 <code class="descclassname">voice_module.</code><code class="descname">get_pitch_features</code><span class="sig-paren">(</span><em>fundamental_freq_array</em><span class="sig-paren">)</span><a class="headerlink" href="#voice_module.get_pitch_features" title="Stały odnośnik do tej definicji">¶</a></dt>
-<dd><p>Funkcja na podstawie podanej listy częstotliwość bazowych oblicza wektor cech dla tych danych
-:param vector fundamental_freq_array: wektor częstotliowści bazowych
-:return: lista cech wektora</p>
+<dd><p>Funkcja na podstawie podanej listy wartości tonów podstawowych oblicza wektor cech dla tych danych</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><strong>fundamental_freq_array</strong> (<em>vector</em>) – wektor częstotliowści bazowych</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body">lista cech obliczonych na podstawie podanej jako argument funckji</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Typ zwracany:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -151,9 +250,11 @@ Następnie tworzy listę częstotliwości bazowych i oblicza wektor cech na pods
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) – ścieżka do pliku</td>
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) – Ścieżka do pliku z rozszerzeniem wav</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body">częstotliwość samplowania</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Typ zwracany:</th><td class="field-body">int</td>
 </tr>
 </tbody>
 </table>
@@ -162,23 +263,51 @@ Następnie tworzy listę częstotliwości bazowych i oblicza wektor cech na pods
 <dl class="function">
 <dt id="voice_module.get_summary_pitch_feature_vector">
 <code class="descclassname">voice_module.</code><code class="descname">get_summary_pitch_feature_vector</code><span class="sig-paren">(</span><em>pitch_feature_vectors</em><span class="sig-paren">)</span><a class="headerlink" href="#voice_module.get_summary_pitch_feature_vector" title="Stały odnośnik do tej definicji">¶</a></dt>
-<dd><p>Funkcja na podstawie danych oblicza wektor cech częstotliwośći bazowych
-:param pitch_feature_vectors: lista wektorów cech częstotliowśći bazowych
-:return: wektor cech</p>
+<dd><p>Funkcja na podstawie danych oblicza wektor cech częstotliwośći bazowych</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><strong>pitch_feature_vectors</strong> – lista wektorów cech częstotliowśći bazowych</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body">wektor cech</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Typ zwracany:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="voice_module.read_from_wav_file">
 <code class="descclassname">voice_module.</code><code class="descname">read_from_wav_file</code><span class="sig-paren">(</span><em>wav_file</em>, <em>length</em><span class="sig-paren">)</span><a class="headerlink" href="#voice_module.read_from_wav_file" title="Stały odnośnik do tej definicji">¶</a></dt>
-<dd><p>Funkcja odczytuje określoną ilość próbek pochodzących z jednego chanellu z pliku wav.</p>
-<p>:param wav_file wskaźnik na plik wav
-:param int length: liczba sampli jaką chcemy odczytać</p>
-<p>:return [list] - lista sampli długości length, pochądzących z jednego channella.</p>
-<p>Ponieważ rozmary sampli w pliku .wav mają różną długość należy odczytywać 1 próbkę należy odczytać określoną ilość bitów.
-DO tego służy tablica ftm_size</p>
-<p>Sample w pliku wav są umieszczone następująco: s1_c1, s1_c2, s2_c1, s2_c2, gdzie s1 oznacza sample_1, a c1 channel_1.</p>
-<p>Aby więc odczytać informację o długości n należy odczytać (fmt_size * length * wav_file.getnchannels()) bitów, a
-następnie wziąć co x-ty element x-ty element, gdzie x to liczba channeli.</p>
+<dd><p>Funkcja odczytuje z pliku wav określoną ilość próbek pochodzących z jednego kanału.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parametry:</th><td class="field-body"><ul class="first simple">
+<li><strong>wav_file</strong> – wskaźnik na plik wav</li>
+<li><strong>length</strong> (<em>int</em>) – liczba sampli jaką chcemy odczytać</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Zwraca:</th><td class="field-body"><p class="first">lista sampli długości length, pochodzących z jednego kanału.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Typ zwracany:</th><td class="field-body"><p class="first last">list</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Opis:</p>
+<dl class="docutils">
+<dt>Sample w plikach wav z więcej niż jednym kanałem są ustawione naprzemiennie. Najpierw jest pierszy sampel kanału 1,</dt>
+<dd>następnie pierwszy sampel kanału 2 itd. dopiero później są sample dla kanału 2.</dd>
+</dl>
+<p>Aby więc odczytać informację o długości n należy odczytać długość sampla * liczbę kanałów * rządana długość, a
+następnie z odczytanych danych wziąć elemnty z określonego kanału. Na przykład dla trzek kanałów należy
+wziać co trzeci element.</p>
 </dd></dl>
 
 </div>

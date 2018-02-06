@@ -1,7 +1,7 @@
 import sys
 import sqlite3 as lite
 
-DB_NAME = 'speech_emotion_recognition'
+DB_NAME = 'speech_emotion_recognition.db'
 
 knn_train_db_table = 'knn_train_set'
 

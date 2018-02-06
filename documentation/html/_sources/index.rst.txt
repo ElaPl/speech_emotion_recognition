@@ -1,10 +1,10 @@
-.. Speech emotion recognition documentation master file, created by
-   sphinx-quickstart on Mon Jan 15 10:05:07 2018.
+.. Rozpoznawanie emocji z głosu documentation master file, created by
+   sphinx-quickstart on Tue Jan 23 23:26:37 2018.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Speech emotion recognition's documentation!
-======================================================
+Welcome to Rozpoznawanie emocji z głosu's documentation!
+========================================================
 
 .. toctree::
    :maxdepth: 2
