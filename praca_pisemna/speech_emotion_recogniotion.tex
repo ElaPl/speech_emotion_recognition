@@ -61,7 +61,7 @@ This document describes a program which was created as part of an engineering pr
 \section{Geneza projektu}
 Rozmowa jest najbardziej naturalnym sposobem wymiany informacji. Dzięki niej możemy przekazywać wiedzę, wyrażać uczucia i~wpływać na stan emocjonalny odbiorcy.  Jednak często ciężko jest ludziom wyrazić słowami myśli i~uczucia. Dlatego w~celu poprawy jakości oraz kontroli rozmowy, tak ważna jest umiejętność rozpoznawania komunikatów niewerbalnych. 
 
-Rozwój technologii umożliwił komunikację online. Coraz częściej ludzie do wymiany informacji używają telefonów lub komputerów. Jest to wygodny oraz szybki sposób prowadzenia konwersacji. Jednak komunikacja internetowa znacznie różni się od tej tradycyjnej. Pomimo że cel jest ten sam, to sposoby jego osiągnięcia bardzo się różnią. Podczas komunikacji tradycyjnej oprócz słów korzystamy z~gestów i~mimiki oraz widzimy reakcję osoby, z~którą rozmawiamy. Dzięki temu możemy przekazać i~odczytać więcej informacji. Te dodatkowe metody umożliwiają lepsze rozpoznanie stanu emocjonalnego i~intencji mówcy. Niestety, nie zawsze jest to możliwe podczas komunikacji internetowej. Rozpoznawanie emocji w~tym przypadku ogranicza się jedynie do interpretacji głosu, jego tonu, energii czy barwy. Złe zinterpretowanie tych sygnałów, często prowadzi do konfliktów. System, który umożliwiłby rozpoznawanie stanu emocjonalnego mówcy, ułatwiłby i~poprawiłby jakość komunikacji we współczesnym życiu. 
+Rozwój technologii umożliwił komunikację online. Coraz częściej ludzie do wymiany informacji używają telefonów lub komputerów. Jest to wygodny oraz szybki sposób prowadzenia konwersacji. Jednak komunikacja internetowa znacznie różni się od tej tradycyjnej. Pomimo że cel jest ten sam, to sposoby jego osiągnięcia bardzo się różnią. Podczas komunikacji tradycyjnej oprócz słów korzystamy z~gestów i~mimiki oraz widzimy reakcję osoby, z~którą rozmawiamy. Dzięki temu możemy przekazać i~odczytać więcej informacji. Te dodatkowe metody umożliwiają lepsze rozpoznanie stanu emocjonalnego i~intencji mówcy. Niestety, nie zawsze jest to możliwe podczas komunikacji internetowej. Rozpoznawanie emocji w~tym przypadku ogranicza się jedynie do interpretacji głosu, jego tonu, energii czy barwy. Złe zinterpretowanie tych sygnałów często prowadzi do konfliktów. System, który umożliwiłby rozpoznawanie stanu emocjonalnego mówcy, ułatwiłby i~poprawiłby jakość komunikacji we współczesnym życiu. 
 
 Elektronika jest coraz powszechniej wykorzystywana przez ludzi. Roboty pomagają znaleźć drogę, służą jako rozrywka oraz pomoc w~codziennych czynnościach. Coraz więcej czasu spędzamy przed ekranem urządzeń elektronicznych. Jednak maszyny nie wiedzą co czujemy. Umiejętność rozpoznawania przez urządzenia emocji na podstawie tylko głosu, znacznie zwiększyłaby jakość komunikacji człowiek-komputer. Maszyny na podstawie danych o stanie emocjonalnym człowieka, mogłyby dostosowywać swoje zachowanie do stanu odbiorcy i~tym samym wpływać na jego reakcje. Obecnie coraz powszechniejsze jest wykrywanie emocji z~mimiki twarzy. Powstają programy, które śledzą ruchy mięśni twarzy i na tej podstawie są w~stanie określić stan emocjonalny człowieka. Jednak dokładnie przetwarzanie obrazu wymaga dużej złożoności obliczeniowej oraz profesjonalnego sprzętu. Natomiast przetwarzanie dźwięku jest prostsze i~szybsze, dlatego nawet prosty sprzęt mógłby spełniać takie funkcje.
 
@@ -75,7 +75,7 @@ Za cechy odpowiadające emocjom zdecydowano wybrać cechy związane z~tonem pods
 \begin{enumerate}
 \item Analiza plików dźwiękowych w~formacie .wav
 \item Wydobycie z~fragmentów wypowiedzi i~obliczenie cech związanych z~tonem podstawowym oraz natężeniem dźwięku
-\item Zaimplementowanie algorytmu ,,k~najbliższych sąsiadów" dla problemu rozpoznawania emocji z~głosu.
+\item Zaimplementowanie algorytmu ,,k~najbliższych sąsiadów"~dla problemu rozpoznawania emocji z~głosu.
 \item Zaimplementowanie algorytmu bazującego na ukrytych modelach Markowa dla problemu rozpoznawania emocji z~głosu.
 \item Zaimplementowanie aplikacji, która korzystając z~tych algorytmów i~opierając się na bazie danych mowy emocjonalnej, potrafiłaby rozpoznawać emocje z~głosu.
 \item Porównanie działania i~wyników dwóch powyższych algorytmów w kontekście rozważanego problemu.
@@ -241,7 +241,7 @@ Ukryty model Markowa jest modelem zawierającym:
 \begin{itemize}
 \item stany, które tworzą łańcuch Markowa
 \item zbiór możliwych obserwacji
-\item macierz prawdopodobieństw przejść pomiędzy stanami $M$~($M_{ij}$~oznacza prawdopodobieństwo przejścia ze stanu $i$~do stanu $j$~)
+\item macierz prawdopodobieństw przejść pomiędzy stanami $M$~($M_{ij}$~oznacza prawdopodobieństwo przejścia ze stanu $i$~do stanu $j$)
 \item macierz emisji $E$~($E_{ij}$~oznacza prawdopodobieństwo emisji obserwacji $j$~w~stanie $i$)
 \end{itemize}
 
@@ -342,9 +342,9 @@ Projekt inżynierski opracowany w~tej pracy ma za zadanie rozpoznawać cztery po
 
 Projekt można rozwinąć. Możliwe usprawnienia:
 \begin{itemize}
-\item dodanie kolejnych cech dźwięku w celu przetestowania wpływu tych właściwości na poprawne rozpoznawanie emocji
-\item dodanie większej liczby emocji
-\item implementacja innych algorytmów w celu przetestowania ich działania w tym problemie
+\item dodanie kolejnych cech dźwięku w celu przetestowania wpływu tych właściwości na poprawne rozpoznawanie emocji,
+\item dodanie większej liczby emocji,
+\item implementacja innych algorytmów w celu przetestowania ich działania w tym problemie.
 \end{itemize}
 
 \listoffigures
