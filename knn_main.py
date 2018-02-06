@@ -33,7 +33,6 @@ def knn_main(train_path_pattern, test_path_pattern, db_name, emotions):
     :type emotions: list
     """
 
-
     con, cursor = connect_to_database(db_name)
     if (cursor is not None) and knn_db.is_training_set_exists(cursor, knn_db.KNN_DB_TABLES):
         training_set = knn_get_training_feature_set_from_db(cursor)
@@ -124,10 +123,10 @@ def knn_get_training_feature_set_from_dir(path_pattern, emotions):
     """Funkcja dla każdego z dla każdego zbioru cech pobiera wektor cech oraz emocję jaką reprezentuje
     z bazy danych na którą wskazuje cursor
 
-       :param: path_pattern: kursor na bazę danych
+   :param path_pattern: kursor na bazę danych
 
-       :return: Dla każdego zbioru cech lista [wektor cech , emocja]
-       :rtype: dictionary
+   :return: Dla każdego zbioru cech lista [wektor cech , emocja]
+   :rtype: dictionary
        """
     features_set = {}
     for feature in knn_features.keys():

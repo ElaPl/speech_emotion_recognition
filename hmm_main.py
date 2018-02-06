@@ -14,6 +14,7 @@ hmm_features = {
     },
 }
 
+
 def hmm_main(train_path_pattern, test_path_pattern, db_name, emotions):
     """Główna funkcja hmm. Dla każdego zestawu cech i kazdej emocji tworzy model HMM i trenuje go wektorami obserwacji
     pobranymi z bazie danych db_name jeżeli istnieją, lub w przeciwnym wypadku obliczonymi z plików znajdujacych sie w katalogu
@@ -174,7 +175,6 @@ def hmm_get_observations_vectors(file, min_max_features_vec, all_possible_observ
     observation_sequence_vec = {}
     for feature in hmm_features.keys():
         observation_sequence_vec[feature] = []
-        #biorę 1,5 sek wektory obserwacji wypowiedzi
         for i in range(len(normalized_observations[feature]) - 2*6 - 2):
             observation = [normalized_observations[feature][j + i] for j in range(0, 12, 2)]
             observation_sequence_vec[feature].append(observation)
@@ -296,6 +296,7 @@ def hmm_get_all_possible_observations(train_path_pattern, db_name, emotions):
             hmm_claster(feature_set[feature])
 
     return possible_observations, min_max_features
+
 
 def hmm_get_features_vectors_from_db(cursor):
     """Funkcja dla każdego z dla każdego zbioru cech pobiera wektor cech z bazy danych, którą wskazuje cursor

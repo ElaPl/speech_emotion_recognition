@@ -7,8 +7,9 @@ class HanningWindow:
     """
     def __init__(self, size):
         """
-        Funkcj tworzy okno Hanninga o podanym rozmiarze
-        :param size:
+        Funkcja tworzy okno Hanninga o podanym rozmiarze
+
+        :param size: rozmiar okna
         """
         self.hanning_window = []
         for i in range(0, size):
@@ -17,8 +18,10 @@ class HanningWindow:
     def plot(self, signal):
         """
         Funkcja przemnaża podany jako argument sygnał przez okno Hanninga
+
         :param signal: Fragment sygnału dźwiękowego
-        :return list: sygnał będący wynikiem przemnożenia podanego sygnału przez okno Hanninga
+
+        :return: sygnał będący wynikiem przemnożenia podanego sygnału przez okno Hanninga
         """
         windowing_signal = []
         for i in range(0, len(signal)):

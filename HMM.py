@@ -61,7 +61,8 @@ class HMM:
         numer z przedziału [0, len(observations)-1].
 
         :param list observations: lista obserwacji (wektorów cech)
-        :return słownik obserwacji
+
+        :return: słownik obserwacji
         """
         observation_dict = {}
         observation_id = 0
@@ -95,7 +96,7 @@ class HMM:
         """Funckcja dla każdej obseracji i każdego stanu tworzy tablicę prawodopodobieństw wyrzucenia obserwacji w
         danym stanie
 
-        :return matrix[state_num][observation_num]: macierz emisji prawdopodobieństw obserwacji
+        :return: matrix[state_num][observation_num] - macierz emisji prawdopodobieństw obserwacji
         """
 
         emission_ppb = numpy.zeros(shape=(self.hidden_states_num, self.observations_num))
@@ -108,7 +109,9 @@ class HMM:
     def create_initial_ppb(self, states_num):
         """Funkcja tworzy wektor prawdopodobieństw przejść ze stanu początkowe do każdego z ukrytych stanów
 
-        :return list[states_num] """
+        :param int states_num: liczba stanów modelu
+
+        :return: list[states_num] """
         initial_ppb = numpy.zeros(shape=states_num)
         for i in range(0, states_num):
             initial_ppb[i] = 1 / states_num
@@ -118,7 +121,7 @@ class HMM:
     def get_parameters(self):
         """Funkcja zwraca parametry obiektu
 
-        :return
+        :return:
             * transiton_ppb
             * emission_ppb
             * initial_ppb
@@ -131,7 +134,7 @@ class HMM:
 
         :param list observation_seq: sekwencja obserwacji
 
-        :return matrix[hidden_states_num][len(observation_seq)], matrix[i][t]
+        :return: matrix[hidden_states_num][len(observation_seq)], matrix[i][t]
 
         Opis algorytmu:
         Dane:
@@ -173,7 +176,7 @@ class HMM:
 
         :param list ob_sequence: sekwencja obserwacji
 
-        :return matrix[hidden_states_num][len(observation_seq)], matrix[i][t]
+        :return: matrix[hidden_states_num][len(observation_seq)], matrix[i][t]
 
             Opis algorytmu:
         Dane:
@@ -189,6 +192,7 @@ class HMM:
 
         * beta[i][n] = 1
         * beta[i][t] = [\sum_{j=1}^{k} (emission_ppb[j][y_t+1] * beta[j][t+1] * transition_ppb[i][j]]
+
         """
 
         observation_len = len(ob_sequence)
@@ -339,7 +343,6 @@ class HMM:
         observations_num = len(training_set)
         obs_seq_len = len(training_set[0])
 
-        # Ponieważ obseracje modelu są typu string, najpierw zamień każdą obserwację na string
         training_set_str = []
         if not isinstance(training_set[0][0], str):
             for obs_seq in training_set:
@@ -352,7 +355,6 @@ class HMM:
             old_likehood = sum(log(self.evaluate(obs)) for obs in training_set)
             old_likehood /= observations_num
 
-            # file: Training Hidden Markov Models with Multiple Observations – A Combinatorial Method
             self.baum_welch_algorithm(training_set_str, observations_num, obs_seq_len, laplance_smoothing)
 
             new_likehood = sum(log(self.evaluate(obs)) for obs in training_set)
@@ -362,10 +364,14 @@ class HMM:
             if reliability < .00001:
                 break
 
-    # Oblicza prawdopodobieństwo, żę dana sekwencja obserwacji została wyprodukowana przez ten model
     def evaluate(self, obs_sequence):
         """Funckcja oblicza prawdopodobieństwo, że dana sekwencja obserwacji została wyprodukowana przez ten model.
-        :param: list obs_sequence: lista obserwacji"""
+
+        :param list obs_sequence: lista obserwacji
+
+        :return: prawdopodobieństwo wygenerowania podanej sekwencji przez ten model
+        """
+
         if not isinstance(obs_sequence, str):
             obs_sequence_str = list(map(str, obs_sequence))
         else:

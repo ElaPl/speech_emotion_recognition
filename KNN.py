@@ -39,7 +39,7 @@ class KNN:
         :param vector test_vector: wektor, którego stan należy odgadnąć
         :param int num_num_of_nearest_neighbour: liczba najbliższych sąsiadów, z których należy wziąć stan do porównania.
 
-        :return lista stanów których wektory pojawiły sie najczęściej w grupie k najbliższych wektorów.
+        :return: lista stanów których wektory pojawiły sie najczęściej w grupie k najbliższych wektorów.
         """
         dist_table = []
         normalize_vector(test_vector, self.min_features, self.max_features)
@@ -70,7 +70,7 @@ class KNN:
             rozpoznać
         :param int num_num_of_nearest_neighbour: liczba najbliższych sąsiadów.
 
-        :return stany najczęściej występujące w podanej sekwencji obserwacji.
+        :return: stany najczęściej występujące w podanej sekwencji obserwacji.
         """
 
         if not isinstance(obs_sequence[0], list):

@@ -7,7 +7,9 @@ def show_subplot_histogram(file_set):
     """
     Funkcja wyświetla przebieg częstotliwości bazowych, oraz wartości natężenia dla każdego
     z plików podanych jako argument
+
     :param file_set: lista plików
+
     :return: None
     """
     if file_set:

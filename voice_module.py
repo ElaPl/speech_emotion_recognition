@@ -8,11 +8,11 @@ import struct
 def read_from_wav_file(wav_file, length):
     """Funkcja odczytuje z pliku wav określoną ilość próbek pochodzących z jednego kanału.
 
-    :param wav_file wskaźnik na plik wav
+    :param wav_file: wskaźnik na plik wav
     :param int length: liczba sampli jaką chcemy odczytać
 
-    :return list - lista sampli długości length, pochodzących z jednego kanału.
-
+    :return: lista sampli długości length, pochodzących z jednego kanału.
+    :rtype: list
     Opis:
 
     Sample w plikach wav z więcej niż jednym kanałem są ustawione naprzemiennie. Najpierw jest pierszy sampel kanału 1,
@@ -40,10 +40,12 @@ def get_feature_vectors(file):
     Z każdej próbki oblicza wektor cech częstotliwości i energii, tworząc wektory cech.
 
     :param str file: ścieżka do pliku z którego mają być wygenerowane wektory cech
-    :return
+
+    :return:
         * lista wektorów cech częstotliwości
         * lista wektorów cech energii
         * lista wektorów cech częstotliwości i energii
+    :rtype: dictionary
     """
 
 
@@ -98,8 +100,12 @@ def get_feature_vectors(file):
 
 def get_file_info(filename):
     """
+    Zwraca informacje o podanym pliku
+
     :param str filename: Ścieżka do pliku z rozszerzeniem wav
+
     :return: parametry pliku
+    :rtype: dictionary
     """
     try:
         wav_file = wave.open(filename, 'rb')
@@ -117,7 +123,9 @@ def get_sample_rate(filename):
     """
 
     :param str filename: Ścieżka do pliku z rozszerzeniem wav
+
     :return: częstotliwość samplowania
+    :rtype: int
     """
     try:
         wav_file = wave.open(filename, 'rb')
@@ -138,7 +146,9 @@ def get_fundamental_freq(freq_domain_vect, sample_rate, sample_length):
     :param vector freq_domain_vect: wektor reprezentujacy funkcję w domenie częstotliowści
     :param int sample_rate: częstotliwość próbkowania dźwięku z którego pochodzi funkcja
     :param int sample_length: długosć ramki z której została wygenerowana funkcja
-    :return float: wartość tonu podstawowego obliczonego z podanej funkcji
+
+    :return: wartość tonu podstawowego obliczonego z podanej funkcji
+    :rtype: float
     """
     max_magnitude = sqrt(np.power(np.real(freq_domain_vect[1]), 2) + np.power(np.imag(freq_domain_vect[1]), 2))
     max_magnitude_ind = 1
@@ -155,8 +165,11 @@ def get_fundamental_freq(freq_domain_vect, sample_rate, sample_length):
 def get_pitch_features(fundamental_freq_array):
     """
     Funkcja na podstawie podanej listy wartości tonów podstawowych oblicza wektor cech dla tych danych
+
     :param vector fundamental_freq_array: wektor częstotliowści bazowych
+
     :return: lista cech obliczonych na podstawie podanej jako argument funckji
+    :rtype: list
     """
 
     if len(fundamental_freq_array) == 0:
@@ -205,8 +218,11 @@ def get_pitch_features(fundamental_freq_array):
 def get_summary_pitch_feature_vector(pitch_feature_vectors):
     """
     Funkcja na podstawie danych oblicza wektor cech częstotliwośći bazowych
+
     :param pitch_feature_vectors: lista wektorów cech częstotliowśći bazowych
+
     :return: wektor cech
+    :rtype: list
     """
 
     pitch_feature_vectors_size = len(pitch_feature_vectors)
@@ -242,10 +258,13 @@ def get_summary_pitch_feature_vector(pitch_feature_vectors):
 
 def get_energy_feature_vector(sample, window):
     """
-        Funkcja na podstawie podanej listy amplitude w domenie czasu oblicza wektor cech dla tych danych
-        :param vector sample: lista zmian energii w domenie czasu
-        :param window: funkcja okna
-        :return: lista cech na podstawie wprowadzonych danych
+    Funkcja na podstawie podanej listy amplitude w domenie czasu oblicza wektor cech dla tych danych
+
+    :param vector sample: lista zmian energii w domenie czasu
+    :param window: funkcja okna
+
+    :return: lista cech na podstawie wprowadzonych danych
+    :rtype: list
     """
     time_domain_signal = window.plot(sample)
     time_domain_signal_len = len(time_domain_signal)
@@ -292,9 +311,12 @@ def get_energy_feature_vector(sample, window):
 
 def get_energy_history(file):
     """
-        Funkcja otwiera plik podany w ścieżce, oraz oblicza rozkłąd wartości nateżęnia w czasie w tym pliku.
-        :param str file: Ścieżka do pliku
-        :return: lista zawierająca wartości natężenia w czasie w podanym pliku
+    Funkcja otwiera plik podany w ścieżce, oraz oblicza rozkłąd wartości nateżęnia w czasie w tym pliku.
+
+    :param str file: Ścieżka do pliku
+
+    :return: lista zawierająca wartości natężenia w czasie w podanym pliku
+    :rtype: list
     """
 
     try:
@@ -325,6 +347,15 @@ def get_energy_history(file):
     return energy_history
 
 def compute_rms_db(time_domain_signal, window):
+    """Funkcja mnoży podany sygnał przez podene okno i oblicza średnią
+    wadratową wartości natężenia tego sygnału
+
+    :param list time_domain_singal: sygnał w domenie czasu
+    :param window: objekt reprezentujący funkcję okna.
+
+    :return: średnia kwadratowa wartości natężenia
+    :rtype: double
+    """
     time_domain_signal = window.plot(time_domain_signal)
     rms_db = 0
     for mag in time_domain_signal:
@@ -340,8 +371,10 @@ def get_freq_history(file):
     podstawowego
 
     :param str file: ścieżka do pliku z którego mają być wygenerowane wektory cech
-    :return
+
+    :return:
         * lista zawierająca wartości tonu podstawego w czasie w podanym pliku
+    :rtype: list
     """
 
 
@@ -380,7 +413,9 @@ def get_fundamental_freq_form_time_domain(sample, frame_length, window, frame_ra
     :param frame_length: Dłguosć ramki do fft
     :param window: Funkcja okna
     :param frame_rate: Czestotliwość samplowania
+
     :return: Lista czestotliwości bazowych
+    :rtype: list
     """
     fundamental_freq_array = []
     sample_len = len(sample)

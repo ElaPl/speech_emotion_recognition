@@ -80,11 +80,13 @@ HMM_DB_TABLES[hmm_observation_db_table]['insert'] = (
 
 def connect_to_database(db_name):
     """Funckja łączy się z bazą danych jako root
-    :param db_name nazwa bazy danych
+
+    :param db_name: nazwa bazy danych
     :type str
-    :param db_password hasło do bazy danych
+    :param db_password" hasło do bazy danych
     :type str
-    :return
+
+    :return:
         * db, cursor - jeżeli połączenie zostało nawiązane
         * None, None - w przeciwnym przypadku
     """
@@ -97,8 +99,14 @@ def connect_to_database(db_name):
         return None, None
 
 
-def prepare_db_table(db, cursor, table):
-    for name, ddl in table.items():
+def prepare_db_table(db, cursor, table_names):
+    """Tworzy w bazie danych tablice o podanych nazwach
+
+    :param db: obiekt połączenia, który reprezentuje bazę danych
+    :param cursor: kursor
+    :param list table_names: lista nazw tablic, do utworzenia
+    """
+    for name, ddl in table_names.items():
         try:
             cursor.execute("DROP TABLE IF EXISTS %s;" % name)
             db.commit()
@@ -110,6 +118,14 @@ def prepare_db_table(db, cursor, table):
 
 
 def is_training_set_exists(cursor, table):
+    """Funkcja sprawdza, czy wszystkie tablice podane w table istnieją.
+
+    :param cursor: kursor
+    :param dictionary table: tablica, której kluczami są nazwy tablic, których istnienie należy sprawdzić
+
+
+    :return True - jeżeli wszystkie tablice w table.kesy istnieją
+            False - w.p.p."""
     for name in table.keys():
         try:
             cursor.execute("SELECT * FROM %s;" % name)
@@ -124,6 +140,11 @@ def is_training_set_exists(cursor, table):
 
 
 def select_all_from_db(cursor, table_name):
+    """Funckja pobiera z bazy danych z tablicy table_name wszystkie wartości i zwraca w postaci listy wektorów.
+
+    :param cursor: kursonr
+    :param string table_name: Nazwa tablicy, z której mają być pobrane dane
+    """
     try:
         cursor.execute("SELECT * FROM %s;" % table_name)
     except lite.Error as e:
@@ -134,6 +155,13 @@ def select_all_from_db(cursor, table_name):
 
 
 def save_in_dbtable(db, cursor, vect, tbname):
+    """Funkcja zapisuje w bazie danych w tablicy tbname, wartości z wektora vect
+
+    :param db: obiekt połączenia, który reprezentuje bazę danych
+    :param cursor: kursor
+    :param vector vect: wektor który ma być zapisany w bazie danych
+    :param string tbname: nazwa tablicy w bazie danych, do ktorej mają być zapisane wartości z wektora
+    """
     try:
 
         if tbname == knn_train_db_table:
