@@ -23,7 +23,7 @@
 % zlamaniu wierszy w temacie pracy, zwlaszcza tego w jezyku pracy. Uzyj do tego
 % polecenia \fmlinebreak.
 \polishtitle    {Rozpoznawanie emocji z~głosu. \fmlinebreak Porównanie algorytmu k~najbliższych sąsiadów oraz \fmlinebreak algorytmu używającego ukrytych modeli Markowa w~problemie rozpoznawanie emocji z~głosu}
-\englishtitle   {Speech emotion recognition.\fmlinebreak Comparison of the operation of the ,,K nearest neighbors" algorithm and \fmlinebreak an algorithm using ,,hidden markov models" in the problem of recognizing emotions from voice}
+\englishtitle   {Speech emotion recognition.\fmlinebreak Comparison of the operation of the k nearest neighbors algorithm and \fmlinebreak an algorithm using hidden Markov models in the problem of recognizing emotions from voice}
 % w pracach wielu autorow nazwiska mozna oddzielic poleceniem \and
 \author         {Elżbieta Plaszczyk}
 % w przypadku kilku promotorow, lub koniecznosci podania ich afiliacji, linie
@@ -61,7 +61,7 @@ This document describes a program which was created as part of an engineering pr
 \section{Geneza projektu}
 Rozmowa jest najbardziej naturalnym sposobem wymiany informacji. Dzięki niej możemy przekazywać wiedzę, wyrażać uczucia i~wpływać na stan emocjonalny odbiorcy.  Jednak często ciężko jest ludziom wyrazić słowami myśli i~uczucia. Dlatego w~celu poprawy jakości oraz kontroli rozmowy, tak ważna jest umiejętność rozpoznawania komunikatów niewerbalnych. 
 
-Rozwój technologii umożliwił komunikację online. Coraz częściej ludzie do wymiany informacji używają telefonów lub komputerów. Jest to wygodny oraz szybki sposób prowadzenia konwersacji. Jednak komunikacja internetowa znacznie różni się od tej tradycyjnej. Pomimo że cel jest ten sam, to sposoby jego osiągnięcia bardzo sie różnią. Podczas komunikacji tradycyjnej oprócz słów korzystamy z~gestów i~mimiki oraz widzimy reakcję osoby, z~którą rozmawiamy. Dzięki temu możemy przekazać i~odczytać więcej informacji. Te dodatkowe metody umożliwiają lepsze rozpoznanie stanu emocjonalnego i~intencji mówcy. Niestety, nie zawsze jest to możliwe podczas komunikacji internetowej. Rozpoznawanie emocji w~tym przypadku ogranicza się jedynie do interpretacji głosu, jego tonu, energii czy barwy. Złe zinterpretowanie tych sygnałów, często prowadzi do konfliktów. System, który umożliwiłby rozpoznawanie stanu emocjonalnego mówcy, ułatwiłby i~poprawiłby jakość komunikacji we współczesnym życiu. 
+Rozwój technologii umożliwił komunikację online. Coraz częściej ludzie do wymiany informacji używają telefonów lub komputerów. Jest to wygodny oraz szybki sposób prowadzenia konwersacji. Jednak komunikacja internetowa znacznie różni się od tej tradycyjnej. Pomimo że cel jest ten sam, to sposoby jego osiągnięcia bardzo się różnią. Podczas komunikacji tradycyjnej oprócz słów korzystamy z~gestów i~mimiki oraz widzimy reakcję osoby, z~którą rozmawiamy. Dzięki temu możemy przekazać i~odczytać więcej informacji. Te dodatkowe metody umożliwiają lepsze rozpoznanie stanu emocjonalnego i~intencji mówcy. Niestety, nie zawsze jest to możliwe podczas komunikacji internetowej. Rozpoznawanie emocji w~tym przypadku ogranicza się jedynie do interpretacji głosu, jego tonu, energii czy barwy. Złe zinterpretowanie tych sygnałów, często prowadzi do konfliktów. System, który umożliwiłby rozpoznawanie stanu emocjonalnego mówcy, ułatwiłby i~poprawiłby jakość komunikacji we współczesnym życiu. 
 
 Elektronika jest coraz powszechniej wykorzystywana przez ludzi. Roboty pomagają znaleźć drogę, służą jako rozrywka oraz pomoc w~codziennych czynnościach. Coraz więcej czasu spędzamy przed ekranem urządzeń elektronicznych. Jednak maszyny nie wiedzą co czujemy. Umiejętność rozpoznawania przez urządzenia emocji na podstawie tylko głosu, znacznie zwiększyłaby jakość komunikacji człowiek-komputer. Maszyny na podstawie danych o stanie emocjonalnym człowieka, mogłyby dostosowywać swoje zachowanie do stanu odbiorcy i~tym samym wpływać na jego reakcje. Obecnie coraz powszechniejsze jest wykrywanie emocji z~mimiki twarzy. Powstają programy, które śledzą ruchy mięśni twarzy i na tej podstawie są w~stanie określić stan emocjonalny człowieka. Jednak dokładnie przetwarzanie obrazu wymaga dużej złożoności obliczeniowej oraz profesjonalnego sprzętu. Natomiast przetwarzanie dźwięku jest prostsze i~szybsze, dlatego nawet prosty sprzęt mógłby spełniać takie funkcje.
 
@@ -88,11 +88,11 @@ Wszystkie wymienione powyżej punkty, sposoby rozwiązania poszczególnych probl
 \section{Istniejące rozwiązania}
 Badania nad wykrywaniem zmian stanu emocjonalnego człowieka na podstawie cech głosu są coraz powszechniejsze. Przez ostatnich parę lat pojawiło się kilka prac na ten temat. 
 
-Przykładem jest praca\cite{sernn} opublikowana w 2016 roku, w~której autorzy opisują swoje badania na ten temat. Autorzy, używając konwolucyjnych sieci neuronowych oraz algorytmu piramid, stworzyli aplikację, która z~powodzeniem odczytuje emocje na podstawie fragmentów wypowiedzi. Do klasyfikacji emocji wykorzystują różne cechy dźwięku, takie jak MFCC czy cechy prozodyczne. Poprawność programu była zależna od bazy danych, na której przeprowadzili testy. Wynosiła ona od ok. 44\% dla jednej z wykorzystanych baz danych do nawet ok. 87\% dla innej.
+Przykładem jest praca~\cite{sernn} opublikowana w 2016 roku, w~której autorzy opisują swoje badania na ten temat. Autorzy, używając konwolucyjnych sieci neuronowych oraz algorytmu piramid, stworzyli aplikację, która z~powodzeniem odczytuje emocje na podstawie fragmentów wypowiedzi. Do klasyfikacji emocji wykorzystują różne cechy dźwięku, takie jak MFCC czy cechy prozodyczne. Poprawność programu była zależna od bazy danych, na której przeprowadzili testy. Wynosiła ona od ok. 44\% dla jednej z wykorzystanych baz danych do nawet ok. 87\% dla innej.
 
 Kolejnym algorytmem, jaki jest często wykorzystywany w~tym problemie jest SVM (Support Vector Machine). Autorzy opublikowanej w 2013 roku na konferencji KST (,,International Conference on Knowledge and Smart Technology") pracy~\cite{svn} pod tytułem: ,,Speech Emotion Recognition using Support Vector Machines” wykorzystują ten algorytm do problemu rozpoznawania emocji z~głosu. Używają cech głosu związanych z~tonem podstawowym, energią i~MFCC. Następnie testują wyniki na trzech różnych bazach danych. Poprawność wyników wynosi od 89,80\% dla niemieckiej bazy danych do nawet 98\% dla tajskiej bazy danych.
 
-Warto również wspomnieć o~projektcie stworzonym przez firmę Affetiva. Firma stworzyła aplikację, która za pomocą algorytów sztucznej inteligencji pozwala rozpoznawać emocję z głosu ,,Emotion API for Speech"~\cite{emo_api_speech}. Jednak aplikacja nie jest ogólno dostepna.
+Warto również wspomnieć o~projektcie stworzonym przez firmę Affectiva. Firma stworzyła aplikację ,,Emotion API for Speech", która za pomocą algorytów sztucznej inteligencji pozwala rozpoznawać emocję z głosu~\cite{emo_api_speech}. Jednak aplikacja nie jest ogólno dostepna.
 
 \section{Porównianie projektu z istniejącymi rozwiązaniami}
 Istniejące rozwiązania bazują na dużej ilości cech dźwięku użytych w~celu rozpoznawania dużej ilości emocji.
@@ -123,12 +123,12 @@ W dalszej części rozdziału opisana jest każda z~tych faz. Rysunki ~\ref{ser_
 Formalnie fala dźwiękowa to rozchodzące się w ośrodku zaburzenie, któremu towarzyszą drgania cząsteczek ośrodka i~która powoduje wrażenie słuchowe~\cite{Akustyka}. Fale mają pewne fundamentalne cechy jak:
 \begin{enumerate}
 \item Długość fali -- odległość pomiędzy początkiem a~końcem jednego pełnego cyklu.
-\item Amplituda -- poziom wychylenia z~położenia równowagi. Amplituda fali akustyczne mierzona jest na 2 sposoby:
+\item Amplituda -- poziom wychylenia z~położenia równowagi. Amplituda fali akustycznej mierzona jest na 2 sposoby:
 	\begin{itemize}
 	\item maksymalne wychylenie -- maksymalny pozytywny lub negatywny poziom sygnału,
 	\item średnia kwadratowa (RMS) -- która mierzy bardziej znaczący średni poziom sygnału.
 	\end{itemize}
-\item Częstotliwość -- czyli liczba pełnych drgań (cykli), jakie wykona fala w~ciągu jednej jednostki czasu (np. sekundy). Jej jednostką jest Herc(Hz).
+\item Częstotliwość -- czyli liczba pełnych drgań (cykli), jakie wykona fala w~ciągu jednej jednostki czasu (np. sekundy). Jej jednostką jest herc(Hz).
 \end{enumerate}
 
 Drganie fałd głosowych podczas wydechu powoduje wibracje, tworząc fale dźwiękowe. Następnie na skutek różnych procesów, takich jak ruchy języka, podniebienia, szczęk nabierają one specyficznych właściwości, tworząc wrażenie słuchowe nazywane głosem. Podstawowe cechy głosu to: barwa głosu, jego wysokość, oraz natężenie.
@@ -216,38 +216,38 @@ Znormalizowany wektor cech podajemy jako argumenty do klasyfikatora. Jeżeli wek
 K najbliższych sąsiadów (KNN) jest algorytmem często wykorzystywanym w~informatyce do klasyfikacji lub przewidywania wartości zmiennej losowej.  
 
 W~pracy posłużono się algorytmem KNN opisanym w~podręczniku do statystyki stworzonym przez firmę StatSoft~\cite{KNN_Wstep}.
-Algorytm w~trakcie trenowania nie przeprowadza żadnych obliczeń. Jedynie zapamiętuje zbiór wektorów trenujących $T$ w~postaci [$X_i$, $Y_i$], gdzie $X_i$~oznacza $i-tą$~obserwację, natomiast $Y_i$ przewidywaną zmienną $i$-tej obserwacji.
+Algorytm w~trakcie trenowania nie przeprowadza żadnych obliczeń. Jedynie zapamiętuje zbiór wektorów trenujących $T$ w~postaci [$X_i$, $Y_i$], gdzie $X_i$~oznacza $i$-tą~obserwację, natomiast $Y_i$ przewidywaną zmienną $i$-tej obserwacji.
 
-Podczas testowania podana jest obserwacja $O$~. Celem algorytmu jest prognoza przewidywanej wartości tej obserwacji. W~tym celu algorytm:
+Podczas testowania podana jest obserwacja $O$. Celem algorytmu jest prognoza przewidywanej wartości tej obserwacji. W~tym celu algorytm:
 \begin{enumerate}
 \item oblicza odległość pomiędzy $O$~a~każdą z~obserwacji ze zbioru trenującego;
-\item tworzy zbiór $O\textprime$~, w~którego skład wchodzi $k$~najbliżej położonych od niego obserwacji ze zbioru trenującego;
+\item tworzy zbiór $O\textprime$, w~którego skład wchodzi $k$~najbliżej położonych od niego obserwacji ze zbioru trenującego;
 \item przeprowadza głosowanie wśród elementów ze zbioru $O\textprime$~i~obserwacji $O$~przypisuje element, który wystąpił największą ilość razy.
 \end{enumerate}
 
 \section{Implementacja}
 W części trenującej program tworzy moduł KNN i~podaje mu zbiór wektorów w postaci [wektor cech, emocja jaką reprezentuje]. Moduł KNN normalizuje wektory ze zbioru, zapamiętuje je oraz parametry użyte do normalizacji.
 
-W części testującej program podaje modułowi KNN zbiór wektorów cech $V$~wypowiedzi. Algorytm KNN najpierw dla każdego wektora $w \in V$ normalizuje $w$~wartościami użytymi do normalizacji zbioru trenującego, a~następnie przeprowadza algorytm testowania opisany na początku tego rozdziału. Jako emocję reprezentującą wypowiedź algorytm zwraca emocję, która została najczęsciej przypisana wektorom ze zbioru $V$~. Jeżeli więcej niż jedna emocja wystąpiła najczęściej, zwracana jest losowa z~nich.  
+W części testującej program podaje modułowi KNN zbiór wektorów cech $V$~wypowiedzi. Algorytm KNN najpierw dla każdego wektora $w \in V$ normalizuje $w$~wartościami użytymi do normalizacji zbioru trenującego, a~następnie przeprowadza algorytm testowania opisany na początku tego rozdziału. Jako emocję reprezentującą wypowiedź algorytm zwraca emocję, która została najczęsciej przypisana wektorom ze zbioru $V$. Jeżeli więcej niż jedna emocja wystąpiła najczęściej, zwracana jest losowa z~nich.  
 
 \chapter{Ukryte Modele Markowa}
 \section{Opis modelu}
 Ukryte modele Markowa (HMM) to narzędzie służące do statystycznej analizy sekwencji zdarzeń. Aby zrozumieć ten model, należy zacząć od 
 definicji łańcucha Markowa.
 
-Łańcuch Markowa jest modelem składającym się ze zbioru stanów $S$~oraz macierzy $M$~, zawierającej prawdopodobieństwa przejść pomiędzy stanami. Opisuje układ, który w danym momencie czasu może znajdować się tylko w jednym ze swoich stanów, a~w~następnym przejść do innego lub pozostać w~swoim z~prawdopodobieństwem zapisanym w macierzy $M$~. Cechą charakterystyczną dla łańcucha Markowa jest to, że zachowuje on własność Markowa, która mówi, że w czasie $t+1$~prawdopodobieństwo bycia w stanie $j$~zależy jedynie od stanu w~jakim układ znajdował się w~czasie $t$~.
+Łańcuch Markowa jest modelem składającym się ze zbioru stanów $S$~oraz macierzy $M$, zawierającej prawdopodobieństwa przejść pomiędzy stanami. Opisuje układ, który w danym momencie czasu może znajdować się tylko w jednym ze swoich stanów, a~w~następnym przejść do innego lub pozostać w~swoim z~prawdopodobieństwem zapisanym w macierzy $M$. Cechą charakterystyczną dla łańcucha Markowa jest to, że zachowuje on własność Markowa, która mówi, że w czasie $t+1$~prawdopodobieństwo bycia w stanie $j$~zależy jedynie od stanu w~jakim układ znajdował się w~czasie $t$.
 
 Ukryty model Markowa jest modelem zawierającym:
 \begin{itemize}
 \item stany, które tworzą łańcuch Markowa
 \item zbiór możliwych obserwacji
 \item macierz prawdopodobieństw przejść pomiędzy stanami $M$~($M_{ij}$~oznacza prawdopodobieństwo przejścia ze stanu $i$~do stanu $j$~)
-\item macierz emisji $E$~($E_{ij}$~oznacza prawdopodobieństwo emisji obserwacji $j$~w~stanie $i$~)
+\item macierz emisji $E$~($E_{ij}$~oznacza prawdopodobieństwo emisji obserwacji $j$~w~stanie $i$)
 \end{itemize}
 
 Ukryte Modele Markowa zakładają, że stany tworzące łańcuch Markowa są ukryte. Widoczna jest tylko obserwacja jaką stan zwróci. Na tej podstawie i~mając dane z tablicy emisji oraz przejść, HMM jest w stanie obliczyć prawdopodobną sekwencję stanów, która wyrzuciła dany wektor obserwacji oraz prawdopodobieństwo wygenerowania obserwacji w modelu.
 
-W projekcie wykorzystano liniowy model HMM~\cite[Chapter~8.1]{HMM_pattern}. Charakteryzuje on się tym, że w czasie $t$~, ze stanu $s_{i}$~możemy przejść do stanu $s_{i+1}$~lub pozostać w stanie $s_{i}$~, z pewnym prawdopodobieństwem. Prawdopodobieństwo przejścia do pozostałych stanów jest zerowe. Do trenowania ukrytych modeli Markowa wykorzystano algorytm Bauma-Welcha, natomiast w~celu obliczenia prawdopodobieństwa wygenerowania obserwacji przez model wykorzystano algorytm prefiksowy. Definicje i~dokładny opis algorytmów można znaleźć w pracy ,,Wstęp do ukrytych modeli Markowa i~metody Bauma–Welcha"~\cite{HMM_Wstep}
+W projekcie wykorzystano liniowy model HMM~\cite[Chapter~8.1]{HMM_pattern}. Charakteryzuje on się tym, że w czasie $t$, ze stanu $s_{i}$~możemy przejść do stanu $s_{i+1}$~lub pozostać w stanie $s_{i}$, z pewnym prawdopodobieństwem. Prawdopodobieństwo przejścia do pozostałych stanów jest zerowe. Do trenowania ukrytych modeli Markowa wykorzystano algorytm Bauma-Welcha, natomiast w~celu obliczenia prawdopodobieństwa wygenerowania obserwacji przez model wykorzystano algorytm prefiksowy. Definicje i~dokładny opis algorytmów można znaleźć w pracy ,,Wstęp do ukrytych modeli Markowa i~metody Bauma–Welcha"~\cite{HMM_Wstep}.
 
 \section{Implementacja}
 W pierwszej fazie program tworzy zbiór wszystkich możliwych obserwacji. W~tym celu, z~każdego pliku w~zbiorze trenującym pobiera wektory cech. Kolejnym etapem jest normalizacja stworzonego zbioru wektorów. W~celu zmniejszenia liczby obserwacji i~uśrednienia ich program używa algorytmu k-średnich, o~nazwie KMeans z~biblioteki sklearn~\cite{sklearn}. Algorytm tworzy podaną ilość możliwych obserwacji.
@@ -260,11 +260,11 @@ W~części trenującej program dla każdej emocji i~każdego pliku trenującego 
 	\includegraphics[scale=0.35]{hmm_train.png}
 \end{figure}
 
-Podczas testowania z~pliku będącego wypowiedzią, algorytm oblicza zbiór obserwacji $O$~. Każdy z~elementów obserwacji reprezentuje zbiór 6 wektorów cech będących sekwencją 1,5-sekundowej wypowiedzi. Kolejnym krokiem jest normalizacja każdej obserwacji, wartościami, którymi był normalizowany zbiór wszystkich możliwych wartości. Każdy ze znormalizowanych wektorów cech zostaje zamieniony na najbliższy mu wektor ze zbioru obserwacji, tworząc zbiór $S$~. Dzięki temu model HMM będzie je rozpoznawał. Następnie, program dla każdej obserwacji ze zbioru $S$~i~każdego modelu HMM, wylicza prawdopodobieństwo wygenerowania tej obserwacji w~tym modelu. Jako emocję, która odpowiada tej obserwacji wybiera tą, która reprezenutje model HMM, który wyliczył największe prawdopodobieństwo jej wygenerowania. Jako emocję reprezentujacą wypowiedź algorytm zwraca emocję, która po przejściu wszystkich obserwacji ze zbioru $O$~wystąpiła najcześciej. Jeżeli więcej niż jedna emocja wystąpiła najczęściej, zwracana jest losowa z~nich.
+Podczas testowania z~pliku będącego wypowiedzią, algorytm oblicza zbiór obserwacji $O$. Każdy z~elementów obserwacji reprezentuje zbiór 6 wektorów cech będących sekwencją 1,5-sekundowej wypowiedzi. Kolejnym krokiem jest normalizacja każdej obserwacji, wartościami, którymi był normalizowany zbiór wszystkich możliwych wartości. Każdy ze znormalizowanych wektorów cech zostaje zamieniony na najbliższy mu wektor ze zbioru obserwacji, tworząc zbiór $S$. Dzięki temu model HMM będzie je rozpoznawał. Następnie, program dla każdej obserwacji ze zbioru $S$~i~każdego modelu HMM, wylicza prawdopodobieństwo wygenerowania tej obserwacji w~tym modelu. Jako emocję, która odpowiada tej obserwacji wybiera tą, która reprezenutje model HMM, który wyliczył największe prawdopodobieństwo jej wygenerowania. Jako emocję reprezentujacą wypowiedź algorytm zwraca emocję, która po przejściu wszystkich obserwacji ze zbioru $O$~wystąpiła najcześciej. Jeżeli więcej niż jedna emocja wystąpiła najczęściej, zwracana jest losowa z~nich.
 
 \chapter{Wyniki}
 \section{Baza danych mowy emocjonalnej}
-W~celu przetestowania algorytmów użyto niemieckiej bazy mowy emocjonalnej ~\cite{BDemo}. Wybrano właśnie tę bazę danych, ponieważ jest ona publicznie dostępna oraz w~istniejących rozwiązaniach, testy na tej bazie danych charakteryzowały się dużą poprawnością. Ponadto baza zawiera wszystkie 4 emocje, na których skupia się ten projekt.
+W~celu przetestowania algorytmów użyto niemieckiej bazy mowy emocjonalnej~\cite{BDemo}. Wybrano właśnie tę bazę danych, ponieważ jest ona publicznie dostępna oraz w~istniejących rozwiązaniach, testy na tej bazie danych charakteryzowały się dużą poprawnością. Ponadto baza zawiera wszystkie 4 emocje, na których skupia się ten projekt.
 
 \section{Wyniki}
 W algorytmie KNN, najlepszy wynik został wygenerowany przy liczbie stanów równej 17. Wyniki prezentuje tabela~\ref{KNN_result}.
@@ -331,7 +331,7 @@ Oba wyniki mają podobne cechy. Mylą szczęście ze złością oraz znudzenie z
 
 Z powyższej tabeli można odczytać, że średnie wartości cech w~emocjach, które algorytmy mylą są bardzo podobne. Przez to szczęście często mylone jest ze złością, która cechuje się niewiele większymi parametrami i~nachodzi na tę emocję. Podobnie jest w przypadku znudzenia i~smutku. 
 
-Pomimo podobieństw widać, że algorytmy całkiem dobrze poradziły sobie z zadaniem. Cechy, które w projekcie użyto nie wystarczą do dokładnego rozpoznawania emocji z~głosu, ale nadają sie do rozpoznawania podstawowych emocji, zmian stanu z pobudzonego na spokojny i~wiele innych. Wynik działania algorytmu można poprawić dodajac dodatkowe cechy na przykład na cechy związane z~: jakością głosu (prędkość mówienia, płynność) lub cechy spektralne MFCC, LFPC. 
+Pomimo podobieństw widać, że algorytmy całkiem dobrze poradziły sobie z zadaniem. Cechy, które w projekcie użyto nie wystarczą do dokładnego rozpoznawania emocji z~głosu, ale nadają sie do rozpoznawania podstawowych emocji, zmian stanu z pobudzonego na spokojny i~wiele innych. Wynik działania algorytmu można poprawić dodajac dodatkowe cechy na przykład na cechy związane z: jakością głosu (prędkość mówienia, płynność) lub cechy spektralne MFCC, LFPC. 
 
 \chapter{Wnioski i podsumowanie}
 Algorytm k najbliższych sąsiadów poradził sobie lepiej z~tym problemem. Jednakże różnica jest niewielka. Poprawność wyników, jakie zwróciły oba algorytmy, wynosi ponad 60\%. Jednak algorytm KNN jest prostszy do zaimplementowania oraz czas działania tego algorytmu jest szybszy. Także biorąc pod uwagę również te cechy, spisuje się o~wiele lepiej.
